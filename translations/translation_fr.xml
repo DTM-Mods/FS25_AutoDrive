@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="Dans un silo couloir ou sur un tas : traverser lentement pour répartir le chargement, ou rester immobile au premier endroit possible (avance un peu quand le tas est plein)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Traverser" />
 		<text name="gui_ad_groundUnload_still"							 text="Rester immobile" />
+		<text name="gui_ad_unloaderEscape"							 text="Se dégager si bloqué" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Benne de transfert : bloquée contre un autre véhicule, ou arrêtée devant une moissonneuse conduite par un ouvrier, elle traverse les véhicules jusqu'au bord du champ le plus proche et réactive ses collisions une fois dégagée" />
+		<text name="AD_escape_harvester"							 text="gêne la moissonneuse : traverse jusqu'au bord du champ" />
+		<text name="AD_escape_stuck"							 text="est bloqué contre un véhicule : traverse jusqu'au bord du champ" />
+		<text name="AD_task_escape"							 text="Se dégage vers le bord du champ" />
 		<text name="AD_routeCheck_loose"								 text="Point de passage isolé sans aucune connexion" />
 		<text name="AD_routeCheck_deadEnd"							 text="Impasse : aucun chemin à partir de ce point de passage" />
 		<text name="AD_routeCheck_trap"								 text="Piège à sens unique : %s points de passage où l'on peut entrer mais d'où l'on ne peut pas sortir" />

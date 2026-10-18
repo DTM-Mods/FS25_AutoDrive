@@ -427,6 +427,19 @@ AutoDrive.settings.parkInField = {
     isCopyPaste = true
 }
 
+-- Overdrive: a combine unloader blocked by / blocking a vehicle drives through to the field edge (ADUnloaderEscape)
+AutoDrive.settings.unloaderEscape = {
+    values = {false, true},
+    texts = {"gui_ad_no", "gui_ad_yes"},
+    default = 1,
+    current = 1,
+    text = "gui_ad_unloaderEscape",
+    tooltip = "gui_ad_unloaderEscape_tooltip",
+    translate = true,
+    isVehicleSpecific = true,
+    isCopyPaste = true
+}
+
 AutoDrive.settings.unloadFillLevel = {
     values = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.90, 0.95, 0.99, 1},
     texts = {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "85%", "90%", "95%", "99%", "100%"},

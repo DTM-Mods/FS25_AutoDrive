@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="In een sleufsilo of op een hoop: langzaam doorrijden om de lading te verdelen, of stilstaan op de eerste plek waar het kan (rijdt een stukje door als de hoop vol is)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Doorrijden" />
 		<text name="gui_ad_groundUnload_still"							 text="Stilstaan" />
+		<text name="gui_ad_unloaderEscape"							 text="Vrijrijden bij blokkade" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Overlaadwagen: als hij vastzit tegen een ander voertuig, of stilstaat voor een maaidorser met helper, rijdt hij door voertuigen heen naar de dichtstbijzijnde veldrand en zet zijn botsingen weer aan zodra hij vrij is" />
+		<text name="AD_escape_harvester"							 text="staat de maaidorser in de weg: rijdt door naar de veldrand" />
+		<text name="AD_escape_stuck"							 text="zit vast tegen een voertuig: rijdt door naar de veldrand" />
+		<text name="AD_task_escape"							 text="Rijdt vrij naar de veldrand" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />

@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="在青贮窖或料堆：慢慢驶过以铺开货物，或停在第一个可卸货的位置（料堆满了会稍微往前开）" />
 		<text name="gui_ad_groundUnload_drive"							 text="驶过" />
 		<text name="gui_ad_groundUnload_still"							 text="原地停住" />
+		<text name="gui_ad_unloaderEscape"							 text="受阻时驶离" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="运粮车：卡在其他车辆上，或停在由帮手驾驶的收割机前方时，会穿过车辆开到最近的田地边缘，离开后重新开启碰撞" />
+		<text name="AD_escape_harvester"							 text="挡住了收割机：穿行到田地边缘" />
+		<text name="AD_escape_stuck"							 text="被车辆卡住：穿行到田地边缘" />
+		<text name="AD_task_escape"							 text="驶向田地边缘" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

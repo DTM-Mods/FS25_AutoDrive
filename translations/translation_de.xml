@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="Im Fahrsilo oder auf einem Haufen: langsam durchfahren, um die Ladung zu verteilen, oder an der ersten möglichen Stelle stehen bleiben (fährt ein Stück weiter, wenn der Haufen voll ist)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Durchfahren" />
 		<text name="gui_ad_groundUnload_still"							 text="Stehen bleiben" />
+		<text name="gui_ad_unloaderEscape"							 text="Bei Blockade freifahren" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Überladefahrzeug: wenn es an einem anderen Fahrzeug festhängt oder vor einem Drescher mit Helfer steht, fährt es durch Fahrzeuge hindurch zum nächsten Feldrand und schaltet seine Kollisionen wieder ein, sobald es frei ist" />
+		<text name="AD_escape_harvester"							 text="steht dem Drescher im Weg: fährt durch zum Feldrand" />
+		<text name="AD_escape_stuck"							 text="hängt an einem Fahrzeug fest: fährt durch zum Feldrand" />
+		<text name="AD_task_escape"							 text="Fährt frei zum Feldrand" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />

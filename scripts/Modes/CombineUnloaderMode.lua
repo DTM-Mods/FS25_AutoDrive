@@ -13,6 +13,8 @@ CombineUnloaderMode.STATE_ACTIVE_UNLOAD_COMBINE = {}
 CombineUnloaderMode.STATE_FOLLOW_CURRENT_UNLOADER = {}
 CombineUnloaderMode.STATE_EXIT_FIELD = {}
 CombineUnloaderMode.STATE_REVERSE_FROM_BAD_LOCATION = {}
+-- Overdrive: drive clear when blocked (ADUnloaderEscape)
+CombineUnloaderMode.STATE_ESCAPE = {}
 
 CombineUnloaderMode.MAX_COMBINE_FILLLEVEL_CHASING = 101
 CombineUnloaderMode.STATIC_X_OFFSET_FROM_HEADER = 0
@@ -75,7 +77,12 @@ function CombineUnloaderMode:monitorTasks(dt)
         self:leaveBreadCrumbs()
     end
     --We are stuck
-    if self.failedPathFinder >= 5 or ((self.vehicle.ad.specialDrivingModule:shouldStopMotor() or self.vehicle.ad.specialDrivingModule.stoppedTimer:done()) and self.vehicle.ad.specialDrivingModule.isBlocked) then
+    local isStuck = self.failedPathFinder >= 5 or ((self.vehicle.ad.specialDrivingModule:shouldStopMotor() or self.vehicle.ad.specialDrivingModule.stoppedTimer:done()) and self.vehicle.ad.specialDrivingModule.isBlocked)
+    -- Overdrive: blocked by or blocking a vehicle: drive through to the field edge instead of reversing (vehicle setting)
+    if ADUnloaderEscape.monitor(self, dt, isStuck) then
+        return
+    end
+    if isStuck then
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:monitorTasks() - detected stuck vehicle - try reversing out of it now")
         self.vehicle.ad.specialDrivingModule:releaseVehicle()
         self.vehicle.ad.taskModule:abortAllTasks()
@@ -234,7 +241,7 @@ function CombineUnloaderMode:getNextTask()
         self.state = self.STATE_ACTIVE_UNLOAD_COMBINE
         self.breadCrumbs = Queue:new()
         self.lastBreadCrumb = nil
-    elseif self.state == self.STATE_DRIVE_TO_PIPE or self.state == self.STATE_REVERSE_FROM_BAD_LOCATION then
+    elseif self.state == self.STATE_DRIVE_TO_PIPE or self.state == self.STATE_REVERSE_FROM_BAD_LOCATION or self.state == self.STATE_ESCAPE then
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_DRIVE_TO_PIPE | STATE_REVERSE_FROM_BAD_LOCATION")
         --Drive to pipe can be finished when combine is emptied or when vehicle has reached 'old' pipe position and should switch to active mode
         nextTask = self:getTaskAfterUnload(filledToUnload)

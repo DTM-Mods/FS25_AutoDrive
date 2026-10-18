@@ -730,6 +730,7 @@ function AutoDrive:update(dt)
 		ADUnloadManager:update(dt)
 		ADWorkSchedule:update(dt)
 		ADStatistics:update(dt)
+		ADUnloaderEscape:update(dt)
 	end
 
 	ADMessagesManager:update(dt)

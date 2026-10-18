@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="Silaj çukurunda veya yığında: yükü yaymak için yavaşça geç, ya da boşaltabileceği ilk yerde dur (yığın dolunca biraz ilerler)" />
 		<text name="gui_ad_groundUnload_drive"							 text="İçinden geç" />
 		<text name="gui_ad_groundUnload_still"							 text="Yerinde dur" />
+		<text name="gui_ad_unloaderEscape"							 text="Engellenince kurtul" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Aktarma aracı: başka bir araca takılırsa veya yardımcının sürdüğü bir biçerdöverin önünde durursa, araçların içinden en yakın tarla kenarına gider ve açıldığında çarpışmaları yeniden açar" />
+		<text name="AD_escape_harvester"							 text="biçerdöverin yolunu kesiyor: tarla kenarına geçiyor" />
+		<text name="AD_escape_stuck"							 text="bir araca takıldı: tarla kenarına geçiyor" />
+		<text name="AD_task_escape"							 text="Tarla kenarına çıkıyor" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />

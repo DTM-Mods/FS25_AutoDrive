@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="In un silo a trincea o su un cumulo: attraversare lentamente per distribuire il carico, o restare fermo nel primo punto possibile (avanza un po' quando il cumulo è pieno)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Attraversa" />
 		<text name="gui_ad_groundUnload_still"							 text="Resta fermo" />
+		<text name="gui_ad_unloaderEscape"							 text="Liberarsi se bloccato" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Scaricatore: se resta bloccato contro un altro veicolo, o fermo davanti a una mietitrebbia guidata da un aiutante, attraversa i veicoli fino al bordo del campo più vicino e riattiva le collisioni quando è libero" />
+		<text name="AD_escape_harvester"							 text="intralcia la mietitrebbia: attraversa fino al bordo del campo" />
+		<text name="AD_escape_stuck"							 text="è bloccato contro un veicolo: attraversa fino al bordo del campo" />
+		<text name="AD_task_escape"							 text="Si libera verso il bordo del campo" />
 		<text name="AD_routeCheck_loose"								 text="Nodo isolato senza alcun collegamento" />
 		<text name="AD_routeCheck_deadEnd"							 text="Vicolo cieco: nessuna via per proseguire da questo nodo" />
 		<text name="AD_routeCheck_trap"								 text="Trappola a senso unico: %s nodi in cui si può entrare ma da cui non si può uscire" />

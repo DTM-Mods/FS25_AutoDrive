@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="Silóárokban vagy kupacra: lassan áthajt, hogy elterítse a rakományt, vagy megáll az első lehetséges helyen (kicsit továbbmegy, ha a kupac megtelt)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Áthajtás" />
 		<text name="gui_ad_groundUnload_still"							 text="Megállás" />
+		<text name="gui_ad_unloaderEscape"							 text="Kiállás elakadáskor" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Átrakó: ha elakad egy másik járműben, vagy egy segítő által vezetett kombájn előtt áll, áthajt a járműveken a legközelebbi táblaszélig, és amint szabad, visszakapcsolja az ütközéseit" />
+		<text name="AD_escape_harvester"							 text="a kombájn útjában áll: áthajt a táblaszélig" />
+		<text name="AD_escape_stuck"							 text="elakadt egy járműben: áthajt a táblaszélig" />
+		<text name="AD_task_escape"							 text="Kiáll a táblaszélre" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

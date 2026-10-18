@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="Em um silo trincheira ou monte: atravessar devagar para espalhar a carga, ou ficar parado no primeiro lugar possível (avança um pouco quando o monte está cheio)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Atravessar" />
 		<text name="gui_ad_groundUnload_still"							 text="Ficar parado" />
+		<text name="gui_ad_unloaderEscape"							 text="Liberar quando bloqueado" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Descarregador: quando fica preso em outro veículo, ou parado na frente de uma colheitadeira com ajudante, atravessa os veículos até a borda do campo mais próxima e religa as colisões quando estiver livre" />
+		<text name="AD_escape_harvester"							 text="está no caminho da colheitadeira: atravessa até a borda do campo" />
+		<text name="AD_escape_stuck"							 text="está preso em um veículo: atravessa até a borda do campo" />
+		<text name="AD_task_escape"							 text="Indo para a borda do campo" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />

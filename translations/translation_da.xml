@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="I en plansilo eller på en bunke: kør langsomt igennem for at fordele læsset, eller hold stille på det første mulige sted (kører lidt videre, når bunken er fuld)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Kør igennem" />
 		<text name="gui_ad_groundUnload_still"							 text="Hold stille" />
+		<text name="gui_ad_unloaderEscape"							 text="Kør fri ved blokering" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Overlæsser: når den sidder fast mod et andet køretøj, eller holder foran en mejetærsker med hjælper, kører den gennem køretøjer til nærmeste markkant og slår kollisioner til igen, når den er fri" />
+		<text name="AD_escape_harvester"							 text="står i vejen for mejetærskeren: kører igennem til markkanten" />
+		<text name="AD_escape_stuck"							 text="sidder fast mod et køretøj: kører igennem til markkanten" />
+		<text name="AD_task_escape"							 text="Kører fri til markkanten" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

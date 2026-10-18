@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="En un silo búnker o un montón: atravesar despacio para repartir la carga, o quedarse quieto en el primer sitio posible (avanza un poco cuando el montón está lleno)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Atravesar" />
 		<text name="gui_ad_groundUnload_still"							 text="Quedarse quieto" />
+		<text name="gui_ad_unloaderEscape"							 text="Liberarse si está bloqueado" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Descargador: si se queda atascado contra otro vehículo, o parado delante de una cosechadora con ayudante, atraviesa los vehículos hasta el borde del campo más cercano y vuelve a activar las colisiones cuando está libre" />
+		<text name="AD_escape_harvester"							 text="estorba a la cosechadora: atraviesa hasta el borde del campo" />
+		<text name="AD_escape_stuck"							 text="está atascado contra un vehículo: atraviesa hasta el borde del campo" />
+		<text name="AD_task_escape"							 text="Saliendo al borde del campo" />
 		<text name="AD_routeCheck_loose"								 text="Punto de ruta suelto sin ninguna conexión" />
 		<text name="AD_routeCheck_deadEnd"							 text="Callejón sin salida: no hay forma de seguir desde este punto de ruta" />
 		<text name="AD_routeCheck_trap"								 text="Trampa de sentido único: %s puntos de ruta en los que se puede entrar pero no salir" />

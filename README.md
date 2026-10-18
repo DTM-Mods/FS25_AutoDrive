@@ -135,6 +135,13 @@ New vehicle setting **Best price unloading**, for pickup and deliver and for unl
 
 The vehicle's own tanks (diesel, DEF, ...) are never counted as load. A stop is done when the selling point takes nothing more, so a vehicle never waits forever for a product the point does not buy. It needs "use folders", does nothing while target rotation for unloading is on, and the target must be in a folder, not in "All".
 
+### Drive clear when blocked
+New vehicle setting for combine unloaders, **Drive clear when blocked** (off by default). When the unloader
+- stands in front of a harvester driven by a helper (AutoDrive's harvester helper or Courseplay) for 6 seconds, with both standing still, or
+- is stuck against another vehicle (where AutoDrive would otherwise reverse),
+
+it switches off its collisions with other vehicles (its trailers too; the ground, buildings and trees still count), drives through to the nearest field edge and a few metres past it, waits there until no other vehicle is near, switches its collisions back on and carries on with its job. Collisions only come back when nothing overlaps, otherwise the physics would throw the vehicles apart; if AutoDrive is stopped during the escape they come back by themselves once the unloader is clear. A message tells you when a driver does this, and it happens at most every 90 seconds per vehicle.
+
 ### Tipping on the ground
 New vehicle setting **Tipping on the ground**, for bunker silos and heaps (unloading onto the ground, not into a tip trigger):
 - **Drive through** (as before): the vehicle drives slowly through while tipping, to spread the load along the silo.

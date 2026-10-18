@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="В силосной траншее или в кучу: медленно проезжать, распределяя груз, или стоять на первом возможном месте (немного проезжает, когда куча заполнена)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Проезжать" />
 		<text name="gui_ad_groundUnload_still"							 text="Стоять" />
+		<text name="gui_ad_unloaderEscape"							 text="Выезжать при блокировке" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Перегрузчик: если он застрял у другой техники или стоит перед комбайном с помощником, он проезжает сквозь технику к ближайшему краю поля и снова включает столкновения, когда путь свободен" />
+		<text name="AD_escape_harvester"							 text="мешает комбайну: проезжает к краю поля" />
+		<text name="AD_escape_stuck"							 text="застрял у техники: проезжает к краю поля" />
+		<text name="AD_task_escape"							 text="Выезжает к краю поля" />
 		<text name="AD_routeCheck_loose"								 text="Одиночная путевая точка без соединений" />
 		<text name="AD_routeCheck_deadEnd"							 text="Тупик: от этой путевой точки дальше пути нет" />
 		<text name="AD_routeCheck_trap"								 text="Односторонняя ловушка: путевых точек, куда можно въехать, но нельзя выехать: %s" />

@@ -604,6 +604,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="V žlabovém silu nebo na hromadu: pomalu projíždět a rozprostřít náklad, nebo stát na prvním možném místě (popojede, když je hromada plná)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Projet" />
 		<text name="gui_ad_groundUnload_still"							 text="Stát na místě" />
+		<text name="gui_ad_unloaderEscape"							 text="Vyjet při zablokování" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Překladač: když uvízne o jiné vozidlo nebo stojí před kombajnem s pomocníkem, projede vozidly k nejbližšímu okraji pole a po uvolnění znovu zapne kolize" />
+		<text name="AD_escape_harvester"							 text="překáží kombajnu: projíždí k okraji pole" />
+		<text name="AD_escape_stuck"							 text="uvízl o vozidlo: projíždí k okraji pole" />
+		<text name="AD_task_escape"							 text="Vyjíždí k okraji pole" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

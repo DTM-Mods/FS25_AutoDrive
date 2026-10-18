@@ -607,6 +607,11 @@
 		<text name="gui_ad_groundUnload_tooltip"							 text="In a bunker silo or on a heap: drive slowly through to spread the load, or stand still at the first place it can tip (moves on a little when the heap is full)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Drive through" />
 		<text name="gui_ad_groundUnload_still"							 text="Stand still" />
+		<text name="gui_ad_unloaderEscape"							 text="Drive clear when blocked" />
+		<text name="gui_ad_unloaderEscape_tooltip"							 text="Unloader: when it is stuck against another vehicle, or stands in front of a harvester driven by a helper, it drives through vehicles to the nearest field edge and switches its collisions back on once it is clear" />
+		<text name="AD_escape_harvester"							 text="is in the way of the harvester: drives through to the field edge" />
+		<text name="AD_escape_stuck"							 text="is stuck against a vehicle: drives through to the field edge" />
+		<text name="AD_task_escape"							 text="Driving clear to the field edge" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />
