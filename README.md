@@ -34,7 +34,7 @@ With the editor turned on, **Ctrl+Z** undoes and **Ctrl+Y** redoes your last cha
 - After an undo or redo, the affected waypoints flash for a few seconds: green = added or restored, yellow = changed, magenta = removed. A moved waypoint also shows a line from its previous position. If the change is out of sight, a pointer from your vehicle shows the direction.
 - **Preview:** hold **Left Alt + Z**, or right click the undo icon, to see what the next undo would change, without changing anything.
 - **While recording**, Ctrl+Z removes the last ~10 m of recorded points and the recording continues from the highlighted point. After the recording is stopped, one Ctrl+Z removes the whole drive.
-- **Multiplayer:** the history is kept on the server and each player undoes their own edits. An older own edit can be undone even if others edited afterwards, as long as their edits don't depend on it; otherwise the message names the player who changed the network in the meantime. Diagnostic lines starting with `[AD Undo]` are written to the game log in multiplayer.
+- **Multiplayer:** the history is kept on the server and each player undoes their own edits, also on a dedicated server. An older own edit can be undone even if others edited afterwards, as long as their edits don't depend on it; otherwise the message names the player who changed the network in the meantime. Diagnostic lines starting with `[AD Undo]` are written to the game log in multiplayer.
 - The history holds the last 100 steps and lasts until the game is closed or the savegame is left. A few changes outside the editor clear it, e.g. switching on the road network debug markers or placing the colour selection points; a message then tells you why.
 
 ### Target folders
@@ -44,16 +44,19 @@ With the editor turned on, **Ctrl+Z** undoes and **Ctrl+Y** redoes your last cha
 - In editor mode, each target in the list has a rename icon, to rename any target directly from the list.
 
 ### Waypoint editing
-- **Move waypoints by dragging:** hold **Left Shift** and drag a waypoint with the left mouse button. A short click without moving still toggles the side road setting as before. The key can be changed ("AD: Hold + left mouse drag to move waypoint").
+- **Move waypoints by dragging:** hold **Left Shift** and drag a waypoint with the left mouse button. The waypoint goes where the mouse points at the road or the ground, at its height, also on hills and slopes. A short click without moving still toggles the side road setting as before. The key can be changed ("AD: Hold + left mouse drag to move waypoint").
+- **Construction screen:** while landscaping (painting, shaping the ground), the left mouse button belongs to the brush: AutoDrive shows the routes but does not select, connect, create or drag waypoints with it there.
 - **Deleting a waypoint** removes all targets on it, not only the first one, and every connection pointing to it. Before, a second target or a reverse connection could be left pointing at the next waypoint.
 
 ### Tidy-up tools
 Select a waypoint with a left click, point the mouse at another waypoint on the same route and press:
 - **Ctrl+Alt+J** to even out the spacing: the waypoints stay on the route, at equal distances
 - **Ctrl+Alt+K** to straighten: the waypoints are lined up between the two waypoints
-- **Ctrl+Alt+U** to smooth: kinks and zig-zags of e.g. a recorded drive are rounded off
+- **Ctrl+Alt+U** to smooth: kinks and zig-zags of e.g. a recorded drive are rounded off. Waypoints only move sideways out of a kink, never along the route, also next to long connections
 
-The route between the two waypoints is the shortest chain of connections. Only waypoints between them are moved, both end points stay where they are, and connections, targets and side road settings don't change. Heights follow the ground. Each tidy-up is one undo step.
+The same tools are in the **waypoint panel** for the whole road a waypoint is on, without pointing at a second waypoint.
+
+The route between the two waypoints is the shortest by distance. Only waypoints between them are moved, both end points stay where they are, and connections, targets and side road settings don't change. Heights follow the ground. Each tidy-up is one undo step.
 
 ### Route check
 **Ctrl+Alt+N** checks the whole route network and lists the problems, nearest first:
@@ -88,7 +91,7 @@ In the editor, **left-click a waypoint** to select it: a panel opens next to the
 - **Direction:** **One-way** (the way most of it already goes), **Two-way**, or **Flip** to turn it round. The junctions at both ends are connected the same way; their other roads stay as they are
 - **Tidy up:** **Even**, **Straight** or **Smooth**, like Ctrl+Alt+J / K / U, without pointing at a second waypoint. The junctions stay where they are
 
-Every click is one undo step and works in multiplayer like the keys. The panel stays while the waypoint is selected; **X**, clicking the waypoint again, or connecting it to another waypoint closes it. It moves to the left of the HUD when there is no room on the right. Switch it off in the user settings (**Waypoint panel**).
+Every click is one undo step and works in multiplayer like the keys. The panel stays while the waypoint is selected, also while you move the mouse onto it; **X**, clicking the waypoint again, or connecting it to another waypoint closes it. It moves to the left of the HUD when there is no room on the right. Switch it off in the user settings (**Waypoint panel**).
 
 ### Waypoint actions
 In the editor, point the mouse at a waypoint (or select one) and press:
