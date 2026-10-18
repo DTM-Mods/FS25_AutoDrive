@@ -6,10 +6,12 @@
 
 ADWaypointPanel = {}
 
-ADWaypointPanel.WIDTH_PIXELS = 290
+ADWaypointPanel.WIDTH_PIXELS = 320
 ADWaypointPanel.ROW_PIXELS = 22
 ADWaypointPanel.GAP_PIXELS = 3
 ADWaypointPanel.LABEL_SHARE = 0.42
+-- connection rows: more room for the waypoint number (5 digits on big maps)
+ADWaypointPanel.CONNECTION_LABEL_SHARE = 0.5
 ADWaypointPanel.MAX_CONNECTIONS = 6
 ADWaypointPanel.MAX_ROAD = 2000
 -- the neighbours are found again after this time (ms); a reverse connection into the waypoint needs a scan
@@ -429,7 +431,7 @@ function ADWaypointPanel.getRows(vehicle, wp)
             table.insert(rows, {label = text("AD_wpPanel_more", #connections - ADWaypointPanel.MAX_CONNECTIONS), wide = true})
             break
         end
-        table.insert(rows, {label = text("AD_wpPanel_connection", tostring(connection.id)), highlight = connection.id, buttons = {
+        table.insert(rows, {label = text("AD_wpPanel_connection", tostring(connection.id)), highlight = connection.id, labelShare = ADWaypointPanel.CONNECTION_LABEL_SHARE, buttons = {
             choice(text("AD_wpPanel_dir_" .. connection.direction) .. "  >", false, function() ADWaypointPanel.cycleConnection(wp, connection) end, 4),
             choice("X", false, function() ADWaypointPanel.removeConnection(wp, connection) end, 1)}})
     end
@@ -568,15 +570,21 @@ function ADWaypointPanel:draw(vehicle, hud)
 
     drawFilledRect(l.x, l.y, l.width, l.height, unpack(ADWaypointPanel.COLOR_BACKGROUND))
     local innerX, innerWidth = l.x + l.gapX, l.width - 2 * l.gapX
-    local labelWidth = innerWidth * ADWaypointPanel.LABEL_SHARE
     setTextAlignment(RenderText.ALIGN_LEFT)
     self.hoveredConnection = nil
+    local closeWidth = l.rowHeight * g_screenHeight / g_screenWidth
     for i, row in ipairs(rows) do
+        local labelWidth = innerWidth * (row.labelShare or ADWaypointPanel.LABEL_SHARE)
+        local isCloseRow = row.buttons ~= nil and #row.buttons == 1 and row.buttons[1].text == "X"
         local rowY = l.y + l.height - l.gapY - i * l.rowHeight
         local textY = rowY + (l.rowHeight - fontSize) / 2 + fontSize * 0.15
         setTextBold(row.bold == true)
         setTextColor(unpack(row.color or {1, 1, 1, 1}))
         local width = (row.wide or row.buttons == nil) and innerWidth or labelWidth - l.gapX
+        if isCloseRow then
+            -- the title: the whole line up to the close button
+            width = innerWidth - closeWidth - l.gapX
+        end
         if row.label ~= "" then
             renderText(innerX, textY, fontSize, fitText(fontSize, row.label, width))
         end
@@ -587,8 +595,8 @@ function ADWaypointPanel:draw(vehicle, hud)
                 areaX, areaWidth = innerX, innerWidth
             end
             -- the close button is small and on the right
-            if #row.buttons == 1 and row.buttons[1].text == "X" then
-                areaWidth = l.rowHeight * g_screenHeight / g_screenWidth
+            if isCloseRow then
+                areaWidth = closeWidth
                 areaX = innerX + innerWidth - areaWidth
             end
             local weights = 0

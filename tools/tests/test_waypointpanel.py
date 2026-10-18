@@ -94,6 +94,20 @@ s.execute("HUD.posX = 0.85; HUD.width = 0.14; draw()")
 assert s.eval("P.rect.x + P.rect.width < HUD.posX")
 s.execute("HUD.posX = 0.1; HUD.width = 0.2; draw()")
 
+# --- big maps: 5-digit waypoint numbers fit in the title and in the connection rows (about 10 pixels a letter)
+s.execute("""
+    local wps = ADGraphManager.wayPoints
+    wps[20512] = {id = 20512, x = 0, y = 5, z = 50, out = {18923}, incoming = {}, flags = 0}
+    wps[18923] = {id = 18923, x = 0, y = 5, z = 60, out = {}, incoming = {20512}, flags = 0}
+    local narrow = getTextWidth
+    getTextWidth = function(size, text) return #text * 10 / g_screenWidth end
+    V.ad.selectedNodeId = 20512; P.invalidate(); draw()
+    getTextWidth = narrow
+    wps[20512], wps[18923] = nil, nil
+""")
+assert s.eval("shown('Waypoint 20512')") and s.eval("shown('Waypoint 18923')"), list(s.eval("TEXTS_DRAWN").values())[:12]
+s.execute("V.ad.selectedNodeId = 3; P.invalidate(); draw()")
+
 # --- connections, also the reverse one into the waypoint, and the road up to the junction
 assert s.eval("shown('Connections: 2 in, 1 out')"), list(s.eval("TEXTS_DRAWN").values())
 assert s.eval("P.cache.connections[1].id") == 2 and s.eval("P.cache.connections[1].direction") == s.eval("P.IN")
