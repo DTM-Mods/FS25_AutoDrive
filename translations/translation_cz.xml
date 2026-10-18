@@ -566,8 +566,8 @@
 		<text name="AD_wpPanel_info"							 text="Výška %s m, %s m odsud" />
 		<text name="AD_wpPanel_target"							 text="Cíl: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Žádný cíl" />
-		<text name="AD_wpPanel_create"							 text="Vytvořit" />
-		<text name="AD_wpPanel_rename"							 text="Přejmenovat" />
+		<text name="AD_wpPanel_create"							 text="Přidat cíl..." />
+		<text name="AD_wpPanel_rename"							 text="Přejmenovat..." />
 		<text name="AD_wpPanel_remove"							 text="Odstranit" />
 		<text name="AD_wpPanel_sideRoad"							 text="Vedlejší silnice" />
 		<text name="AD_wpPanel_connections"							 text="Spojení: %s dovnitř, %s ven" />

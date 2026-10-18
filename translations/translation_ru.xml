@@ -566,8 +566,8 @@
 		<text name="AD_wpPanel_info"							 text="Высота %s м, %s м отсюда" />
 		<text name="AD_wpPanel_target"							 text="Локация: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Нет локации" />
-		<text name="AD_wpPanel_create"							 text="Создать" />
-		<text name="AD_wpPanel_rename"							 text="Переименовать" />
+		<text name="AD_wpPanel_create"							 text="Добавить локацию..." />
+		<text name="AD_wpPanel_rename"							 text="Переименовать..." />
 		<text name="AD_wpPanel_remove"							 text="Удалить" />
 		<text name="AD_wpPanel_sideRoad"							 text="Боковая дорога" />
 		<text name="AD_wpPanel_connections"							 text="Соединения: %s вход, %s выход" />

@@ -80,6 +80,8 @@ A = "ADWaypointActions"
 # --- shown only for a selected waypoint in the editor, with the HUD and the setting on
 s.execute("draw()")
 assert s.eval("P.rect ~= nil") and s.eval("shown('Waypoint 3')") and s.eval("shown('No target')")
+# the target comes first, right under the waypoint number: "No target", then the button that opens the text box
+assert [s.eval("TEXTS_DRAWN[%d]" % i) for i in (1, 3, 4)] == ["Waypoint 3", "No target", "Add target..."], list(s.eval("TEXTS_DRAWN").values())[:6]
 assert not s.eval("P.failed")
 for setup in ["EDITOR = false", "SETTINGS.waypointPanel = false", "SETTINGS.showHUD = false", "V.ad.newcreated = 3", "V.ad.selectedNodeId = nil", "V.ad.selectedNodeId = 99"]:
     s.execute("%s; draw()" % setup)
@@ -187,7 +189,7 @@ assert s.eval("ADGraphManager.wayPoints[3].z") == 4
 s.execute("ADGraphManager.wayPoints[3].z = 0")
 
 # --- target: create on this waypoint (not the closest), rename, remove
-assert s.eval("click(nil, 'Create')") and s.eval("OPENED") == 1 and s.eval("AutoDrive.createMapMarkerWayPointId") == 3
+assert s.eval("click('Target', 'Add target')") and s.eval("OPENED") == 1 and s.eval("AutoDrive.createMapMarkerWayPointId") == 3
 s.execute("""
     AutoDrive.createMapMarkerWayPointId = nil
     ADGraphManager.mapMarkers = {{id = 3, markerIndex = 1, name = "Grain Mill", group = "All"}}

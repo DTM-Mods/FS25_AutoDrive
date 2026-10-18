@@ -566,8 +566,8 @@
 		<text name="AD_wpPanel_info"							 text="Højde %s m, %s m væk" />
 		<text name="AD_wpPanel_target"							 text="Mål: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Intet mål" />
-		<text name="AD_wpPanel_create"							 text="Opret" />
-		<text name="AD_wpPanel_rename"							 text="Omdøb" />
+		<text name="AD_wpPanel_create"							 text="Tilføj mål..." />
+		<text name="AD_wpPanel_rename"							 text="Omdøb..." />
 		<text name="AD_wpPanel_remove"							 text="Fjern" />
 		<text name="AD_wpPanel_sideRoad"							 text="Sidevej" />
 		<text name="AD_wpPanel_connections"							 text="Forbindelser: %s ind, %s ud" />

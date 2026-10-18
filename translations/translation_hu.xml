@@ -566,8 +566,8 @@
 		<text name="AD_wpPanel_info"							 text="Magasság %s m, %s m-re" />
 		<text name="AD_wpPanel_target"							 text="Cél: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Nincs cél" />
-		<text name="AD_wpPanel_create"							 text="Létrehozás" />
-		<text name="AD_wpPanel_rename"							 text="Átnevezés" />
+		<text name="AD_wpPanel_create"							 text="Cél hozzáadása..." />
+		<text name="AD_wpPanel_rename"							 text="Átnevezés..." />
 		<text name="AD_wpPanel_remove"							 text="Törlés" />
 		<text name="AD_wpPanel_sideRoad"							 text="Mellékút" />
 		<text name="AD_wpPanel_connections"							 text="Kapcsolatok: %s be, %s ki" />

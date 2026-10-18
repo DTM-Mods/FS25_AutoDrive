@@ -27,6 +27,8 @@ ADWaypointPanel.COLOR_BACKGROUND = {0, 0, 0, 0.82}
 ADWaypointPanel.COLOR_BUTTON = {0.18, 0.18, 0.18, 0.95}
 ADWaypointPanel.COLOR_HOVER = {0.35, 0.35, 0.35, 0.95}
 ADWaypointPanel.COLOR_ACTIVE = {1, 0.6, 0.1, 0.95}
+ADWaypointPanel.COLOR_TARGET = {1, 0.7, 0.2, 1}
+ADWaypointPanel.COLOR_DIM = {0.75, 0.75, 0.75, 1}
 
 ADWaypointPanel.buttons = {}
 ADWaypointPanel.cache = {}
@@ -381,26 +383,29 @@ function ADWaypointPanel.getRows(vehicle, wp)
     table.insert(rows, {label = text("AD_wpPanel_title", tostring(wp.id)), bold = true, buttons = {
         choice("X", false, function() vehicle.ad.selectedNodeId = nil end)}})
 
-    local distance = 0
-    if vehicle.components ~= nil and vehicle.components[1] ~= nil then
-        local x, _, z = getWorldTranslation(vehicle.components[1].node)
-        distance = MathUtil.vector2Length(wp.x - x, wp.z - z)
-    end
-    table.insert(rows, {label = text("AD_wpPanel_info", string.format("%.1f", wp.y), string.format("%d", math.floor(distance + 0.5))), wide = true})
-
+    -- the target first: its name on a line of its own (long names fit), the buttons below over the whole width
     local markerIndex = ADWaypointPanel.getMarkerIndex(wp.id)
     local marker = markerIndex ~= nil and ADGraphManager:getMapMarkerById(markerIndex) or nil
     if marker ~= nil then
-        table.insert(rows, {label = text("AD_wpPanel_target", marker.name), buttons = {
+        table.insert(rows, {label = text("AD_wpPanel_target", marker.name), bold = true, wide = true, color = ADWaypointPanel.COLOR_TARGET})
+        table.insert(rows, {name = "Target", label = "", fullWidth = true, buttons = {
             choice(text("AD_wpPanel_rename"), false, function() ADWaypointPanel.renameTarget(markerIndex) end),
             choice(text("AD_wpPanel_remove"), false, function() ADGraphManager:removeMapMarkerByWayPoint(wp.id) end)}})
         table.insert(rows, {label = text("AD_wpPanel_vehicles"), buttons = {
             choice(text("AD_wpPanel_driveHere"), false, function() ADWaypointPanel.driveHere(vehicle, markerIndex) end),
             choice(text("AD_wpPanel_sendVehicle"), false, function() AutoDrive.onOpenSendTo(nil, markerIndex) end)}})
     else
-        table.insert(rows, {label = text("AD_wpPanel_noTarget"), buttons = {
+        table.insert(rows, {label = text("AD_wpPanel_noTarget"), wide = true, color = ADWaypointPanel.COLOR_DIM})
+        table.insert(rows, {name = "Target", label = "", fullWidth = true, buttons = {
             choice(text("AD_wpPanel_create"), false, function() ADWaypointPanel.createTarget(wp) end)}})
     end
+
+    local distance = 0
+    if vehicle.components ~= nil and vehicle.components[1] ~= nil then
+        local x, _, z = getWorldTranslation(vehicle.components[1].node)
+        distance = MathUtil.vector2Length(wp.x - x, wp.z - z)
+    end
+    table.insert(rows, {label = text("AD_wpPanel_info", string.format("%.1f", wp.y), string.format("%d", math.floor(distance + 0.5))), wide = true})
 
     local subPrio = ADGraphManager:getIsPointSubPrio(wp.id)
     table.insert(rows, {label = text("AD_wpPanel_sideRoad"), buttons = {
@@ -570,12 +575,17 @@ function ADWaypointPanel:draw(vehicle, hud)
         local rowY = l.y + l.height - l.gapY - i * l.rowHeight
         local textY = rowY + (l.rowHeight - fontSize) / 2 + fontSize * 0.15
         setTextBold(row.bold == true)
-        setTextColor(1, 1, 1, 1)
+        setTextColor(unpack(row.color or {1, 1, 1, 1}))
         local width = (row.wide or row.buttons == nil) and innerWidth or labelWidth - l.gapX
-        renderText(innerX, textY, fontSize, fitText(fontSize, row.label, width))
+        if row.label ~= "" then
+            renderText(innerX, textY, fontSize, fitText(fontSize, row.label, width))
+        end
         if row.buttons ~= nil and #row.buttons > 0 then
             local areaX = innerX + labelWidth
             local areaWidth = innerWidth - labelWidth
+            if row.fullWidth then
+                areaX, areaWidth = innerX, innerWidth
+            end
             -- the close button is small and on the right
             if #row.buttons == 1 and row.buttons[1].text == "X" then
                 areaWidth = l.rowHeight * g_screenHeight / g_screenWidth
@@ -615,7 +625,7 @@ function ADWaypointPanel:draw(vehicle, hud)
                 renderText(rect.x + rect.width / 2, textY, fontSize, fitText(fontSize, button.text, rect.width - l.gapX))
                 setTextAlignment(RenderText.ALIGN_LEFT)
                 rect.onClick = button.onClick
-                rect.text, rect.row, rect.active, rect.section = button.text, row.label, button.active, row.section
+                rect.text, rect.row, rect.active, rect.section = button.text, row.name or row.label, button.active, row.section
                 table.insert(self.buttons, rect)
             end
         end

@@ -566,8 +566,8 @@
 		<text name="AD_wpPanel_info"							 text="Altura %s m, a %s m" />
 		<text name="AD_wpPanel_target"							 text="Destino: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Sin destino" />
-		<text name="AD_wpPanel_create"							 text="Crear" />
-		<text name="AD_wpPanel_rename"							 text="Renombrar" />
+		<text name="AD_wpPanel_create"							 text="Añadir destino..." />
+		<text name="AD_wpPanel_rename"							 text="Renombrar..." />
 		<text name="AD_wpPanel_remove"							 text="Quitar" />
 		<text name="AD_wpPanel_sideRoad"							 text="Carretera secundaria" />
 		<text name="AD_wpPanel_connections"							 text="Conexiones: %s entrada, %s salida" />
