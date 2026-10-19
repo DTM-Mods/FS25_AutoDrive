@@ -18,7 +18,7 @@ s.execute("""
     end
 """)
 for f in [("Utils", "TidyTools.lua"), ("Events", "Graph", "MoveWayPointEvent.lua"), ("Events", "Graph", "MoveWayPointsEvent.lua"),
-          ("Events", "Graph", "SetConnectionEvent.lua"), ("Events", "Graph", "RoadEvent.lua"), ("Gui", "WaypointPanel.lua")]:
+          ("Events", "Graph", "SetConnectionEvent.lua"), ("Events", "Graph", "RoadEvent.lua"), ("Events", "Graph", "DeleteWayPointsEvent.lua"), ("Gui", "WaypointPanel.lua")]:
     s.execute(t.read(os.path.join(t.MOD, "scripts", *f)))
 s.globals().setupNetwork(10, 2)
 s.execute("""
@@ -332,7 +332,21 @@ assert s.eval("LIST[1].name") == "Near" and s.eval("LIST[2].name") == "Far"
 assert s.eval("ADSendToGui.getVehicleRowText(LIST[1])") == "Near  (0.0 km)  - busy"
 assert s.eval("SENT_TO[1] == NEAR") and s.eval("SENT_TO[2]") == 1 and s.eval("CLOSED")
 
+# --- delete: the waypoint (with its target and connections) goes, the panel closes, one Ctrl+Z brings it all back
+s.execute("""
+    ADGraphManager.mapMarkers = {{id = 3, markerIndex = 1, name = "Grain Mill", group = "All"}}
+    V.ad.selectedNodeId = 3; ADUndoManager:clear(); BEFORE_DEL = snapshot(); draw()
+    COUNT = function() local n = 0; for _ in pairs(ADGraphManager.wayPoints) do n = n + 1 end; return n end
+    N_BEFORE = COUNT()
+""")
+assert s.eval("click('Delete', 'Delete waypoint')")
+assert s.eval("COUNT()") == s.eval("N_BEFORE") - 1 and s.eval("#ADGraphManager.mapMarkers") == 0
+assert s.eval("V.ad.selectedNodeId") is None and s.eval("P.rect == nil")
+assert s.eval("#ADUndoManager.undoStack") == 1
+s.execute("ADUndoManager:undo(nil)")
+assert s.globals().snapshot() == s.eval("BEFORE_DEL")
+
 # --- an error switches the panel off instead of breaking the HUD
 s.execute("V.ad.selectedNodeId = 3; local orig = P.getRows; P.getRows = function() error('boom') end; Logging = {error = function() LOGGED = true end}; draw(); P.getRows = orig")
 assert s.eval("P.failed") and s.eval("LOGGED") and s.eval("P.rect == nil")
-print("OK: waypoint panel (shown when, stays while the mouse is on it, construction screen ignores left clicks, road: zone, side road, direction, tidy; remove connection, drive here, send vehicle, layout, connections incl. reverse in, road to junction, every button one undo step, target, close, error guard)")
+print("OK: waypoint panel (delete waypoint, shown when, stays while the mouse is on it, construction screen ignores left clicks, road: zone, side road, direction, tidy; remove connection, drive here, send vehicle, layout, connections incl. reverse in, road to junction, every button one undo step, target, close, error guard)")

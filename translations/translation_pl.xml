@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="blokuje kombajn: przejeżdża do krawędzi pola" />
 		<text name="AD_escape_stuck"							 text="utknął na pojeździe: przejeżdża do krawędzi pola" />
 		<text name="AD_task_escape"							 text="Wyjeżdża na krawędź pola" />
+		<text name="AD_wpPanel_delete"							 text="Usuń punkt" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />

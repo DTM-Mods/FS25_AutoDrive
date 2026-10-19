@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="står i vejen for mejetærskeren: kører igennem til markkanten" />
 		<text name="AD_escape_stuck"							 text="sidder fast mod et køretøj: kører igennem til markkanten" />
 		<text name="AD_task_escape"							 text="Kører fri til markkanten" />
+		<text name="AD_wpPanel_delete"							 text="Slet vejpunkt" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

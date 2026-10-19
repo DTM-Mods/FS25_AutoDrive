@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="заважає комбайну: проїжджає до краю поля" />
 		<text name="AD_escape_stuck"							 text="застряг біля техніки: проїжджає до краю поля" />
 		<text name="AD_task_escape"							 text="Виїжджає до краю поля" />
+		<text name="AD_wpPanel_delete"							 text="Видалити точку" />
 		<text name="AD_routeCheck_loose"								 text="Окрема точка шляху без з'єднань" />
 		<text name="AD_routeCheck_deadEnd"							 text="Глухий кут: від цієї точки шляху далі немає шляху" />
 		<text name="AD_routeCheck_trap"								 text="Одностороння пастка: точок шляху, куди можна заїхати, але не можна виїхати: %s" />

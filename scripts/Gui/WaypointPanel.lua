@@ -31,6 +31,8 @@ ADWaypointPanel.COLOR_HOVER = {0.35, 0.35, 0.35, 0.95}
 ADWaypointPanel.COLOR_ACTIVE = {1, 0.6, 0.1, 0.95}
 ADWaypointPanel.COLOR_TARGET = {1, 0.7, 0.2, 1}
 ADWaypointPanel.COLOR_DIM = {0.75, 0.75, 0.75, 1}
+ADWaypointPanel.COLOR_DANGER = {0.55, 0.1, 0.1, 0.95}
+ADWaypointPanel.COLOR_DANGER_HOVER = {0.8, 0.15, 0.15, 0.95}
 
 ADWaypointPanel.buttons = {}
 ADWaypointPanel.cache = {}
@@ -372,8 +374,8 @@ local function text(key, ...)
     return g_i18n:getText(key)
 end
 
-local function choice(label, active, onClick, width)
-    return {text = label, active = active, onClick = onClick, width = width}
+local function choice(label, active, onClick, width, color, hoverColor)
+    return {text = label, active = active, onClick = onClick, width = width, color = color, hoverColor = hoverColor}
 end
 
 -- a row: label on the left, buttons on the right; title rows are bold
@@ -408,6 +410,12 @@ function ADWaypointPanel.getRows(vehicle, wp)
         distance = MathUtil.vector2Length(wp.x - x, wp.z - z)
     end
     table.insert(rows, {label = text("AD_wpPanel_info", string.format("%.1f", wp.y), string.format("%d", math.floor(distance + 0.5))), wide = true})
+    -- delete: like AutoDrive's delete (targets on it and connections to it go too), one undo step
+    table.insert(rows, {name = "Delete", label = "", fullWidth = true, buttons = {
+        choice(text("AD_wpPanel_delete"), false, function()
+            vehicle.ad.selectedNodeId = nil
+            ADGraphManager:removeWayPoint(wp.id)
+        end, nil, ADWaypointPanel.COLOR_DANGER, ADWaypointPanel.COLOR_DANGER_HOVER)}})
 
     local subPrio = ADGraphManager:getIsPointSubPrio(wp.id)
     table.insert(rows, {label = text("AD_wpPanel_sideRoad"), buttons = {
@@ -610,11 +618,11 @@ function ADWaypointPanel:draw(vehicle, hud)
                 local rect = {x = buttonX, y = rowY + l.gapY / 2, width = buttonWidth, height = l.rowHeight - l.gapY}
                 buttonX = buttonX + buttonWidth + l.gapX
                 local hovered = inside(rect, mouseX, mouseY)
-                local color = ADWaypointPanel.COLOR_BUTTON
+                local color = button.color or ADWaypointPanel.COLOR_BUTTON
                 if button.active then
                     color = ADWaypointPanel.COLOR_ACTIVE
                 elseif hovered then
-                    color = ADWaypointPanel.COLOR_HOVER
+                    color = button.hoverColor or ADWaypointPanel.COLOR_HOVER
                 end
                 drawFilledRect(rect.x, rect.y, rect.width, rect.height, unpack(color))
                 if hovered and button.active then

@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="biçerdöverin yolunu kesiyor: tarla kenarına geçiyor" />
 		<text name="AD_escape_stuck"							 text="bir araca takıldı: tarla kenarına geçiyor" />
 		<text name="AD_task_escape"							 text="Tarla kenarına çıkıyor" />
+		<text name="AD_wpPanel_delete"							 text="Noktayı sil" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />

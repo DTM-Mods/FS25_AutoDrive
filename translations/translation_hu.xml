@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="a kombájn útjában áll: áthajt a táblaszélig" />
 		<text name="AD_escape_stuck"							 text="elakadt egy járműben: áthajt a táblaszélig" />
 		<text name="AD_task_escape"							 text="Kiáll a táblaszélre" />
+		<text name="AD_wpPanel_delete"							 text="Útpont törlése" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="挡住了收割机：穿行到田地边缘" />
 		<text name="AD_escape_stuck"							 text="被车辆卡住：穿行到田地边缘" />
 		<text name="AD_task_escape"							 text="驶向田地边缘" />
+		<text name="AD_wpPanel_delete"							 text="删除航点" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

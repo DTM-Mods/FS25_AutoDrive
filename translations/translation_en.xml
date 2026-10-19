@@ -612,6 +612,7 @@
 		<text name="AD_escape_harvester"							 text="is in the way of the harvester: drives through to the field edge" />
 		<text name="AD_escape_stuck"							 text="is stuck against a vehicle: drives through to the field edge" />
 		<text name="AD_task_escape"							 text="Driving clear to the field edge" />
+		<text name="AD_wpPanel_delete"							 text="Delete waypoint" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />

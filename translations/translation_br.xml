@@ -609,6 +609,7 @@
 		<text name="AD_escape_harvester"							 text="está no caminho da colheitadeira: atravessa até a borda do campo" />
 		<text name="AD_escape_stuck"							 text="está preso em um veículo: atravessa até a borda do campo" />
 		<text name="AD_task_escape"							 text="Indo para a borda do campo" />
+		<text name="AD_wpPanel_delete"							 text="Apagar waypoint" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />
