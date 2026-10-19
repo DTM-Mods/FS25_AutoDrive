@@ -14,6 +14,8 @@ ADWaypointPanel.LABEL_SHARE = 0.42
 ADWaypointPanel.CONNECTION_LABEL_SHARE = 0.5
 ADWaypointPanel.MAX_CONNECTIONS = 6
 ADWaypointPanel.MAX_ROAD = 2000
+-- the height buttons move the waypoint up or down by this much (m)
+ADWaypointPanel.HEIGHT_STEP = 0.5
 -- the neighbours are found again after this time (ms); a reverse connection into the waypoint needs a scan
 ADWaypointPanel.REFRESH_TIME = 500
 
@@ -409,7 +411,12 @@ function ADWaypointPanel.getRows(vehicle, wp)
         local x, _, z = getWorldTranslation(vehicle.components[1].node)
         distance = MathUtil.vector2Length(wp.x - x, wp.z - z)
     end
-    table.insert(rows, {label = text("AD_wpPanel_info", string.format("%.1f", wp.y), string.format("%d", math.floor(distance + 0.5))), wide = true})
+    -- height: up or down by half a metre a click (a move, so one undo step, nudges of 10 s merge)
+    local step = ADWaypointPanel.HEIGHT_STEP
+    table.insert(rows, {label = text("AD_wpPanel_height", string.format("%.1f", wp.y)), buttons = {
+        choice(string.format("-%.1f", step), false, function() ADGraphManager:moveWayPoint(wp.id, wp.x, wp.y - step, wp.z, wp.flags) end),
+        choice(string.format("+%.1f", step), false, function() ADGraphManager:moveWayPoint(wp.id, wp.x, wp.y + step, wp.z, wp.flags) end)}})
+    table.insert(rows, {label = text("AD_wpPanel_away", string.format("%d", math.floor(distance + 0.5))), wide = true, color = ADWaypointPanel.COLOR_DIM})
     -- delete: like AutoDrive's delete (targets on it and connections to it go too), one undo step
     table.insert(rows, {name = "Delete", label = "", fullWidth = true, buttons = {
         choice(text("AD_wpPanel_delete"), false, function()

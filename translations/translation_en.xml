@@ -566,7 +566,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Waypoint panel" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="In the editor, a panel next to the HUD for the selected waypoint: target, side road, connections, actions and speed zone" />
 		<text name="AD_wpPanel_title"							 text="Waypoint %s" />
-		<text name="AD_wpPanel_info"							 text="Height %s m, %s m away" />
 		<text name="AD_wpPanel_target"							 text="Target: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="No target" />
 		<text name="AD_wpPanel_create"							 text="Add target..." />
@@ -613,6 +612,8 @@
 		<text name="AD_escape_stuck"							 text="is stuck against a vehicle: drives through to the field edge" />
 		<text name="AD_task_escape"							 text="Driving clear to the field edge" />
 		<text name="AD_wpPanel_delete"							 text="Delete waypoint" />
+		<text name="AD_wpPanel_height"							 text="Height %s m" />
+		<text name="AD_wpPanel_away"							 text="%s m away" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />

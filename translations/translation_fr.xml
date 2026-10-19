@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Panneau du point" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="Dans l'éditeur, un panneau à côté du HUD pour le point sélectionné : destination, voie de dégagement, connexions, actions et zone de vitesse" />
 		<text name="AD_wpPanel_title"							 text="Point %s" />
-		<text name="AD_wpPanel_info"							 text="Hauteur %s m, à %s m" />
 		<text name="AD_wpPanel_target"							 text="Destination : %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Pas de destination" />
 		<text name="AD_wpPanel_create"							 text="Ajouter une destination..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="est bloqué contre un véhicule : traverse jusqu'au bord du champ" />
 		<text name="AD_task_escape"							 text="Se dégage vers le bord du champ" />
 		<text name="AD_wpPanel_delete"							 text="Supprimer le point" />
+		<text name="AD_wpPanel_height"							 text="Hauteur %s m" />
+		<text name="AD_wpPanel_away"							 text="à %s m" />
 		<text name="AD_routeCheck_loose"								 text="Point de passage isolé sans aucune connexion" />
 		<text name="AD_routeCheck_deadEnd"							 text="Impasse : aucun chemin à partir de ce point de passage" />
 		<text name="AD_routeCheck_trap"								 text="Piège à sens unique : %s points de passage où l'on peut entrer mais d'où l'on ne peut pas sortir" />

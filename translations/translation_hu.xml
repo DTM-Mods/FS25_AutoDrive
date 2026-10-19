@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Útpont panel" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="A szerkesztőben egy panel a HUD mellett a kijelölt útponthoz: cél, mellékút, kapcsolatok, műveletek és sebességzóna" />
 		<text name="AD_wpPanel_title"							 text="%s. útpont" />
-		<text name="AD_wpPanel_info"							 text="Magasság %s m, %s m-re" />
 		<text name="AD_wpPanel_target"							 text="Cél: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Nincs cél" />
 		<text name="AD_wpPanel_create"							 text="Cél hozzáadása..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="elakadt egy járműben: áthajt a táblaszélig" />
 		<text name="AD_task_escape"							 text="Kiáll a táblaszélre" />
 		<text name="AD_wpPanel_delete"							 text="Útpont törlése" />
+		<text name="AD_wpPanel_height"							 text="Magasság %s m" />
+		<text name="AD_wpPanel_away"							 text="%s m-re" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

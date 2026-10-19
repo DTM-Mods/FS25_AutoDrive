@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Vejpunktpanel" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="I editoren et panel ved siden af HUD'en for det valgte vejpunkt: mål, sidevej, forbindelser, handlinger og hastighedszone" />
 		<text name="AD_wpPanel_title"							 text="Vejpunkt %s" />
-		<text name="AD_wpPanel_info"							 text="Højde %s m, %s m væk" />
 		<text name="AD_wpPanel_target"							 text="Mål: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Intet mål" />
 		<text name="AD_wpPanel_create"							 text="Tilføj mål..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="sidder fast mod et køretøj: kører igennem til markkanten" />
 		<text name="AD_task_escape"							 text="Kører fri til markkanten" />
 		<text name="AD_wpPanel_delete"							 text="Slet vejpunkt" />
+		<text name="AD_wpPanel_height"							 text="Højde %s m" />
+		<text name="AD_wpPanel_away"							 text="%s m væk" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

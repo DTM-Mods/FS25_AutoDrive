@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="航点面板" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="在编辑器中，HUD 旁边显示所选航点的面板：目标、支线、连接、动作和限速区" />
 		<text name="AD_wpPanel_title"							 text="航点 %s" />
-		<text name="AD_wpPanel_info"							 text="高度 %s 米，距离 %s 米" />
 		<text name="AD_wpPanel_target"							 text="目标：%s" />
 		<text name="AD_wpPanel_noTarget"							 text="无目标" />
 		<text name="AD_wpPanel_create"							 text="添加目标..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="被车辆卡住：穿行到田地边缘" />
 		<text name="AD_task_escape"							 text="驶向田地边缘" />
 		<text name="AD_wpPanel_delete"							 text="删除航点" />
+		<text name="AD_wpPanel_height"							 text="高度 %s 米" />
+		<text name="AD_wpPanel_away"							 text="距离 %s 米" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

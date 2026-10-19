@@ -80,6 +80,7 @@ The route between the two waypoints is the shortest by distance. Only waypoints 
 ### Waypoint panel
 In the editor, **left-click a waypoint** to select it: a panel opens next to the AutoDrive HUD with everything about that waypoint, as buttons:
 - **Target** (first, right under the waypoint number): its name in orange with **Rename...** and **Remove**, or **No target** with **Add target...**: a text box opens, type the name and press Enter, and the target is put on this waypoint
+- **Height:** **-0.5** / **+0.5** move the waypoint down or up by half a metre a click (only the height changes; Ctrl+Z puts it back, quick clicks undo together)
 - **Delete waypoint** (red, under the height and distance): deletes the waypoint like the editor's delete, with the targets on it and all connections to it; one Ctrl+Z brings it all back
 - **Vehicles** (on a target): **Drive here** sends the vehicle you are in to this target (drive to, and it starts); **Send vehicle** lists the AutoDrive vehicles of your farm, nearest first (busy ones are marked), and sends the one you pick
 - **Side road:** no / yes for this waypoint

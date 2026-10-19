@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Wegpunkt-Fenster" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="Im Editor ein Fenster neben dem HUD für den ausgewählten Wegpunkt: Ziel, Nebenstrecke, Verbindungen, Aktionen und Tempozone" />
 		<text name="AD_wpPanel_title"							 text="Wegpunkt %s" />
-		<text name="AD_wpPanel_info"							 text="Höhe %s m, %s m entfernt" />
 		<text name="AD_wpPanel_target"							 text="Ziel: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Kein Ziel" />
 		<text name="AD_wpPanel_create"							 text="Ziel hinzufügen..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="hängt an einem Fahrzeug fest: fährt durch zum Feldrand" />
 		<text name="AD_task_escape"							 text="Fährt frei zum Feldrand" />
 		<text name="AD_wpPanel_delete"							 text="Wegpunkt löschen" />
+		<text name="AD_wpPanel_height"							 text="Höhe %s m" />
+		<text name="AD_wpPanel_away"							 text="%s m entfernt" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />

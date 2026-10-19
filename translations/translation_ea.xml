@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Panel del punto" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="En el editor, un panel junto al HUD para el punto seleccionado: destino, carretera secundaria, conexiones, acciones y zona de velocidad" />
 		<text name="AD_wpPanel_title"							 text="Punto %s" />
-		<text name="AD_wpPanel_info"							 text="Altura %s m, a %s m" />
 		<text name="AD_wpPanel_target"							 text="Destino: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Sin destino" />
 		<text name="AD_wpPanel_create"							 text="Añadir destino..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="está atascado contra un vehículo: atraviesa hasta el borde del campo" />
 		<text name="AD_task_escape"							 text="Saliendo al borde del campo" />
 		<text name="AD_wpPanel_delete"							 text="Borrar punto" />
+		<text name="AD_wpPanel_height"							 text="Altura %s m" />
+		<text name="AD_wpPanel_away"							 text="a %s m" />
 		<text name="AD_routeCheck_loose"								 text="Punto de ruta suelto sin ninguna conexión" />
 		<text name="AD_routeCheck_deadEnd"							 text="Callejón sin salida: no hay forma de seguir desde este punto de ruta" />
 		<text name="AD_routeCheck_trap"								 text="Trampa de sentido único: %s puntos de ruta en los que se puede entrar pero no salir" />

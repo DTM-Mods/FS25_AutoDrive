@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Panel bodu trasy" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="V editoru panel vedle HUD pro vybraný bod trasy: cíl, vedlejší silnice, spojení, akce a rychlostní zóna" />
 		<text name="AD_wpPanel_title"							 text="Bod %s" />
-		<text name="AD_wpPanel_info"							 text="Výška %s m, %s m odsud" />
 		<text name="AD_wpPanel_target"							 text="Cíl: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Žádný cíl" />
 		<text name="AD_wpPanel_create"							 text="Přidat cíl..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="uvízl o vozidlo: projíždí k okraji pole" />
 		<text name="AD_task_escape"							 text="Vyjíždí k okraji pole" />
 		<text name="AD_wpPanel_delete"							 text="Smazat bod" />
+		<text name="AD_wpPanel_height"							 text="Výška %s m" />
+		<text name="AD_wpPanel_away"							 text="%s m odsud" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

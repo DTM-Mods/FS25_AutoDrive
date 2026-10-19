@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Painel do waypoint" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="No editor, um painel ao lado do HUD para o waypoint selecionado: destino, estrada secundária, ligações, ações e zona de velocidade" />
 		<text name="AD_wpPanel_title"							 text="Waypoint %s" />
-		<text name="AD_wpPanel_info"							 text="Altura %s m, a %s m" />
 		<text name="AD_wpPanel_target"							 text="Destino: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Sem destino" />
 		<text name="AD_wpPanel_create"							 text="Adicionar destino..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="está preso num veículo: atravessa até à borda do campo" />
 		<text name="AD_task_escape"							 text="A ir para a borda do campo" />
 		<text name="AD_wpPanel_delete"							 text="Apagar waypoint" />
+		<text name="AD_wpPanel_height"							 text="Altura %s m" />
+		<text name="AD_wpPanel_away"							 text="a %s m" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem qualquer ligação" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há caminho a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de sentido único: %s waypoints onde se pode entrar mas não sair" />

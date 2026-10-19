@@ -332,6 +332,17 @@ assert s.eval("LIST[1].name") == "Near" and s.eval("LIST[2].name") == "Far"
 assert s.eval("ADSendToGui.getVehicleRowText(LIST[1])") == "Near  (0.0 km)  - busy"
 assert s.eval("SENT_TO[1] == NEAR") and s.eval("SENT_TO[2]") == 1 and s.eval("CLOSED")
 
+# --- height: +0.5 / -0.5 m a click, only the height changes, Ctrl+Z puts it back
+s.execute("""
+    V.ad.selectedNodeId = 3; ADUndoManager:clear(); BEFORE_H = snapshot()
+    WP3 = ADGraphManager.wayPoints[3]; H0, X0, Z0 = WP3.y, WP3.x, WP3.z
+""")
+assert s.eval("click('Height', '+0.5')") and s.eval("click('Height', '+0.5')") and s.eval("click('Height', '-0.5')")
+assert abs(s.eval("WP3.y - H0") - 0.5) < 1e-6 and s.eval("WP3.x == X0 and WP3.z == Z0")
+assert s.eval("shown(string.format('Height %.1f m', H0 + 0.5))")
+s.execute("while #ADUndoManager.undoStack > 0 do ADUndoManager:undo(nil) end")
+assert s.globals().snapshot() == s.eval("BEFORE_H")
+
 # --- delete: the waypoint (with its target and connections) goes, the panel closes, one Ctrl+Z brings it all back
 s.execute("""
     ADGraphManager.mapMarkers = {{id = 3, markerIndex = 1, name = "Grain Mill", group = "All"}}
@@ -349,4 +360,4 @@ assert s.globals().snapshot() == s.eval("BEFORE_DEL")
 # --- an error switches the panel off instead of breaking the HUD
 s.execute("V.ad.selectedNodeId = 3; local orig = P.getRows; P.getRows = function() error('boom') end; Logging = {error = function() LOGGED = true end}; draw(); P.getRows = orig")
 assert s.eval("P.failed") and s.eval("LOGGED") and s.eval("P.rect == nil")
-print("OK: waypoint panel (delete waypoint, shown when, stays while the mouse is on it, construction screen ignores left clicks, road: zone, side road, direction, tidy; remove connection, drive here, send vehicle, layout, connections incl. reverse in, road to junction, every button one undo step, target, close, error guard)")
+print("OK: waypoint panel (height +/-, delete waypoint, shown when, stays while the mouse is on it, construction screen ignores left clicks, road: zone, side road, direction, tidy; remove connection, drive here, send vehicle, layout, connections incl. reverse in, road to junction, every button one undo step, target, close, error guard)")

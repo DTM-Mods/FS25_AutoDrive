@@ -563,7 +563,6 @@
 		<text name="gui_ad_waypointPanel"							 text="Routepuntpaneel" />
 		<text name="gui_ad_waypointPanel_tooltip"							 text="In de editor een paneel naast de HUD voor het geselecteerde routepunt: bestemming, zijweg, verbindingen, acties en snelheidszone" />
 		<text name="AD_wpPanel_title"							 text="Routepunt %s" />
-		<text name="AD_wpPanel_info"							 text="Hoogte %s m, %s m verderop" />
 		<text name="AD_wpPanel_target"							 text="Bestemming: %s" />
 		<text name="AD_wpPanel_noTarget"							 text="Geen bestemming" />
 		<text name="AD_wpPanel_create"							 text="Bestemming toevoegen..." />
@@ -610,6 +609,8 @@
 		<text name="AD_escape_stuck"							 text="zit vast tegen een voertuig: rijdt door naar de veldrand" />
 		<text name="AD_task_escape"							 text="Rijdt vrij naar de veldrand" />
 		<text name="AD_wpPanel_delete"							 text="Routepunt verwijderen" />
+		<text name="AD_wpPanel_height"							 text="Hoogte %s m" />
+		<text name="AD_wpPanel_away"							 text="%s m verderop" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />
