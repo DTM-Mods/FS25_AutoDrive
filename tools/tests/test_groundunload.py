@@ -68,4 +68,22 @@ assert not s.eval("pit(30)")                      # closed: not tipping
 s.execute("TRAILER_STATE = 1; SETTING = G.DRIVE_THROUGH")
 assert not s.eval("pit(30)")                      # "drive through": as before
 
-print("OK: while tipping (silo pit / truck + trailer hold while the load runs; ground: waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")
+# --- holding while it tips: standing with "stand still" = no throttle, full brake and handbrake (not AutoDrive's
+# 0.0001 throttle, which let a loaded truck in drive creep); while still rolling, or with "drive through", as before
+s.execute("""
+    PHYSICS = nil; SDM_UPDATES = 0
+    H = {lastSpeedReal = 0, raiseActive = function() end,
+        updateVehiclePhysics = function(self, forward, side, handbrake, dt) PHYSICS = {forward, side, handbrake} end,
+        ad = {drivePathModule = {getIsReversing = function() return false end},
+            specialDrivingModule = {stopVehicle = function() end, update = function() SDM_UPDATES = SDM_UPDATES + 1 end}}}
+    SETTING = G.STAND_STILL
+    G.hold(H, 16)
+""")
+assert list(s.eval("PHYSICS").values()) == [0, 0, True] and s.eval("SDM_UPDATES") == 0
+assert s.eval("H.ad.specialDrivingModule.motorShouldNotBeStopped") is True
+s.execute("PHYSICS = nil; H.lastSpeedReal = 3 / 3600; G.hold(H, 16)")      # still rolling at 3 km/h: brake down as before
+assert s.eval("PHYSICS") is None and s.eval("SDM_UPDATES") == 1
+s.execute("PHYSICS = nil; H.lastSpeedReal = 0; SETTING = G.DRIVE_THROUGH; H.ad.specialDrivingModule.motorShouldNotBeStopped = nil; G.hold(H, 16)")
+assert s.eval("PHYSICS") is None and s.eval("SDM_UPDATES") == 2 and s.eval("H.ad.specialDrivingModule.motorShouldNotBeStopped") is None
+
+print("OK: while tipping (hard hold: no throttle, full brake; silo pit / truck + trailer hold while the load runs; ground: waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")

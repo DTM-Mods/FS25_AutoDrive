@@ -123,8 +123,8 @@ function UnloadAtDestinationTask:update(dt)
                     --Keep motor running. Maybe we could check if the current trailer need Power to be unloaded or not
                     self.vehicle.ad.specialDrivingModule.motorShouldNotBeStopped = true
 
-                    self.vehicle.ad.specialDrivingModule:stopVehicle()
-                    self.vehicle.ad.specialDrivingModule:update(dt)
+                    -- Overdrive: "while tipping: stand still" holds hard (no throttle, full brake), else as before
+                    ADGroundUnload.hold(self.vehicle, dt)
                     if self.vehicle.ad.trailerModule:getHasAL() == true then
                     	-- AutoLoad
                         AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update unloadALAll start")
@@ -154,8 +154,8 @@ function UnloadAtDestinationTask:update(dt)
                 else
                     --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isTargetReached NOT isActiveAtTrigger stopVehicle")
                     self.vehicle.ad.specialDrivingModule.motorShouldNotBeStopped = true
-                    self.vehicle.ad.specialDrivingModule:stopVehicle()
-                    self.vehicle.ad.specialDrivingModule:update(dt)
+                    -- Overdrive: "while tipping: stand still" holds hard (no throttle, full brake), else as before
+                    ADGroundUnload.hold(self.vehicle, dt)
                 end
             end
         else
@@ -168,8 +168,8 @@ function UnloadAtDestinationTask:update(dt)
                 else
                     --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isActiveAtTrigger stopVehicle")
                     self.isReverseTriggerReached = self.vehicle.ad.drivePathModule:getIsReversing()
-                    self.vehicle.ad.specialDrivingModule:stopVehicle()
-                    self.vehicle.ad.specialDrivingModule:update(dt)
+                    -- Overdrive: "while tipping: stand still" holds hard (no throttle, full brake), else as before
+                    ADGroundUnload.hold(self.vehicle, dt)
                 end
             else
                 --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isActiveAtTrigger drivePathModule:update")
@@ -177,9 +177,7 @@ function UnloadAtDestinationTask:update(dt)
                     self:finished()
                 elseif ADGroundUnload.isStillTipping(self, dt) then
                     -- Overdrive: "while tipping: stand still" - a unit is open and the load runs, don't roll on
-                    self.vehicle.ad.specialDrivingModule.motorShouldNotBeStopped = true
-                    self.vehicle.ad.specialDrivingModule:stopVehicle()
-                    self.vehicle.ad.specialDrivingModule:update(dt)
+                    ADGroundUnload.hold(self.vehicle, dt)
                 else
                     self.vehicle.ad.drivePathModule:update(dt)
                 end

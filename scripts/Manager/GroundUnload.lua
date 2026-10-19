@@ -79,6 +79,29 @@ function ADGroundUnload.isStillTipping(task, dt)
     return open and watch.sinceFlow < ADGroundUnload.FLOW_HOLD
 end
 
+-- below this speed (km/h) the vehicle counts as standing and is held hard
+ADGroundUnload.HOLD_SPEED = 0.5
+
+-- holding the vehicle while it unloads. AutoDrive's hold gives a touch of throttle (0.0001) with the handbrake
+-- flag once it stands; with an automatic gearbox in drive a loaded truck and trailer then creep against the brake.
+-- With "stand still", once the vehicle stands: no throttle at all (the gearbox gets no drive request), full brake
+-- and handbrake, until the load stops running. Otherwise AutoDrive's own hold, as before.
+function ADGroundUnload.hold(vehicle, dt)
+    local sdm = vehicle.ad.specialDrivingModule
+    if ADGroundUnload.isStandStill(vehicle) then
+        -- the tipping needs the motor
+        sdm.motorShouldNotBeStopped = true
+    end
+    sdm:stopVehicle()
+    local standing = vehicle.lastSpeedReal ~= nil and vehicle.lastSpeedReal * 3600 <= ADGroundUnload.HOLD_SPEED
+    if not ADGroundUnload.isStandStill(vehicle) or not standing or vehicle.updateVehiclePhysics == nil then
+        sdm:update(dt)
+        return
+    end
+    vehicle:updateVehiclePhysics(0, 0, true, dt)
+    vehicle:raiseActive()
+end
+
 function ADGroundUnload.reset(vehicle)
     if vehicle ~= nil and vehicle.ad ~= nil then
         vehicle.ad.groundUnloadState = nil
@@ -97,9 +120,7 @@ function ADGroundUnload.drive(task, dt)
             ADGroundUnload.isStandStill(vehicle) and "stand still" or "drive through")
     end
     if ADGroundUnload.shouldStop(vehicle, AutoDrive.getAllFillLevels(task.trailers), dt) then
-        vehicle.ad.specialDrivingModule.motorShouldNotBeStopped = true
-        vehicle.ad.specialDrivingModule:stopVehicle()
-        vehicle.ad.specialDrivingModule:update(dt)
+        ADGroundUnload.hold(vehicle, dt)
     else
         vehicle.ad.drivePathModule:update(dt)
     end
