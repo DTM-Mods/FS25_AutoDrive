@@ -134,6 +134,8 @@ New vehicle setting **Best price unloading**, for pickup and deliver and for unl
 - **One stop (whole load):** the target where everything on board together brings the most. Products that selling point does not buy stay on board.
 - **Each product (several stops), maximum profit:** the product worth the most goes first, to the target that pays the most for it. At each stop only the products that get their best price there are unloaded; everything else stays on board, even if that selling point would buy it for less. Then pickup and deliver drives on to the next target for what is left, until nothing sellable is left (at most 5 stops). This works per trailer (or per tipping compartment): a trailer with a product for another stop simply stays closed. In unload mode there is only one stop, so it works like one stop.
 
+A selling point counts only for the target nearest to where it is unloaded: a factory with a loading and an unloading section can have a target at each, and only the one at the unloading section gets its price (if that target does not take the product, see unload products, the next nearest does).
+
 The vehicle's own tanks (diesel, DEF, ...) are never counted as load. A stop is done when the selling point takes nothing more, so a vehicle never waits forever for a product the point does not buy. It needs "use folders", does nothing while target rotation for unloading is on, and the target must be in a folder, not in "All".
 
 ### Drive clear when blocked

@@ -147,4 +147,28 @@ assert s.eval("ADBestPrice.apply(ALL, false)") is False
 # --- folders switched off: not used
 s.execute("SETTINGS.useFolders = false")
 assert s.eval("ADBestPrice.apply(makeTruck(1, {unit({{1, 10000}})}), false)") is False
-print("OK: best price (one stop for the whole load, each product with several stops, limits, own tanks, old savegames)")
+# --- a factory with a loading and an unloading section: two targets near its selling point. The price belongs to
+# the target nearest to where it is unloaded, not to the one that comes first in the folder (the loading section)
+s.execute("""
+    FACTORY = {{marker = {name = "Cannery load"}, x = 0, z = 40}, {marker = {name = "Cannery unload"}, x = 0, z = 4}}
+    CANNERY = {{name = "Cannery", x = 0, z = 0, price = 1.2}}
+    FP = ADBestPrice.getPrices(FACTORY, {[1] = CANNERY}, ADBestPrice.MAX_DISTANCE)
+    FI = ADBestPrice.pickOneStop(FACTORY, FP, {[1] = 1000})
+""")
+assert s.eval("FI") == 2 and s.eval("FP[1][1]") is None and s.eval("FP[2][1].price") == 1.2
+# the unloading section does not take it (unload products of the target): the price goes to the next one
+s.execute("""
+    local original = ADUnloadFilter
+    ADUnloadFilter = {getTargetFilter = function(marker) if marker.name == "Cannery unload" then return {BARLEY = true} end end,
+        allows = function(set, name) return set == nil or set[name] == true end}
+    FP2 = ADBestPrice.getPrices(FACTORY, {[1] = CANNERY}, ADBestPrice.MAX_DISTANCE)
+    ADUnloadFilter = original
+""")
+assert s.eval("FP2[1][1].price") == 1.2 and s.eval("FP2[2][1]") is None
+# two selling points near one target: the nearest counts, as before; one too far away (over 60 m) counts nowhere
+s.execute("""
+    FP3 = ADBestPrice.getPrices({{marker = {name = "T"}, x = 0, z = 0}}, {[1] = {{name = "Near", x = 5, z = 0, price = 1}, {name = "Other", x = 20, z = 0, price = 3}, {name = "Far", x = 200, z = 0, price = 9}}}, ADBestPrice.MAX_DISTANCE)
+""")
+assert s.eval("FP3[1][1].station.name") == "Near"
+
+print("OK: best price (factory sections: the price belongs to the target at the unloading point, one stop for the whole load, each product with several stops, limits, own tanks, old savegames)")

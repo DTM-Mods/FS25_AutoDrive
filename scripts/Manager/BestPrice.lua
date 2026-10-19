@@ -130,31 +130,39 @@ function ADBestPrice.getStations(fillType)
     return stations
 end
 
--- the nearest selling point within maxDistance of the candidate, from stations
-local function nearestStation(candidate, stations, maxDistance)
-    local nearest, nearestDistance = nil, maxDistance
-    for _, station in ipairs(stations) do
-        local distance = MathUtil.vector2Length(candidate.x - station.x, candidate.z - station.z)
-        if distance <= nearestDistance then
-            nearest, nearestDistance = station, distance
-        end
-    end
-    return nearest
+-- does the target take the fill type (unload products of the target)?
+local function takes(candidate, fillType)
+    local targetFilter = ADUnloadFilter ~= nil and candidate.marker ~= nil and ADUnloadFilter.getTargetFilter(candidate.marker) or nil
+    return targetFilter == nil or ADUnloadFilter.allows(targetFilter, g_fillTypeManager:getFillTypeNameByIndex(fillType))
 end
 
 -- candidates: {marker, x, z}; stationsByFillType: fill type -> stations (getStations)
--- prices[i][fillType] = {price, station} of candidate i, if a selling point nearby takes the fill type
+-- prices[i][fillType] = {price, station} of candidate i, if a selling point nearby takes the fill type.
+-- A selling point counts only for the target nearest to where it is unloaded (within maxDistance) that takes the
+-- fill type: a factory with a loading and an unloading section has a target at each, both near its selling point,
+-- and only the one at the unloading section is the right one to tip at.
 function ADBestPrice.getPrices(candidates, stationsByFillType, maxDistance)
     local prices = {}
-    for i, candidate in ipairs(candidates) do
+    for i, _ in ipairs(candidates) do
         prices[i] = {}
-        -- products the target does not take (unload products of the target) are not priced there
-        local targetFilter = ADUnloadFilter ~= nil and candidate.marker ~= nil and ADUnloadFilter.getTargetFilter(candidate.marker) or nil
-        for fillType, stations in pairs(stationsByFillType) do
-            local station = nearestStation(candidate, stations, maxDistance)
-            if station ~= nil and (targetFilter == nil or ADUnloadFilter.allows(targetFilter, g_fillTypeManager:getFillTypeNameByIndex(fillType))) then
-                prices[i][fillType] = {price = station.price, station = station}
+    end
+    for fillType, stations in pairs(stationsByFillType) do
+        -- each station to its nearest target; a target with several stations keeps the nearest one
+        local assigned = {}
+        for _, station in ipairs(stations) do
+            local nearest, nearestDistance = nil, maxDistance
+            for i, candidate in ipairs(candidates) do
+                local distance = MathUtil.vector2Length(candidate.x - station.x, candidate.z - station.z)
+                if distance <= nearestDistance and takes(candidate, fillType) then
+                    nearest, nearestDistance = i, distance
+                end
             end
+            if nearest ~= nil and (assigned[nearest] == nil or nearestDistance < assigned[nearest].distance) then
+                assigned[nearest] = {station = station, distance = nearestDistance}
+            end
+        end
+        for i, entry in pairs(assigned) do
+            prices[i][fillType] = {price = entry.station.price, station = entry.station}
         end
     end
     return prices
