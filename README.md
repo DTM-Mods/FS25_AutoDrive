@@ -149,7 +149,7 @@ it switches off its collisions with other vehicles (its trailers too; the ground
 ### While tipping
 New vehicle setting **While tipping**:
 - **Drive through** (as before): in a bunker silo or on a heap the vehicle drives slowly through while tipping, to spread the load along the silo.
-- **Stand still:** once the vehicle stands for tipping it gets no throttle at all, full brake and handbrake (AutoDrive's normal hold gives a touch of throttle, which let a loaded truck with an automatic gearbox creep), until the load stops running.
+- **Stand still:** once the vehicle stands for tipping it gets no throttle at all (no drive request to the gearbox), the handbrake, and the full brake on the vehicle **and every trailer** (AutoDrive's normal hold gives a touch of throttle and only brakes the truck, so a heavy trailer tipping backwards could push it along). Everything is released as soon as the load stops running: the trailer is empty or the tipping place takes nothing more.
   - **Silo pit / tip trigger, truck with trailer:** the vehicle does not drive on while one of its units is open and the load is running, also when AutoDrive lost track of which unit tips (it used to creep on with the grain still flowing). When nothing has come out for 1.5 seconds it drives on as usual, e.g. to bring the trailer over the pit.
   - **Bunker silo / heap (tipping onto the ground):** the vehicle stops at the first place where it can tip and stays there. It waits up to 30 seconds for the load to start running (the tipper body rises first). Once it ran, when nothing comes out for 6 seconds (the heap is as high as it gets), it moves on slowly until the load runs again, and stops again. Reversing into a silo works as before.
 
