@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Simítás" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Küldés ide: %s" />
 		<text name="AD_sendTo_busy"							 text="foglalt" />
-		<text name="gui_ad_groundUnload"							 text="Billentés a földre" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="Silóárokban vagy kupacra: lassan áthajt, hogy elterítse a rakományt, vagy megáll az első lehetséges helyen (kicsit továbbmegy, ha a kupac megtelt)" />
+		<text name="gui_ad_groundUnload"							 text="Billentés közben" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Megállás: a jármű nem halad tovább, amíg a rakomány ömlik (silógaratnál és pótkocsival is); silóárokban vagy kupacnál az első lehetséges helyen megáll, és csak akkor megy kicsit tovább, ha a kupac megtelt. Áthajtás: mint eddig (elteríti a rakományt a silóárokban)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Áthajtás" />
 		<text name="gui_ad_groundUnload_still"							 text="Megállás" />
 		<text name="gui_ad_unloaderEscape"							 text="Kiállás elakadáskor" />

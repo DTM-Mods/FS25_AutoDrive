@@ -143,12 +143,14 @@ New vehicle setting for combine unloaders, **Drive clear when blocked** (off by 
 
 it switches off its collisions with other vehicles (its trailers too; the ground, buildings and trees still count), drives through to the nearest field edge and a few metres past it, waits there until no other vehicle is near, switches its collisions back on and carries on with its job. Collisions only come back when nothing overlaps, otherwise the physics would throw the vehicles apart; if AutoDrive is stopped during the escape they come back by themselves once the unloader is clear. A message tells you when a driver does this, and it happens at most every 90 seconds per vehicle.
 
-### Tipping on the ground
-New vehicle setting **Tipping on the ground**, for bunker silos and heaps (unloading onto the ground, not into a tip trigger):
-- **Drive through** (as before): the vehicle drives slowly through while tipping, to spread the load along the silo.
-- **Stand still:** the vehicle stops at the first place where it can tip and stays there. It waits up to 30 seconds for the load to start running (the tipper body rises first). Once it ran, when nothing comes out for 6 seconds (the heap is as high as it gets), it moves on slowly until the load runs again, and stops again. Reversing into a silo works as before.
+### While tipping
+New vehicle setting **While tipping**:
+- **Drive through** (as before): in a bunker silo or on a heap the vehicle drives slowly through while tipping, to spread the load along the silo.
+- **Stand still:**
+  - **Silo pit / tip trigger, truck with trailer:** the vehicle does not drive on while one of its units is open and the load is running, also when AutoDrive lost track of which unit tips (it used to creep on with the grain still flowing). When nothing has come out for 1.5 seconds it drives on as usual, e.g. to bring the trailer over the pit.
+  - **Bunker silo / heap (tipping onto the ground):** the vehicle stops at the first place where it can tip and stays there. It waits up to 30 seconds for the load to start running (the tipper body rises first). Once it ran, when nothing comes out for 6 seconds (the heap is as high as it gets), it moves on slowly until the load runs again, and stops again. Reversing into a silo works as before.
 
-This only works where AutoDrive knows the vehicle tips onto the ground: a bunker silo or a heap area. The server log shows a line `[AD] <driver>: tipping on the ground (bunker silo / heap), setting stand still` (or `drive through`) when it starts. No such line means AutoDrive does not see a tipping place there and simply drives on to the last waypoint.
+On the ground this only works where AutoDrive knows the vehicle tips onto the ground: a bunker silo or a heap area. The server log shows a line `[AD] <driver>: tipping on the ground (bunker silo / heap), setting stand still` (or `drive through`) when it starts.
 
 ### Work schedule
 New vehicle settings **Start work at** and **Stop work at** (in-game hours, `--:--` = off).

@@ -46,4 +46,26 @@ assert s.eval("tick(50)") == "drive" and not s.eval("G.isStandStill(V)")
 s.execute("REVERSING = false; SETTING = G.DRIVE_THROUGH")
 assert s.eval("tick(50)") == "drive" and not s.eval("G.isStandStill(V)")
 assert "tipping on the ground (bunker silo / heap), setting stand still" in s.eval("LOGGED")
-print("OK: tipping on the ground (waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")
+
+# --- a silo pit, truck + trailer: with "stand still" no rolling on while a unit is open and the load goes down
+s.execute("""
+    SETTING = G.STAND_STILL; REVERSING = false
+    Dischargeable = {DISCHARGE_STATE_OFF = 0, DISCHARGE_STATE_OBJECT = 1}
+    TRUCK_STATE, TRAILER_STATE = 0, 0
+    PIT = {vehicle = V, trailers = {{getDischargeState = function() return TRUCK_STATE end}, {getDischargeState = function() return TRAILER_STATE end}}}
+    FILL = 50000
+    function pit(litres, dt) FILL = FILL - litres; return G.isStillTipping(PIT, dt or 100) end
+""")
+assert not s.eval("pit(0)")                       # closed, nothing runs: drive on (to the pit)
+s.execute("TRAILER_STATE = 1")                    # the trailer opens (AutoDrive may follow the truck only)
+assert s.eval("pit(40)") and s.eval("pit(40)")    # grain runs: hold
+for _ in range(14):
+    assert s.eval("pit(0)")                        # a short gap in the flow: still hold
+assert not s.eval("pit(0)")                       # nothing for 1.5 s: drive on (bring the next unit over the pit)
+assert s.eval("pit(30)")                          # runs again: hold
+s.execute("TRAILER_STATE = 0")
+assert not s.eval("pit(30)")                      # closed: not tipping
+s.execute("TRAILER_STATE = 1; SETTING = G.DRIVE_THROUGH")
+assert not s.eval("pit(30)")                      # "drive through": as before
+
+print("OK: while tipping (silo pit / truck + trailer hold while the load runs; ground: waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")

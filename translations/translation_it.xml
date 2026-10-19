@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Ammorbidisci" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Invia a %s" />
 		<text name="AD_sendTo_busy"							 text="occupato" />
-		<text name="gui_ad_groundUnload"							 text="Scarico a terra" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="In un silo a trincea o su un cumulo: attraversare lentamente per distribuire il carico, o restare fermo nel primo punto possibile (avanza un po' quando il cumulo è pieno)" />
+		<text name="gui_ad_groundUnload"							 text="Durante lo scarico" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Resta fermo: il veicolo non avanza finché il carico scende (anche alla fossa di un silo e con rimorchio); in un silo a trincea o su un cumulo si ferma nel primo punto possibile e avanza un po' solo quando il cumulo è pieno. Attraversa: come prima (distribuisce il carico nel silo a trincea)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Attraversa" />
 		<text name="gui_ad_groundUnload_still"							 text="Resta fermo" />
 		<text name="gui_ad_unloaderEscape"							 text="Liberarsi se bloccato" />

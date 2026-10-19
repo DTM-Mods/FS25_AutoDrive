@@ -175,6 +175,11 @@ function UnloadAtDestinationTask:update(dt)
                 --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isActiveAtTrigger drivePathModule:update")
                 if self.isReverseTriggerReached then
                     self:finished()
+                elseif ADGroundUnload.isStillTipping(self, dt) then
+                    -- Overdrive: "while tipping: stand still" - a unit is open and the load runs, don't roll on
+                    self.vehicle.ad.specialDrivingModule.motorShouldNotBeStopped = true
+                    self.vehicle.ad.specialDrivingModule:stopVehicle()
+                    self.vehicle.ad.specialDrivingModule:update(dt)
                 else
                     self.vehicle.ad.drivePathModule:update(dt)
                 end

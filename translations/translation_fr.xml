@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Lisser" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Envoyer vers %s" />
 		<text name="AD_sendTo_busy"							 text="occupé" />
-		<text name="gui_ad_groundUnload"							 text="Déversement au sol" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="Dans un silo couloir ou sur un tas : traverser lentement pour répartir le chargement, ou rester immobile au premier endroit possible (avance un peu quand le tas est plein)" />
+		<text name="gui_ad_groundUnload"							 text="Pendant le déchargement" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Rester immobile : le véhicule n'avance pas tant que le chargement s'écoule (aussi à la fosse d'un silo et avec une remorque) ; dans un silo couloir ou sur un tas, il s'arrête au premier endroit possible et n'avance un peu que quand le tas est plein. Traverser : comme avant (répartit le chargement dans le silo couloir)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Traverser" />
 		<text name="gui_ad_groundUnload_still"							 text="Rester immobile" />
 		<text name="gui_ad_unloaderEscape"							 text="Se dégager si bloqué" />

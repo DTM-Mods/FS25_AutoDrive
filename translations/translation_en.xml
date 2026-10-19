@@ -603,8 +603,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Smooth" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Send to %s" />
 		<text name="AD_sendTo_busy"							 text="busy" />
-		<text name="gui_ad_groundUnload"							 text="Tipping on the ground" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="In a bunker silo or on a heap: drive slowly through to spread the load, or stand still at the first place it can tip (moves on a little when the heap is full)" />
+		<text name="gui_ad_groundUnload"							 text="While tipping" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Stand still: the vehicle does not drive on while the load runs (also at a silo pit and with a trailer); in a bunker silo or on a heap it stops at the first place it can tip and moves on a little only when the heap is full. Drive through: as before (spreads the load in a bunker silo)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Drive through" />
 		<text name="gui_ad_groundUnload_still"							 text="Stand still" />
 		<text name="gui_ad_unloaderEscape"							 text="Drive clear when blocked" />

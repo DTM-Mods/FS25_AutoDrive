@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Wygładź" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Wyślij do %s" />
 		<text name="AD_sendTo_busy"							 text="zajęty" />
-		<text name="gui_ad_groundUnload"							 text="Wysypywanie na ziemię" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="W silosie przejazdowym lub na pryzmie: przejeżdżaj powoli, aby rozłożyć ładunek, albo stój w pierwszym możliwym miejscu (podjeżdża kawałek, gdy pryzma jest pełna)" />
+		<text name="gui_ad_groundUnload"							 text="Podczas wysypywania" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Stój w miejscu: pojazd nie jedzie dalej, dopóki ładunek się wysypuje (także przy koszu zasypowym silosu i z przyczepą); w silosie przejazdowym lub na pryzmie staje w pierwszym możliwym miejscu i podjeżdża tylko, gdy pryzma jest pełna. Przejedź: jak dotąd (rozkłada ładunek w silosie)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Przejedź" />
 		<text name="gui_ad_groundUnload_still"							 text="Stój w miejscu" />
 		<text name="gui_ad_unloaderEscape"							 text="Wyjedź przy blokadzie" />

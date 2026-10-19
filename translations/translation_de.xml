@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Glätten" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Schicken zu %s" />
 		<text name="AD_sendTo_busy"							 text="beschäftigt" />
-		<text name="gui_ad_groundUnload"							 text="Abkippen auf den Boden" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="Im Fahrsilo oder auf einem Haufen: langsam durchfahren, um die Ladung zu verteilen, oder an der ersten möglichen Stelle stehen bleiben (fährt ein Stück weiter, wenn der Haufen voll ist)" />
+		<text name="gui_ad_groundUnload"							 text="Beim Abkippen" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Stehen bleiben: das Fahrzeug fährt nicht weiter, solange die Ladung läuft (auch an einer Siloschütte und mit Anhänger); im Fahrsilo oder auf einem Haufen hält es an der ersten möglichen Stelle und fährt nur ein Stück weiter, wenn der Haufen voll ist. Durchfahren: wie bisher (verteilt die Ladung im Fahrsilo)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Durchfahren" />
 		<text name="gui_ad_groundUnload_still"							 text="Stehen bleiben" />
 		<text name="gui_ad_unloaderEscape"							 text="Bei Blockade freifahren" />

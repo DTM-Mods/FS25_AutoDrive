@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Vyhladit" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Poslat do %s" />
 		<text name="AD_sendTo_busy"							 text="zaneprázdněno" />
-		<text name="gui_ad_groundUnload"							 text="Vysypání na zem" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="V žlabovém silu nebo na hromadu: pomalu projíždět a rozprostřít náklad, nebo stát na prvním možném místě (popojede, když je hromada plná)" />
+		<text name="gui_ad_groundUnload"							 text="Při vysypávání" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Stát na místě: vozidlo nejede dál, dokud náklad sype (i u násypky sila a s přívěsem); v žlabovém silu nebo na hromadu zastaví na prvním možném místě a popojede jen, když je hromada plná. Projet: jako dřív (rozprostře náklad v silu)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Projet" />
 		<text name="gui_ad_groundUnload_still"							 text="Stát na místě" />
 		<text name="gui_ad_unloaderEscape"							 text="Vyjet při zablokování" />

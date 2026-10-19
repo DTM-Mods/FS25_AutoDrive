@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Сгладить" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Отправить в %s" />
 		<text name="AD_sendTo_busy"							 text="занята" />
-		<text name="gui_ad_groundUnload"							 text="Выгрузка на землю" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="В силосной траншее или в кучу: медленно проезжать, распределяя груз, или стоять на первом возможном месте (немного проезжает, когда куча заполнена)" />
+		<text name="gui_ad_groundUnload"							 text="Во время выгрузки" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Стоять: техника не едет дальше, пока груз высыпается (также у приёмной ямы силоса и с прицепом); в силосной траншее или у кучи останавливается на первом возможном месте и немного проезжает, только когда куча заполнена. Проезжать: как раньше (распределяет груз в траншее)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Проезжать" />
 		<text name="gui_ad_groundUnload_still"							 text="Стоять" />
 		<text name="gui_ad_unloaderEscape"							 text="Выезжать при блокировке" />

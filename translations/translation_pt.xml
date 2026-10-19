@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Suavizar" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Enviar para %s" />
 		<text name="AD_sendTo_busy"							 text="ocupado" />
-		<text name="gui_ad_groundUnload"							 text="Descarregar no chão" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="Num silo trincheira ou monte: atravessar devagar para espalhar a carga, ou ficar parado no primeiro sítio possível (avança um pouco quando o monte está cheio)" />
+		<text name="gui_ad_groundUnload"							 text="Ao descarregar" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Ficar parado: o veículo não avança enquanto a carga escoa (também numa moega de silo e com reboque); num silo trincheira ou monte para no primeiro sítio possível e só avança um pouco quando o monte está cheio. Atravessar: como antes (espalha a carga no silo trincheira)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Atravessar" />
 		<text name="gui_ad_groundUnload_still"							 text="Ficar parado" />
 		<text name="gui_ad_unloaderEscape"							 text="Libertar quando bloqueado" />

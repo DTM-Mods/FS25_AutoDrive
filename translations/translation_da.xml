@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Udglat" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Send til %s" />
 		<text name="AD_sendTo_busy"							 text="optaget" />
-		<text name="gui_ad_groundUnload"							 text="Tipning på jorden" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="I en plansilo eller på en bunke: kør langsomt igennem for at fordele læsset, eller hold stille på det første mulige sted (kører lidt videre, når bunken er fuld)" />
+		<text name="gui_ad_groundUnload"							 text="Under tipning" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Hold stille: køretøjet kører ikke videre, mens læsset løber (også ved en silos indtag og med anhænger); i en plansilo eller på en bunke stopper det det første mulige sted og kører kun lidt videre, når bunken er fuld. Kør igennem: som før (fordeler læsset i plansiloen)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Kør igennem" />
 		<text name="gui_ad_groundUnload_still"							 text="Hold stille" />
 		<text name="gui_ad_unloaderEscape"							 text="Kør fri ved blokering" />

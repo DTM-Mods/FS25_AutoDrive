@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Gladmaken" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Sturen naar %s" />
 		<text name="AD_sendTo_busy"							 text="bezig" />
-		<text name="gui_ad_groundUnload"							 text="Lossen op de grond" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="In een sleufsilo of op een hoop: langzaam doorrijden om de lading te verdelen, of stilstaan op de eerste plek waar het kan (rijdt een stukje door als de hoop vol is)" />
+		<text name="gui_ad_groundUnload"							 text="Tijdens het lossen" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Stilstaan: het voertuig rijdt niet verder zolang de lading loopt (ook bij een stortput van een silo en met aanhanger); in een sleufsilo of op een hoop stopt het op de eerste plek waar het kan en rijdt alleen een stukje door als de hoop vol is. Doorrijden: zoals voorheen (verdeelt de lading in de sleufsilo)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Doorrijden" />
 		<text name="gui_ad_groundUnload_still"							 text="Stilstaan" />
 		<text name="gui_ad_unloaderEscape"							 text="Vrijrijden bij blokkade" />

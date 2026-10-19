@@ -1,7 +1,10 @@
--- Tipping on the ground (bunker silo / heap areas): AutoDrive drives slowly through the area while tipping, to
--- spread the load (upstream). Vehicle setting groundUnload "stand still": the vehicle stops at the first place it
--- can tip and stays there. When nothing comes out any more for a while (the heap is as high as it gets), it moves
--- on slowly until the load runs again, and stops again. Reversing into a silo is left as it is.
+-- While tipping (vehicle setting groundUnload):
+-- Bunker silo / heap areas: AutoDrive drives slowly through the area while tipping, to spread the load (upstream).
+-- "Stand still": the vehicle stops at the first place it can tip and stays there. When nothing comes out any more
+-- for a while (the heap is as high as it gets), it moves on slowly until the load runs again, and stops again.
+-- Reversing into a silo is left as it is.
+-- Everywhere else (a silo pit, a truck with a trailer): with "stand still" the vehicle does not drive on while one
+-- of its units is open and the load goes down, also when AutoDrive lost track of which unit tips.
 ADGroundUnload = {}
 
 ADGroundUnload.DRIVE_THROUGH = 1
@@ -44,6 +47,36 @@ function ADGroundUnload.shouldStop(vehicle, fillLevel, dt)
         return state.stalled < ADGroundUnload.STALL_TIME
     end
     return state.stalled < ADGroundUnload.FIRST_FLOW_TIME
+end
+
+-- the load went down within this time (ms): it still runs
+ADGroundUnload.FLOW_HOLD = 1500
+
+-- a unit of the vehicle is open (discharging) and the load went down a moment ago; only with "stand still"
+function ADGroundUnload.isStillTipping(task, dt)
+    local vehicle = task.vehicle
+    if not ADGroundUnload.isStandStill(vehicle) or task.trailers == nil or #task.trailers == 0 then
+        return false
+    end
+    local open = false
+    for _, unit in ipairs(task.trailers) do
+        if unit.getDischargeState ~= nil and unit:getDischargeState() ~= Dischargeable.DISCHARGE_STATE_OFF then
+            open = true
+        end
+    end
+    local fillLevel = AutoDrive.getAllFillLevels(task.trailers)
+    local watch = task.tipWatch
+    if watch == nil or fillLevel > watch.fillLevel + ADGroundUnload.MIN_FLOW then
+        watch = {fillLevel = fillLevel, sinceFlow = math.huge}
+        task.tipWatch = watch
+    end
+    if fillLevel < watch.fillLevel - ADGroundUnload.MIN_FLOW then
+        watch.fillLevel = fillLevel
+        watch.sinceFlow = 0
+    else
+        watch.sinceFlow = watch.sinceFlow + (dt or 0)
+    end
+    return open and watch.sinceFlow < ADGroundUnload.FLOW_HOLD
 end
 
 function ADGroundUnload.reset(vehicle)

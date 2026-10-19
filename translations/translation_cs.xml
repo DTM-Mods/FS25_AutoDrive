@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="平滑" />
 		<text name="gui_ad_sendToTitleTarget"							 text="派往 %s" />
 		<text name="AD_sendTo_busy"							 text="忙碌" />
-		<text name="gui_ad_groundUnload"							 text="卸到地面" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="在青贮窖或料堆：慢慢驶过以铺开货物，或停在第一个可卸货的位置（料堆满了会稍微往前开）" />
+		<text name="gui_ad_groundUnload"							 text="卸货时" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="原地停住：卸货期间车辆不会继续行驶（在筒仓卸料坑和带拖车时也是）；在青贮窖或料堆停在第一个可卸货位置，只有料堆满了才会稍微往前开。驶过：与以前相同（在青贮窖中铺开货物）" />
 		<text name="gui_ad_groundUnload_drive"							 text="驶过" />
 		<text name="gui_ad_groundUnload_still"							 text="原地停住" />
 		<text name="gui_ad_unloaderEscape"							 text="受阻时驶离" />

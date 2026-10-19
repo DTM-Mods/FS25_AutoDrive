@@ -600,8 +600,8 @@
 		<text name="AD_wpPanel_smooth"							 text="Suavizar" />
 		<text name="gui_ad_sendToTitleTarget"							 text="Enviar a %s" />
 		<text name="AD_sendTo_busy"							 text="ocupado" />
-		<text name="gui_ad_groundUnload"							 text="Descargar en el suelo" />
-		<text name="gui_ad_groundUnload_tooltip"							 text="En un silo búnker o un montón: atravesar despacio para repartir la carga, o quedarse quieto en el primer sitio posible (avanza un poco cuando el montón está lleno)" />
+		<text name="gui_ad_groundUnload"							 text="Al descargar" />
+		<text name="gui_ad_groundUnload_tooltip"							 text="Quedarse quieto: el vehículo no avanza mientras sale la carga (también en la tolva de un silo y con remolque); en un silo búnker o un montón para en el primer sitio posible y solo avanza un poco cuando el montón está lleno. Atravesar: como antes (reparte la carga en el silo búnker)" />
 		<text name="gui_ad_groundUnload_drive"							 text="Atravesar" />
 		<text name="gui_ad_groundUnload_still"							 text="Quedarse quieto" />
 		<text name="gui_ad_unloaderEscape"							 text="Liberarse si está bloqueado" />
