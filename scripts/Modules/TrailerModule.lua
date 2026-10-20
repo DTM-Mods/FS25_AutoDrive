@@ -528,7 +528,7 @@ function ADTrailerModule:updateUnload(dt)
                     self.isUnloadingWithTrailer:setDischargeState(Dischargeable.DISCHARGE_STATE_OBJECT)
                 end
                 self.unloadRetryTimer:timer(false)      -- clear timer
-            elseif not (self.vehicle.ad.drivePathModule:getIsReversing()) and self.unloadingToBunkerSilo and self.stuckInBunkerTimer:done() and not ADGroundUnload.isStandStill(self.vehicle) then
+            elseif not (self.vehicle.ad.drivePathModule:getIsReversing()) and self.unloadingToBunkerSilo and self.stuckInBunkerTimer:done() and not ADGroundUnload.isHoldingForFlow(self.vehicle) then
                 -- stuck in silo bunker
                 AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_TRAILERINFO, "ADTrailerModule:updateUnload unloadDelayTimer:done 5")
                 if self.isUnloadingWithTrailer ~= nil and self.isUnloadingWithTrailer.setDischargeState then

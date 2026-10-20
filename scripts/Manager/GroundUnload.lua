@@ -49,6 +49,25 @@ function ADGroundUnload.shouldStop(vehicle, fillLevel, dt)
     return state.stalled < ADGroundUnload.FIRST_FLOW_TIME
 end
 
+-- with "stand still": still waiting at this place for the load to run, or it runs. Only then AutoDrive's
+-- "stuck in silo bunker" rescue (discharge off, drive on) must wait; once nothing came out for the full wait it
+-- works again - a loading wagon passing the bunker next to its target "started" tipping there, nothing came out,
+-- and with the rescue always off it stood there for good (od.37)
+function ADGroundUnload.isHoldingForFlow(vehicle)
+    if not ADGroundUnload.isStandStill(vehicle) then
+        return false
+    end
+    local state = vehicle.ad.groundUnloadState
+    if state == nil then
+        -- just started: the tipper body still rises
+        return true
+    end
+    if state.flowing then
+        return state.stalled < ADGroundUnload.STALL_TIME
+    end
+    return state.stalled < ADGroundUnload.FIRST_FLOW_TIME
+end
+
 -- the load went down within this time (ms): it still runs
 ADGroundUnload.FLOW_HOLD = 1500
 
