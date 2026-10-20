@@ -52,6 +52,7 @@ def main():
         run("test_drag_ground.py"),
         run("test_groundunload.py"),
         run("test_unloader_escape.py"),
+        run("test_fill_levels.py"),
     ]
     if not all(results):
         sys.exit(1)

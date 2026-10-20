@@ -101,6 +101,34 @@ function AutoDrive.getFreeCapacity(object)
     return fillFreeCapacity
 end
 
+-- Overdrive: an empty tank of the truck itself (not of a trailer) that takes none of the products selected to
+-- load can never be filled by this load - e.g. the wood chip tank of a crusher truck (Tatra "Frankenstein") under
+-- a silo pouring alfalfa. Counted, the truck was never full and waited at the loading point for good.
+function AutoDrive.isOwnTankOutOfLoad(object, fillUnitIndex, rootVehicle)
+    if object ~= rootVehicle or rootVehicle.ad == nil or rootVehicle.ad.stateModule == nil
+        or object.getFillUnitSupportsFillType == nil or object.getFillUnitFillLevel == nil then
+        return false
+    end
+    if #AutoDrive.getAllImplements(rootVehicle) == 0 or object:getFillUnitFillLevel(fillUnitIndex) > 0.01 then
+        return false
+    end
+    local stateModule = rootVehicle.ad.stateModule
+    local selected = stateModule.getSelectedFillTypes ~= nil and stateModule:getSelectedFillTypes() or nil
+    if selected == nil or #selected == 0 then
+        local single = stateModule.getFillType ~= nil and stateModule:getFillType() or nil
+        selected = (single ~= nil and single ~= FillType.UNKNOWN) and {single} or {}
+    end
+    if #selected == 0 then
+        return false
+    end
+    for _, fillType in ipairs(selected) do
+        if object:getFillUnitSupportsFillType(fillUnitIndex, fillType) then
+            return false
+        end
+    end
+    return true
+end
+
 -- new
 -- consider only dischargable fillUnits
 -- consider units which should be filled but will be consumed by unit itself, i.e. sprayer, sowingMachine
@@ -119,6 +147,9 @@ function AutoDrive.getObjectFillLevels(object)
     local fillLevel, fillCapacity, fillFreeCapacity = 0, 0, 0
 
     local function updateFillLevels(fillUnitIndex)
+        if AutoDrive.isOwnTankOutOfLoad(object, fillUnitIndex, rootVehicle) then
+            return
+        end
         if object.getFillUnitFillLevel and object.getFillUnitCapacity and object.getFillUnitFreeCapacity then
             local unitFillLevel = object:getFillUnitFillLevel(fillUnitIndex)
             local unitCapacity = object:getFillUnitCapacity(fillUnitIndex)
