@@ -1,4 +1,4 @@
--- While tipping (vehicle setting groundUnload):
+-- While tipping (vehicle setting whileTipping, default stand still):
 -- Bunker silo / heap areas: AutoDrive drives slowly through the area while tipping, to spread the load (upstream).
 -- "Stand still": the vehicle stops at the first place it can tip and stays there. When nothing comes out any more
 -- for a while (the heap is as high as it gets), it moves on slowly until the load runs again, and stops again.
@@ -17,7 +17,7 @@ ADGroundUnload.FIRST_FLOW_TIME = 30000
 ADGroundUnload.MIN_FLOW = 1
 
 function ADGroundUnload.isStandStill(vehicle)
-    if vehicle == nil or vehicle.ad == nil or AutoDrive.getSetting("groundUnload", vehicle) ~= ADGroundUnload.STAND_STILL then
+    if vehicle == nil or vehicle.ad == nil or AutoDrive.getSetting("whileTipping", vehicle) ~= ADGroundUnload.STAND_STILL then
         return false
     end
     local drivePathModule = vehicle.ad.drivePathModule

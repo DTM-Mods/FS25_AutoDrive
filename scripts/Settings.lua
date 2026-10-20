@@ -802,12 +802,14 @@ AutoDrive.settings.bestPriceUnload = {
     isCopyPaste = true
 }
 
--- tipping on the ground (bunker silo / heap): drive through to spread it, or stand still (ADGroundUnload)
-AutoDrive.settings.groundUnload = {
+-- while tipping: stand still (held hard) or drive through as AutoDrive always did (ADGroundUnload). Saved under
+-- this name since od.37 with stand still as the default: the values saved as "groundUnload" (default drive through)
+-- are not read any more, so every vehicle starts on stand still
+AutoDrive.settings.whileTipping = {
     values = {1, 2},
     texts = {"gui_ad_groundUnload_drive", "gui_ad_groundUnload_still"},
-    default = 1,
-    current = 1,
+    default = 2,
+    current = 2,
     text = "gui_ad_groundUnload",
     tooltip = "gui_ad_groundUnload_tooltip",
     translate = true,

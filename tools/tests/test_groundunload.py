@@ -9,7 +9,7 @@ s.execute("""
     Logging = {info = function(...) LOGGED = string.format(select(1, ...), select(2, ...)) end}
     G = ADGroundUnload
     SETTING = G.STAND_STILL
-    AutoDrive.getSetting = function(name, vehicle) if name == "groundUnload" then return SETTING end end
+    AutoDrive.getSetting = function(name, vehicle) if name == "whileTipping" then return SETTING end end
     REVERSING = false
     FILL = 10000
     AutoDrive.getAllFillLevels = function() return FILL end
@@ -100,4 +100,14 @@ assert s.eval("PHYSICS") is None and s.eval("SDM_UPDATES") == 1
 s.execute("PHYSICS = nil; H.lastSpeedReal = 0; SETTING = G.DRIVE_THROUGH; H.ad.specialDrivingModule.motorShouldNotBeStopped = nil; G.hold(H, 16)")
 assert s.eval("PHYSICS") is None and s.eval("SDM_UPDATES") == 2 and s.eval("H.ad.specialDrivingModule.motorShouldNotBeStopped") is None
 
-print("OK: while tipping (hard hold: no throttle, handbrake, full brake on truck and trailer, released after; silo pit / truck + trailer hold while the load runs; ground: waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")
+# --- the setting: stand still is the default, saved under the new name (old "groundUnload" values are not read)
+settings = t.read(os.path.join(t.MOD, "scripts", "Settings.lua"))
+block = settings.replace(chr(13) + chr(10), chr(10))
+block = block[block.index("AutoDrive.settings.whileTipping = {"):]
+block = block[:block.index(chr(10) + "}") + 2]
+assert "default = 2," in block and "values = {1, 2}," in block and "isVehicleSpecific = true" in block
+assert "AutoDrive.settings.groundUnload" not in settings
+assert 'name="whileTipping"' in t.read(os.path.join(t.MOD, "gui", "vehicleSettingsPage.xml"))
+assert s.eval("G.STAND_STILL") == 2
+
+print("OK: while tipping (default stand still; hard hold: no throttle, handbrake, full brake on truck and trailer, released after; silo pit / truck + trailer hold while the load runs; ground: waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")
