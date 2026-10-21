@@ -6,7 +6,7 @@
 --   - AutoDrive vehicles stopped because of a problem (errors red, warnings yellow) for as long as they stand
 --   - Courseplay vehicles with their Courseplay info texts (errors red, things to look after yellow)
 --   - the AutoDrive messages of the last minutes (the pop-ups at the top stay as they are)
--- User setting showTicker.
+-- User setting tickerBar (off by default; was showTicker until od.43, renamed so the saved "on" of every player is dropped).
 ADTicker = {}
 
 ADTicker.HEIGHT = 0.026            -- of the screen height
@@ -387,7 +387,7 @@ function ADTicker.buildSegments()
 end
 
 function ADTicker.isShown()
-    if not AutoDrive.getSetting("showTicker") or g_dedicatedServer ~= nil then
+    if not AutoDrive.getSetting("tickerBar") or g_dedicatedServer ~= nil then
         return false
     end
     if g_gui ~= nil and g_gui:getIsGuiVisible() then

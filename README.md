@@ -104,7 +104,7 @@ A bar along the bottom edge of the screen scrolls, like a news ticker:
 - Courseplay vehicles of your farm with their Courseplay info texts: errors (no path found, stuck, blocked, out of fuel, broken, ...) in **red**, things to look after (fuel low, needs filling / unloading, waiting for rain) in yellow, the rest in white
 - the AutoDrive messages of the last 3 minutes (warnings in yellow, errors in red). The pop-ups at the top stay as they are.
 
-It is hidden in menus and when the game's HUD is off; otherwise it is always there (with the numbers), even when nothing drives. Switch it off in the user settings (**Ticker at the bottom**).
+It is **off until you switch it on**: AutoDrive settings, user page, **Ticker at the bottom**. Each player chooses for themselves (the server keeps the choice per player). When on, it is hidden in menus and when the game's HUD is off; otherwise it is always there (with the numbers), even when nothing drives.
 
 Every wait reason and every Courseplay info comes with a short hint in grey on what it means or what to check (e.g. "Blocked: the obstacle detection sees something in front: a vehicle, object or person").
 

@@ -23,7 +23,7 @@ s.execute("""
     end
     CONTROLLED = nil
     AutoDrive.getControlledVehicle = function() return CONTROLLED end
-    SETTINGS = {showTicker = true}
+    SETTINGS = {tickerBar = true}
     AutoDrive.getSetting = function(name) return SETTINGS[name] end
     g_time = 100000
     g_localPlayer = {getFarmId = function() return 1 end}
@@ -183,7 +183,7 @@ assert s.eval("DRAWN[1][1]") < first                                           #
 s.execute("T.offset = T.totalWidth * 3 + 0.01; DRAWN = {}; T:safeDraw()")
 assert 0 <= s.eval("T.offset") < s.eval("T.totalWidth")                         # wraps around
 assert not s.eval("T.failed")
-s.execute("MENU = true; OVERLAYS = 0; T:safeDraw(); MENU = false; SETTINGS.showTicker = false; T:safeDraw(); SETTINGS.showTicker = true")
+s.execute("MENU = true; OVERLAYS = 0; T:safeDraw(); MENU = false; SETTINGS.tickerBar = false; T:safeDraw(); SETTINGS.tickerBar = true")
 assert s.eval("OVERLAYS") == 0
 
 # --- the reason goes along with the vehicle's state: written last, read back and translated
@@ -193,4 +193,13 @@ read = state[state.index("function ADStateModule:doReadStream"):state.index("fun
 assert "streamWriteString(streamId, self.waitReason or " in write.split("streamWriteUInt8(streamId, self.actualFarmId)")[1]
 assert "self.waitReason = streamReadString(streamId)" in read.split("self.actualFarmId = streamReadUInt8(streamId)")[1]
 assert "self.waitReasonLocalized = AutoDrive.localize(self.waitReason)" in read
+
+# the setting: off until the player switches it on, under a new name so the "on" saved for everyone under showTicker is dropped
+import re as _re
+_settings = t.read(os.path.join(t.MOD, "scripts", "Settings.lua"))
+_block = _re.search(r"AutoDrive\.settings\.tickerBar = \{(.*?)\n\}", _settings.replace("\r\n", "\n"), _re.S).group(1)
+assert "values = {false, true}" in _block and "default = 1," in _block and "current = 1," in _block and "isUserSpecific = true" in _block
+assert "AutoDrive.settings.showTicker" not in _settings
+assert 'name="tickerBar" id="tickerBar"' in t.read(os.path.join(t.MOD, "gui", "userSettingsPage.xml"))
+
 print("OK: ticker (errors red: Courseplay info texts and AutoDrive vehicles stopped by an error; driver counts AutoDrive / waiting / Courseplay / helpers; why it waits: queue, waypoint, traffic, blocked, loading, not full, tipping, nothing comes out, unload point, standing; messages copied once; line; scrolling; synced reason)")

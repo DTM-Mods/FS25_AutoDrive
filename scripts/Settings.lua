@@ -1031,12 +1031,13 @@ AutoDrive.settings.waypointPanel = {
     isUserSpecific = true
 }
 
--- Overdrive: the ticker at the bottom of the screen (ADTicker)
-AutoDrive.settings.showTicker = {
+-- Overdrive: the ticker at the bottom (ADTicker), off until the player switches it on. Named showTicker (default on)
+-- until od.43; renamed so the "on" saved for every player is not taken over.
+AutoDrive.settings.tickerBar = {
     values = {false, true},
     texts = {"gui_ad_no", "gui_ad_yes"},
-    default = 2,
-    current = 2,
+    default = 1,
+    current = 1,
     text = "gui_ad_showTicker",
     tooltip = "gui_ad_showTicker_tooltip",
     translate = true,
