@@ -321,8 +321,13 @@ function ADUnloaderEscape.start(mode, reason)
     mode.failedPathFinder = 0
     vehicle.ad.taskModule:addTask(mode.activeTask)
     if AutoDriveMessageEvent ~= nil and ADMessagesManager ~= nil then
-        local key = reason == "harvester" and "AD_escape_harvester" or "AD_escape_stuck"
-        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.INFO, "$l10n_AD_Driver_of; %s $l10n_" .. key .. ";", 5000, vehicle.ad.stateModule:getName())
+        if reason == "harvester" then
+            local harvester = ADUnloaderEscape.getBlockedHarvester(mode)
+            AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.INFO, "$l10n_AD_Driver_of; %s $l10n_AD_escape_harvester; (%s)", 8000,
+                vehicle.ad.stateModule:getName(), harvester ~= nil and ADDiag.unitName(harvester) or "?")
+        else
+            AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.INFO, "$l10n_AD_Driver_of; %s $l10n_AD_escape_stuck;", 8000, vehicle.ad.stateModule:getName())
+        end
     end
 end
 

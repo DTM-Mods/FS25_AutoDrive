@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="靜止" />
 		<text name="AD_ticker_waiting"							 text="等待中" />
 		<text name="AD_ticker_helpers"							 text="幫手" />
+		<text name="AD_diag_to"							 text="前往" />
+		<text name="AD_diag_from"							 text="從" />
+		<text name="AD_diag_nearestWp"							 text="最近的航點" />
+		<text name="AD_diag_offNetwork"							 text="距離路線網路" />
+		<text name="AD_diag_startWp"							 text="起點航點" />
+		<text name="AD_diag_nextWp"							 text="下一個航點" />
+		<text name="AD_diag_blockedBy"							 text="被阻擋：" />
+		<text name="AD_diag_stations"							 text="個有此燃料的加油站" />
+		<text name="AD_diag_tankNotLow"							 text="無需加油：沒有油箱低於" />
+		<text name="AD_diag_noWorkshop"							 text="找不到維修廠" />
+		<text name="AD_diag_workshops"							 text="個維修廠" />
+		<text name="AD_diag_forTool"							 text="用於" />
+		<text name="AD_diag_mode"							 text="目前模式" />
+		<text name="AD_diag_byCourseplay"							 text="Courseplay 正在駕駛" />
+		<text name="AD_diag_byHelper"							 text="遊戲幫手正在駕駛" />
+		<text name="AD_diag_notOnField"							 text="不在田地上" />
+		<text name="AD_diag_noTarget"							 text="無法開始：未設定目標（此模式還需要卸貨目標）" />
+		<text name="AD_diag_recordOffsets"							 text="雙車道錄製已停止：兩條車道需要不同的偏移" />
+		<text name="AD_diag_recordReverse"							 text="雙車道錄製已停止：倒車時無法錄製" />
+		<text name="AD_diag_attached"							 text="已連接" />
+		<text name="AD_diag_bunkerEmpty"							 text="在青貯窖中找不到可裝的東西" />
+		<text name="AD_diag_ualUnsupported"							 text="卸載產品：不支援此版本的 Universal Autoload，設定了產品清單時不會卸下棧板" />
+		<text name="AD_hint_pfNoRoute"							 text="最近的航點沒有通往此目標的路線。檢查那裡的連接（單向和倒車箭頭）或執行路線檢查（Ctrl+Alt+N）" />
+		<text name="AD_hint_pfBlocked"							 text="找不到從車輛到路線網路的可行駛道路。檢查是否有建築、圍欄、樹木、車輛或陡坡擋路；把車開近路線網路，關閉「避開作物」或「限制在田地內」，或增加尋路時間" />
+		<text name="AD_hint_noRoute"							 text="路線網路中從車輛所在位置到此目標沒有路線。檢查車輛附近（可能在另一條車道上）和沿途的箭頭，或執行路線檢查（Ctrl+Alt+N）" />
+		<text name="AD_hint_stuck"							 text="8 秒內沒有靠近下一個航點。常見原因：有東西擋路、對此車輛和拖車來說轉彎太急、航點在物體內部，或地面陡峭或濕滑。AutoDrive 會重新開始任務" />
+		<text name="AD_hint_exitField"							 text="路線網路中從那裡到卸貨目標沒有路線。檢查兩個目標都已設定且不同，以及它們之間的連接（路線檢查，Ctrl+Alt+N）" />
+		<text name="AD_hint_refuel"							 text="AutoDrive 目標必須在出售此燃料且對你的農場有庫存的加油站 15 公尺內。在加油機旁建立一個目標" />
+		<text name="AD_hint_repair"							 text="AutoDrive 目標必須在維修廠或維修點 15 公尺內。在那裡建立一個目標，或關閉自動維修" />
+		<text name="AD_hint_park"							 text="停車目標按每個連接的農具分別儲存。在連接此農具時，在 HUD 中選擇目標並右鍵點擊停車按鈕（P），或關閉「作業完成後停車」" />
+		<text name="AD_hint_helperMode"							 text="從 Courseplay 或遊戲幫手接手只適用於「取貨並送貨」、「裝貨」和「卸貨」模式。切換 AutoDrive 模式，或關閉移交給 AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="先停止另一個駕駛者，再啟動 AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive 會繼續幫手上一次的田間作業：車輛必須停在該田地上、距第一個目標 30 公尺內，且作業必須有效（田地、農具、種子）" />
+		<text name="AD_hint_shovel"							 text="青貯窖模式需要裝載機上裝有鏟斗" />
+		<text name="AD_hint_bunker"							 text="裝載機啟動時必須在青貯窖 100 公尺內" />
+		<text name="AD_hint_bunkerEmpty"							 text="青貯窖可能是空的或仍在發酵，或鏟斗寬度設定不合適" />
+		<text name="AD_hint_bgaTrailer"							 text="一輛帶 AutoDrive 且拖車有空餘的車輛必須在 50 公尺內停穩 3 秒" />
+		<text name="AD_hint_waitQueue"							 text="另一輛車先在那裡卸貨" />
+		<text name="AD_hint_waitBlocked"							 text="障礙偵測看到前方有東西：車輛、物體或人" />
+		<text name="AD_hint_waitNotFull"							 text="它會等到達到卸貨裝載量設定；檢查筒倉裡是否有此產品" />
+		<text name="AD_hint_waitNoFlow"							 text="卸貨點可能不收此產品或已滿，或拖車不能向這一側傾卸" />
+		<text name="AD_hint_waitStanding"							 text="原因不明，去看看車輛" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="離路線太遠（被推開或被擋住）；把它開回路線或重新開始" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="找不到繞過障礙到目標的路；檢查路上的車輛、圍欄、建築或作物、田地邊緣，以及 Courseplay 的避開作物設定" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="這輛拖車不能向那一側傾卸到地上；選擇另一側或卸到卸貨點" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="這個割台不能自動連接；請手動連接" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="沒有連接割台且自動連接已關閉；連接割台或開啟該設定" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="這種作物這個月不能種植；檢查日曆或種子" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="合約需要另一種作物；選擇合約的種子" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="機器上的棧板都滿了；卸下它們" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="先裝上空棧板" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="開始前把它開近田地" />
+		<text name="AD_cpHint_IS_STUCK"							 text="有一段時間無法移動：有東西擋路、斜坡、車輪卡住或動力不足" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="路上有東西：車輛、棧板、草捆或樹" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="農場沒錢購買途中需要的東西（種子、肥料、燃料）" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="田裡沒有所選類型的草捆；檢查草捆設定" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="油箱空了；加油" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="損壞達到百分之百；去維修廠修理" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="種子、肥料或噴霧箱空了；重新加滿" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="糧倉或拖車滿了；卸貨或派一輛運糧車" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="盡快加油" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="這項工作下雨時暫停，之後會自動繼續" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="這項工作在有積雪時暫停，之後會自動繼續" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="糧倉滿了：需要運糧車過來；檢查運糧車已設定好且沒有卡住" />
 		<text name="AD_routeCheck_loose"								 text="沒有任何連接的孤立航點" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：從此航點無法繼續前進" />
 		<text name="AD_routeCheck_trap"								 text="單向陷阱：%s 個航點只能駛入無法駛出" />

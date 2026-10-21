@@ -592,7 +592,7 @@ function ADInputManager:input_parkVehicle(vehicle, farmId)
         vehicle.ad.onRouteToPark = true
     else
         vehicle.ad.onRouteToPark = false
-        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_parkVehicle_noPosSet;", 5000, vehicle.ad.stateModule:getName())
+        ADDiag.noParkDestination(vehicle)
     end
 end
 
@@ -659,7 +659,7 @@ function ADInputManager:input_refuelVehicle(vehicle, farmId)
         if #refuelFillTypes > 0 then
             refuelFillTypeTitle = g_fillTypeManager:getFillTypeByIndex(refuelFillTypes[1]).title
         end
-        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Refuel_Station; %s", 5000, vehicle.ad.stateModule:getName(), refuelFillTypeTitle)
+        ADDiag.noRefuelStation(vehicle, true)
     end
 end
 
@@ -675,7 +675,7 @@ function ADInputManager:input_repairVehicle(vehicle, farmId)
         vehicle.ad.stateModule:setMode(AutoDrive.MODE_DRIVETO)
         self:input_start_stop(vehicle, farmId)
     else
-        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Repair_Station;", 5000, vehicle.ad.stateModule:getName())
+        ADDiag.noRepairStation(vehicle)
     end
 end
 

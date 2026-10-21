@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="áll" />
 		<text name="AD_ticker_waiting"							 text="vár" />
 		<text name="AD_ticker_helpers"							 text="Segítők" />
+		<text name="AD_diag_to"							 text="ide:" />
+		<text name="AD_diag_from"							 text="innen:" />
+		<text name="AD_diag_nearestWp"							 text="legközelebbi útpont" />
+		<text name="AD_diag_offNetwork"							 text="az útvonalhálózattól" />
+		<text name="AD_diag_startWp"							 text="kezdőpont" />
+		<text name="AD_diag_nextWp"							 text="következő útpont" />
+		<text name="AD_diag_blockedBy"							 text="blokkolja:" />
+		<text name="AD_diag_stations"							 text="talált kút ezzel az üzemanyaggal" />
+		<text name="AD_diag_tankNotLow"							 text="nem kell üzemanyag: egyik tartály sincs ez alatt:" />
+		<text name="AD_diag_noWorkshop"							 text="nem talált szervizt a javításhoz" />
+		<text name="AD_diag_workshops"							 text="talált szerviz" />
+		<text name="AD_diag_forTool"							 text="ehhez:" />
+		<text name="AD_diag_mode"							 text="jelenlegi mód" />
+		<text name="AD_diag_byCourseplay"							 text="a Courseplay vezeti" />
+		<text name="AD_diag_byHelper"							 text="a játék segítője vezeti" />
+		<text name="AD_diag_notOnField"							 text="nem áll táblán" />
+		<text name="AD_diag_noTarget"							 text="nem indulhat: nincs cél megadva (ebben a módban a lerakodási cél is kell)" />
+		<text name="AD_diag_recordOffsets"							 text="Két sáv rögzítése leállt: a két sávnak eltérő eltolás kell" />
+		<text name="AD_diag_recordReverse"							 text="Két sáv rögzítése leállt: tolatás közben nem rögzíthető" />
+		<text name="AD_diag_attached"							 text="felszerelve" />
+		<text name="AD_diag_bunkerEmpty"							 text="nem talált rakodnivalót a silóárokban" />
+		<text name="AD_diag_ualUnsupported"							 text="Termékek lerakodása: ez a Universal Autoload verzió nem támogatott, terméklistával nem rak le raklapot" />
+		<text name="AD_hint_pfNoRoute"							 text="a legközelebbi útpontról nincs útvonal ehhez a célhoz. Ellenőrizd ott a kapcsolatokat (egyirányú és tolató nyilak) vagy futtasd az útvonal-ellenőrzést (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="nem található járható út a járműtől az útvonalhálózatig. Keress épületeket, kerítéseket, fákat, járműveket vagy meredek terepet útban; vidd közelebb a hálózathoz, kapcsold ki a Termény elkerülését vagy a Táblára korlátozást, vagy növeld a keresési időt" />
+		<text name="AD_hint_noRoute"							 text="nincs útvonal a hálózaton a jármű helyétől ehhez a célhoz. Ellenőrizd a nyilakat a jármű közelében (lehet, hogy a másik sávban áll) és útközben, vagy futtasd az útvonal-ellenőrzést (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="8 másodpercig nem került közelebb a következő útponthoz. Szokásos okok: valami útban van, túl szűk kanyar ehhez a járműhöz és pótkocsihoz, útpont egy tárgyon belül, vagy meredek vagy csúszós talaj. Az AutoDrive újraindítja a munkát" />
+		<text name="AD_hint_exitField"							 text="nincs útvonal a hálózaton onnan a lerakodási célhoz. Ellenőrizd, hogy mindkét cél be van-e állítva és eltérnek-e, és a köztük lévő kapcsolatokat (útvonal-ellenőrzés, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="egy AutoDrive célnak legfeljebb 15 m-re kell lennie egy kúttól, amely ezt az üzemanyagot árulja és van készlete a farmodnak. Hozz létre célt közvetlenül a kútnál" />
+		<text name="AD_hint_repair"							 text="egy AutoDrive célnak legfeljebb 15 m-re kell lennie egy szerviztől vagy javítóponttól. Hozz létre ott célt, vagy kapcsold ki az automatikus javítást" />
+		<text name="AD_hint_park"							 text="a parkolási cél minden felszerelt munkagéphez külön mentődik. Ezzel a munkagéppel válaszd ki a célt a HUD-ban és kattints jobb gombbal a parkolás gombra (P), vagy kapcsold ki a Parkolás a munka végén beállítást" />
+		<text name="AD_hint_helperMode"							 text="az átvétel a Courseplaytől vagy a játék segítőjétől a Felvétel és kiszállítás, Rakodás és Lerakodás módokban működik. Válts AutoDrive módot, vagy kapcsold ki az átadást az AutoDrive-nak" />
+		<text name="AD_hint_aiActive"							 text="először állítsd le a másik vezetőt, aztán indítsd az AutoDrive-ot" />
+		<text name="AD_hint_aiJob"							 text="az AutoDrive a segítő utolsó táblás munkáját folytatja: a járműnek azon a táblán kell állnia az első céltól legfeljebb 30 m-re, és a munkának érvényesnek kell lennie (tábla, munkagépek, vetőmag)" />
+		<text name="AD_hint_shovel"							 text="a silóárok módhoz lapát vagy kanál kell a rakodóra" />
+		<text name="AD_hint_bunker"							 text="a rakodónak induláskor legfeljebb 100 m-re kell lennie egy silóároktól" />
+		<text name="AD_hint_bunkerEmpty"							 text="a siló talán üres vagy még erjed, vagy a lapátszélesség beállítás nem megfelelő" />
+		<text name="AD_hint_bgaTrailer"							 text="egy AutoDrive-os járműnek szabad hellyel rendelkező pótkocsival 3 másodpercig állnia kell 50 m-en belül" />
+		<text name="AD_hint_waitQueue"							 text="egy másik jármű rak le ott előbb" />
+		<text name="AD_hint_waitBlocked"							 text="az akadályérzékelő lát valamit elöl: járművet, tárgyat vagy személyt" />
+		<text name="AD_hint_waitNotFull"							 text="megvárja a lerakodási töltöttség beállítás elérését; ellenőrizd, hogy a silóban van-e ez a termék" />
+		<text name="AD_hint_waitNoFlow"							 text="a pont talán nem fogadja ezt a terméket vagy tele van, vagy a pótkocsi nem tud erre az oldalra billenteni" />
+		<text name="AD_hint_waitStanding"							 text="nincs ismert ok, nézd meg a járművet" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="túl messze van a pályától (eltolták vagy blokkolva); vidd vissza a pályára vagy indítsd újra" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="nincs út az akadályok körül a célig; ellenőrizd a járműveket, kerítéseket, épületeket vagy terményt útban, a táblaszélt és a Courseplay termény elkerülése beállítását" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="ez a pótkocsi nem billent a földre erre az oldalra; válassz másik oldalt vagy rakodj le egy pontba" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="ez a vágóasztal nem szerelhető fel automatikusan; szereld fel kézzel" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="nincs vágóasztal és az automatikus felszerelés ki van kapcsolva; szereld fel vagy kapcsold be" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="ezt a terményt ebben a hónapban nem lehet vetni; nézd meg a naptárt vagy a vetőmagot" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="a szerződés másik terményt kér; válaszd a szerződés vetőmagját" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="a gépen minden raklap tele van; rakd le őket" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="először rakj fel üres raklapokat" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="indulás előtt vidd közelebb a táblához" />
+		<text name="AD_cpHint_IS_STUCK"							 text="egy ideig nem tudott mozogni: valami útban van, emelkedő, beragadt kerekek vagy kevés erő" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="valami útban van: jármű, raklap, bála vagy fa" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="a farmnak nincs pénze arra, amit útközben vesz (vetőmag, műtrágya, üzemanyag)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="nincs a választott típusú bála a táblán; ellenőrizd a bála beállítást" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="a tartály üres; tankold meg" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="a sérülés 100 százalék; javítsd meg szervizben" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="a vetőmag-, műtrágya- vagy permettartály üres; töltsd fel" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="a tartály vagy pótkocsi tele van; rakd le vagy küldj átrakót" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="hamarosan tankolj" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="ez a munka esőben leáll és magától folytatódik" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="ez a munka hó idején leáll és magától folytatódik" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="a tartály tele van: jönnie kell egy átrakónak; ellenőrizd, hogy az átrakók be vannak-e állítva és nem akadtak-e el" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

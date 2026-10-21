@@ -43,7 +43,8 @@ function ADRecordingModule:start(dual, subPrio, twoWay)
         if math.abs(AutoDrive.getSetting("RecordDriveDirectionOffset") - AutoDrive.getSetting("RecordOppositeDriveDirectionOffset")) < 0.1 then
             -- disable recording if twoWay selected but distance difference between them < 0.1
             self.vehicle.ad.stateModule:disableCreationMode()
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_gui_ad_RecordOppositeDriveDirectionOffset;", 1000)
+            -- Overdrive: say why (it showed the setting's label)
+            ADDiag.recordingTwoRoads(self.vehicle, false)
             return
         elseif self.vehicle.ad.ADRightNode then
             AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.INFO, "$l10n_gui_ad_RecordDriveDirectionOffset;", 1000)
@@ -142,7 +143,8 @@ function ADRecordingModule:updateTick(dt, isActiveForInput, isActiveForInputIgno
         if self.drivingReverse or (self.wasRecordingTwoRoads and math.abs(AutoDrive.getSetting("RecordDriveDirectionOffset") - AutoDrive.getSetting("RecordOppositeDriveDirectionOffset")) < 0.1) then
             -- no 2 road recording in reverse driving, changed offsets improper or distance set to 0 - stop recording
             self.vehicle.ad.stateModule:disableCreationMode()
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_gui_ad_RecordOppositeDriveDirectionOffset;", 1000)
+            -- Overdrive: say why (it showed the setting's label)
+            ADDiag.recordingTwoRoads(self.vehicle, self.drivingReverse)
             return
         else
             -- 2 road recording

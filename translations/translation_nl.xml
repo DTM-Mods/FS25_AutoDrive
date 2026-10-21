@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="staat stil" />
 		<text name="AD_ticker_waiting"							 text="wachtend" />
 		<text name="AD_ticker_helpers"							 text="Helpers" />
+		<text name="AD_diag_to"							 text="naar" />
+		<text name="AD_diag_from"							 text="van" />
+		<text name="AD_diag_nearestWp"							 text="dichtstbijzijnde routepunt" />
+		<text name="AD_diag_offNetwork"							 text="van het routenetwerk" />
+		<text name="AD_diag_startWp"							 text="start bij routepunt" />
+		<text name="AD_diag_nextWp"							 text="volgende routepunt" />
+		<text name="AD_diag_blockedBy"							 text="geblokkeerd door" />
+		<text name="AD_diag_stations"							 text="tankstations met deze brandstof gevonden" />
+		<text name="AD_diag_tankNotLow"							 text="heeft geen brandstof nodig: geen tank is onder" />
+		<text name="AD_diag_noWorkshop"							 text="kon geen werkplaats vinden om te repareren" />
+		<text name="AD_diag_workshops"							 text="werkplaatsen gevonden" />
+		<text name="AD_diag_forTool"							 text="voor" />
+		<text name="AD_diag_mode"							 text="huidige modus" />
+		<text name="AD_diag_byCourseplay"							 text="Courseplay rijdt ermee" />
+		<text name="AD_diag_byHelper"							 text="de helper van het spel rijdt ermee" />
+		<text name="AD_diag_notOnField"							 text="staat niet op een veld" />
+		<text name="AD_diag_noTarget"							 text="kan niet starten: geen bestemming ingesteld (in deze modus is ook de losbestemming nodig)" />
+		<text name="AD_diag_recordOffsets"							 text="Opname van twee rijstroken gestopt: beide rijstroken hebben verschillende afstanden nodig" />
+		<text name="AD_diag_recordReverse"							 text="Opname van twee rijstroken gestopt: achteruit kan niet worden opgenomen" />
+		<text name="AD_diag_attached"							 text="aangekoppeld" />
+		<text name="AD_diag_bunkerEmpty"							 text="vond niets om te laden in de sleufsilo" />
+		<text name="AD_diag_ualUnsupported"							 text="Producten lossen: deze Universal Autoload-versie wordt niet ondersteund, met een productlijst worden geen pallets gelost" />
+		<text name="AD_hint_pfNoRoute"							 text="het dichtstbijzijnde routepunt heeft geen route naar deze bestemming. Controleer de verbindingen daar (eenrichtings- en achteruitpijlen) of gebruik de routecontrole (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="er is geen berijdbare weg van het voertuig naar het routenetwerk gevonden. Zoek naar gebouwen, hekken, bomen, voertuigen of steil terrein; rijd het dichter bij het netwerk, zet Gewas vermijden of Beperken tot veld uit, of verhoog de zoektijd" />
+		<text name="AD_hint_noRoute"							 text="geen route in het netwerk van waar het voertuig staat naar deze bestemming. Controleer de pijlen bij het voertuig (het staat misschien op de andere rijstrook) en onderweg, of gebruik de routecontrole (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="het kwam 8 seconden niet dichter bij het volgende routepunt. Gebruikelijke oorzaken: iets in de weg, een te krappe bocht voor dit voertuig en aanhanger, een routepunt in een object, of steil of glad terrein. AutoDrive start de taak opnieuw" />
+		<text name="AD_hint_exitField"							 text="er is geen route in het netwerk van daar naar de losbestemming. Controleer of beide bestemmingen ingesteld en verschillend zijn, en de verbindingen ertussen (routecontrole, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="een AutoDrive-bestemming moet binnen 15 m van een tankstation liggen dat deze brandstof verkoopt en voorraad heeft voor jouw boerderij. Maak een bestemming vlak bij de pomp" />
+		<text name="AD_hint_repair"							 text="een AutoDrive-bestemming moet binnen 15 m van een werkplaats of reparatiepunt liggen. Maak daar een bestemming of zet automatisch repareren uit" />
+		<text name="AD_hint_park"							 text="de parkeerbestemming wordt per aangekoppeld werktuig opgeslagen. Kies met dit werktuig aangekoppeld de bestemming in de HUD en klik met rechts op de parkeerknop (P), of zet Parkeren na de taak uit" />
+		<text name="AD_hint_helperMode"							 text="overnemen van Courseplay of de helper van het spel werkt in de modi Ophalen en afleveren, Laden en Lossen. Wissel de AutoDrive-modus of zet het overdragen aan AutoDrive uit" />
+		<text name="AD_hint_aiActive"							 text="stop eerst de andere bestuurder en start dan AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive gaat verder met de laatste veldtaak van de helper: het voertuig moet op dat veld staan binnen 30 m van de eerste bestemming, en de taak moet geldig zijn (veld, werktuigen, zaad)" />
+		<text name="AD_hint_shovel"							 text="de sleufsilomodus heeft een schep of bak op de lader nodig" />
+		<text name="AD_hint_bunker"							 text="de lader moet bij het starten binnen 100 m van een sleufsilo staan" />
+		<text name="AD_hint_bunkerEmpty"							 text="de silo is misschien leeg of nog aan het gisten, of de schepbreedte past niet" />
+		<text name="AD_hint_bgaTrailer"							 text="een voertuig met AutoDrive en een aanhanger met vrije ruimte moet 3 seconden binnen 50 m stilstaan" />
+		<text name="AD_hint_waitQueue"							 text="een ander voertuig lost daar eerst" />
+		<text name="AD_hint_waitBlocked"							 text="de obstakeldetectie ziet iets vooraan: een voertuig, object of persoon" />
+		<text name="AD_hint_waitNotFull"							 text="het wacht tot de instelling losvulgraad bereikt is; controleer of de silo dit product heeft" />
+		<text name="AD_hint_waitNoFlow"							 text="het lospunt neemt dit product misschien niet aan of is vol, of de aanhanger kan aan deze kant niet kippen" />
+		<text name="AD_hint_waitStanding"							 text="geen bekende reden, kijk naar het voertuig" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="het is te ver van de koers (weggeduwd of geblokkeerd); rijd het terug op de koers of herstart" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="geen weg om de obstakels heen naar het doel; controleer voertuigen, hekken, gebouwen of gewas in de weg, de veldrand en de Courseplay-instelling gewas vermijden" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="deze aanhanger kan aan die kant niet op de grond kippen; kies een andere kipzijde of los in een lospunt" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="dit maaibord kan niet automatisch worden aangekoppeld; koppel het met de hand aan" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="geen maaibord aangekoppeld en automatisch aankoppelen staat uit; koppel het aan of zet de instelling aan" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="dit gewas kan deze maand niet gezaaid worden; controleer de kalender of het zaad" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="het contract vraagt een ander gewas; kies het zaad van het contract" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="alle pallets op de machine zijn vol; los ze" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="laad eerst lege pallets" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="rijd het voor het starten dichter bij het veld" />
+		<text name="AD_cpHint_IS_STUCK"							 text="het kon een tijdje niet bewegen: iets in de weg, een helling, vastgelopen wielen of te weinig vermogen" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="er staat iets in de weg: een voertuig, pallet, baal of boom" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="de boerderij heeft geen geld voor wat onderweg gekocht wordt (zaad, kunstmest, brandstof)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="geen balen van het gekozen type op het veld; controleer de baleninstelling" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="de tank is leeg; tank het bij" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="de schade is 100 procent; repareer het in een werkplaats" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="de zaad-, kunstmest- of spuittank is leeg; vul hem bij" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="de tank of aanhanger is vol; los hem of stuur een overlaadwagen" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="binnenkort tanken" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="dit werk stopt bij regen en gaat vanzelf verder" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="dit werk stopt zolang er sneeuw ligt en gaat vanzelf verder" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="de tank is vol: er moet een overlaadwagen komen; controleer of overlaadwagens ingesteld zijn en niet vastzitten" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />

@@ -24,6 +24,10 @@ function UnloadAtMode:start(user)
     end
 
     if self.vehicle.ad.stateModule:getFirstMarker() == nil then
+        -- Overdrive: say why it does not start
+        if g_server ~= nil then
+            ADDiag.noTarget(self.vehicle)
+        end
         return
     end
 

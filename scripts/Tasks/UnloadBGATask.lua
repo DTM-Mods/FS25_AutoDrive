@@ -231,7 +231,7 @@ function UnloadBGATask:initializeBGA()
     if self.shovel == nil then
         self:getVehicleShovel()
         if self.shovel == nil then
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Shovel;", 5000, self.vehicle.ad.stateModule:getName())
+            ADDiag.noShovel(self.vehicle)
             self.state = self.STATE_IDLE
             self.vehicle:stopAutoDrive()
             return
@@ -239,7 +239,7 @@ function UnloadBGATask:initializeBGA()
     end
 
     if self.targetBunker == nil then
-        AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Bunker;", 5000, self.vehicle.ad.stateModule:getName())
+        ADDiag.noBunker(self.vehicle)
         self.state = self.STATE_IDLE
         self.vehicle:stopAutoDrive()
     end
@@ -1241,7 +1241,7 @@ end
 
 function UnloadBGATask:driveToBGAUnload(dt)
     if self.targetTrailer == nil and not self.unloadToTrigger then
-        AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Trailer;", 5000, self.vehicle.ad.stateModule:getName())
+        ADDiag.noTrailerForShovel(self.vehicle)
         self:getVehicleToPause()
         self.vehicle.ad.specialDrivingModule:stopVehicle()
         self.vehicle.ad.specialDrivingModule:update(dt)
@@ -1430,7 +1430,8 @@ function UnloadBGATask:setShovelOffsetToNonEmptyRow()
     end
 
     if ((currentFillLevel == 0) and (iterations < 0)) then
-        AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Bunker;", 5000, self.vehicle.ad.stateModule:getName())
+        -- Overdrive: the bunker was found, it has nothing to load
+        ADDiag.bunkerEmpty(self.vehicle, self.targetBunker ~= nil and self.targetBunker.outputFillType or nil)
         self.state = self.STATE_IDLE
         self.vehicle:stopAutoDrive()
     end

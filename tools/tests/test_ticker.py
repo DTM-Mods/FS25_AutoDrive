@@ -66,19 +66,19 @@ assert s.eval("reason(TRUCK)") == ""                                  # just sto
 s.execute("g_time = g_time + 2000")
 assert s.eval("reason(TRUCK)") == ""                                  # stands, nothing to say yet
 s.execute("TRUCK.ad.drivePathModule.isPaused = true")
-assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_queue;"
+assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_queue;: $l10n_AD_hint_waitQueue;"
 s.execute("TRUCK.ad.drivePathModule.isPaused = false; TRUCK.ad.actionWaitUntil = g_time + 19500")
 assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_waypoint; (20 s)"
 s.execute("TRUCK.ad.actionWaitUntil = nil; OTHER = vehicle('8RX 410'); TRUCK.ad.collisionDetectionModule.trafficVehicle = OTHER")
 assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_traffic; (8RX 410)"
 s.execute("TRUCK.ad.collisionDetectionModule.trafficVehicle = nil; TRUCK.ad.collisionDetectionModule.detectedObstable = true")
-assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_blocked;"
+assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_blocked;: $l10n_AD_hint_waitBlocked;"
 s.execute("TRUCK.ad.collisionDetectionModule.detectedObstable = false")
 # loading: filling, then at the load point and not full (the free litres)
 s.execute("TRUCK.ad.taskModule.activeTask = LoadAtDestinationTask:create(); TRUCK.ad.taskModule.activeTask.trailers = {{}}; FILL = 40000; TRUCK.ad.trailerModule.isLoading = true")
 assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_loading; (40000 l / 87400 l)", s.eval("reason(TRUCK)")
 s.execute("TRUCK.ad.trailerModule.isLoading = false; TRUCK.atTarget = true; FILL = 86850")
-assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_notFull; (500 l free)", s.eval("reason(TRUCK)")
+assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_notFull; (500 l $l10n_AD_wait_free;): $l10n_AD_hint_waitNotFull;", s.eval("reason(TRUCK)")
 # unloading: tipping while it runs, then nothing comes out
 s.execute("""
     TRUCK.atTarget = false
@@ -88,11 +88,11 @@ s.execute("""
 """)
 assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_tipping; (29000 l)", s.eval("reason(TRUCK)")
 s.execute("g_time = g_time + 12000")
-assert s.eval("reason(TRUCK)").startswith("$l10n_AD_wait_noFlow; (")
+assert s.eval("reason(TRUCK)").startswith("$l10n_AD_wait_noFlow; (") and s.eval("reason(TRUCK)").endswith("): $l10n_AD_hint_waitNoFlow;")
 s.execute("TRUCK.ad.trailerModule.isUnloading = false; TRUCK.atTarget = true")
 assert s.eval("reason(TRUCK)") == "$l10n_AD_wait_unloadPoint; (29000 l)"
 s.execute("TRUCK.atTarget = false; TRUCK.ad.taskModule.activeTask = nil")
-assert s.eval("reason(TRUCK)").startswith("$l10n_AD_wait_standing; (")
+assert s.eval("reason(TRUCK)").startswith("$l10n_AD_wait_standing; (") and s.eval("reason(TRUCK)").endswith("): $l10n_AD_hint_waitStanding;")
 s.execute("TRUCK.ad.stateModule.active = false")
 assert s.eval("reason(TRUCK)") == ""                                  # switched off
 s.execute("TRUCK.ad.stateModule.active = true")

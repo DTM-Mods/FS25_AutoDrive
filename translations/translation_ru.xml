@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="стоит" />
 		<text name="AD_ticker_waiting"							 text="ждут" />
 		<text name="AD_ticker_helpers"							 text="Помощники" />
+		<text name="AD_diag_to"							 text="в" />
+		<text name="AD_diag_from"							 text="из" />
+		<text name="AD_diag_nearestWp"							 text="ближайшая точка" />
+		<text name="AD_diag_offNetwork"							 text="от сети маршрутов" />
+		<text name="AD_diag_startWp"							 text="старт с точки" />
+		<text name="AD_diag_nextWp"							 text="следующая точка" />
+		<text name="AD_diag_blockedBy"							 text="блокирует" />
+		<text name="AD_diag_stations"							 text="найдено заправок с этим топливом" />
+		<text name="AD_diag_tankNotLow"							 text="топливо не нужно: ни один бак не ниже" />
+		<text name="AD_diag_noWorkshop"							 text="не нашёл мастерскую для ремонта" />
+		<text name="AD_diag_workshops"							 text="найдено мастерских" />
+		<text name="AD_diag_forTool"							 text="для" />
+		<text name="AD_diag_mode"							 text="текущий режим" />
+		<text name="AD_diag_byCourseplay"							 text="им управляет Courseplay" />
+		<text name="AD_diag_byHelper"							 text="им управляет помощник игры" />
+		<text name="AD_diag_notOnField"							 text="стоит не на поле" />
+		<text name="AD_diag_noTarget"							 text="не может начать: цель не задана (в этом режиме нужна и цель разгрузки)" />
+		<text name="AD_diag_recordOffsets"							 text="Запись двух полос остановлена: у полос должны быть разные смещения" />
+		<text name="AD_diag_recordReverse"							 text="Запись двух полос остановлена: нельзя записывать задним ходом" />
+		<text name="AD_diag_attached"							 text="прицеплено" />
+		<text name="AD_diag_bunkerEmpty"							 text="не нашёл, что грузить в силосной траншее" />
+		<text name="AD_diag_ualUnsupported"							 text="Разгрузка продуктов: эта версия Universal Autoload не поддерживается, со списком продуктов поддоны не выгружаются" />
+		<text name="AD_hint_pfNoRoute"							 text="от ближайшей точки нет маршрута к этой цели. Проверьте там соединения (односторонние и задние стрелки) или запустите проверку маршрутов (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="не найден проезжий путь от техники до сети маршрутов. Ищите здания, заборы, деревья, технику или крутой склон на пути; подведите её ближе к сети, выключите Объезд культур или Только по полю, или увеличьте время поиска пути" />
+		<text name="AD_hint_noRoute"							 text="в сети нет маршрута от места техники к этой цели. Проверьте стрелки возле техники (она может стоять на другой полосе) и по пути, или запустите проверку маршрутов (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="8 секунд не приближался к следующей точке. Обычные причины: что-то на пути, слишком крутой поворот для этой техники с прицепом, точка внутри объекта, или крутой или скользкий грунт. AutoDrive перезапускает задачу" />
+		<text name="AD_hint_exitField"							 text="в сети нет маршрута оттуда к цели разгрузки. Проверьте, что обе цели заданы и разные, и соединения между ними (проверка маршрутов, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="цель AutoDrive должна быть не дальше 15 м от заправки, которая продаёт это топливо и имеет запас для вашей фермы. Создайте цель прямо у колонки" />
+		<text name="AD_hint_repair"							 text="цель AutoDrive должна быть не дальше 15 м от мастерской или точки ремонта. Создайте там цель или выключите автоматический ремонт" />
+		<text name="AD_hint_park"							 text="цель стоянки сохраняется для каждого прицепленного орудия. С этим орудием выберите цель в HUD и нажмите правой кнопкой на кнопку стоянки (P), или выключите Парковку после работы" />
+		<text name="AD_hint_helperMode"							 text="передача от Courseplay или помощника игры работает в режимах Забрать и доставить, Погрузка и Разгрузка. Смените режим AutoDrive или выключите передачу в AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="сначала остановите другого водителя, затем запустите AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive продолжает последнюю полевую работу помощника: техника должна стоять на этом поле не дальше 30 м от первой цели, и работа должна быть допустимой (поле, орудия, семена)" />
+		<text name="AD_hint_shovel"							 text="для режима силосной траншеи нужен ковш на погрузчике" />
+		<text name="AD_hint_bunker"							 text="погрузчик при старте должен быть не дальше 100 м от силосной траншеи" />
+		<text name="AD_hint_bunkerEmpty"							 text="силос может быть пуст или ещё бродит, или ширина ковша не подходит" />
+		<text name="AD_hint_bgaTrailer"							 text="техника с AutoDrive и прицепом со свободным местом должна стоять в пределах 50 м 3 секунды" />
+		<text name="AD_hint_waitQueue"							 text="там сначала разгружается другая техника" />
+		<text name="AD_hint_waitBlocked"							 text="обнаружение препятствий видит что-то впереди: технику, объект или человека" />
+		<text name="AD_hint_waitNotFull"							 text="ждёт, пока не будет достигнут уровень заполнения для разгрузки; проверьте, есть ли в силосе этот продукт" />
+		<text name="AD_hint_waitNoFlow"							 text="точка может не принимать этот продукт или быть полной, или прицеп не может разгружаться на эту сторону" />
+		<text name="AD_hint_waitStanding"							 text="причина неизвестна, посмотрите на технику" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="слишком далеко от курса (сдвинут или заблокирован); верните на курс или перезапустите" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="нет пути в обход препятствий к цели; проверьте технику, заборы, здания или культуру на пути, край поля и настройку объезда культур в Courseplay" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="этот прицеп не может разгружаться на землю на эту сторону; выберите другую сторону или разгружайтесь в точку" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="эту жатку нельзя навесить автоматически; навесьте её вручную" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="жатка не навешена, а автоматическая навеска выключена; навесьте её или включите настройку" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="эту культуру нельзя сеять в этом месяце; проверьте календарь или семена" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="контракту нужна другая культура; выберите семена контракта" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="все поддоны на машине полные; выгрузите их" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="сначала загрузите пустые поддоны" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="подведите технику ближе к полю перед стартом" />
+		<text name="AD_cpHint_IS_STUCK"							 text="некоторое время не мог двигаться: что-то на пути, склон, застрявшие колёса или мало мощности" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="что-то стоит на пути: техника, поддон, тюк или дерево" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="у фермы нет денег на то, что покупается по пути (семена, удобрения, топливо)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="на поле нет тюков выбранного типа; проверьте настройку тюков" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="бак пуст; заправьте" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="повреждение 100 процентов; отремонтируйте в мастерской" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="бак семян, удобрений или опрыскивателя пуст; заполните его" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="бункер или прицеп полон; разгрузите или пошлите перегрузчик" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="скоро заправьте" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="эта работа останавливается в дождь и продолжится сама" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="эта работа останавливается, пока лежит снег, и продолжится сама" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="бункер полон: должен приехать перегрузчик; проверьте, что перегрузчики настроены и не застряли" />
 		<text name="AD_routeCheck_loose"								 text="Одиночная путевая точка без соединений" />
 		<text name="AD_routeCheck_deadEnd"							 text="Тупик: от этой путевой точки дальше пути нет" />
 		<text name="AD_routeCheck_trap"								 text="Односторонняя ловушка: путевых точек, куда можно въехать, но нельзя выехать: %s" />

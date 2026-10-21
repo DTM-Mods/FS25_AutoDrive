@@ -141,7 +141,8 @@ function ADTaskModule:RefuelIfNeeded()
         else
             self.vehicle.ad.isStoppingWithError = true
             self.vehicle:stopAutoDrive()
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Refuel_Station;", 5000, self.vehicle.ad.stateModule:getName())
+            -- Overdrive: which fuel, how full, how many stations found, what to check
+            ADDiag.noRefuelStation(self.vehicle, self.vehicle.ad.onRouteToRefuel)
         end
     end
 end
@@ -174,7 +175,8 @@ function ADTaskModule:RepairIfNeeded()
         else
             --self.vehicle.ad.isStoppingWithError = true
             --self.vehicle:stopAutoDrive()
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Repair_Station;", 5000, self.vehicle.ad.stateModule:getName())
+            -- Overdrive: which units are damaged, how many workshops found, what to check
+            ADDiag.noRepairStation(self.vehicle)
         end
     end
 end

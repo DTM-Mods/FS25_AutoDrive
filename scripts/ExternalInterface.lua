@@ -143,7 +143,7 @@ function AutoDrive:StartDriving(vehicle, destinationID, unloadDestinationID, cal
                     end
                     vehicle.ad.stateModule:getCurrentMode():start()
                 else
-                    AutoDriveMessageEvent.sendMessage(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_parkVehicle_noPosSet;", 5000)
+                    ADDiag.noParkDestination(vehicle)
                     -- stop vehicle movement
                     vehicle.ad.trailerModule:handleTrailerReversing(false)
                     AutoDrive.driveInDirection(vehicle, 16, 30, 0, 0.2, 20, false, false, 0, 0, 0, 1)
@@ -456,7 +456,7 @@ function AutoDrive:onCpFinished()
                 end
                 self.ad.stateModule:getCurrentMode():start()
             else
-                AutoDriveMessageEvent.sendMessageOrNotification(self, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_parkVehicle_noPosSet;", 5000, self.ad.stateModule:getName())
+                ADDiag.noParkDestination(self)
                 -- stop vehicle movement
                 self.ad.trailerModule:handleTrailerReversing(false)
                 -- AutoDrive.driveInDirection(self, 16, 30, 0, 0.2, 20, false, false, 0, 0, 0, 1) -- not to call here #222!
@@ -489,7 +489,7 @@ function AutoDrive:handleCPFieldWorker(vehicle)
                         vehicle.ad.stateModule:getCurrentMode():start()
                     else
                         -- deactivate CP button
-                        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s: $l10n_AD_Wrong_Mode_takeover_from_CP;", 5000, vehicle.ad.stateModule:getName())
+                        ADDiag.wrongModeForHelper(vehicle)
                         vehicle.ad.restartCP = false -- do not continue CP course
                         vehicle.ad.stateModule:setStartHelper(false)
                     end
@@ -549,7 +549,7 @@ function AutoDrive:onCpFuelEmpty() -- refuel
                 end
             else
                 local refuelFillTypes = AutoDrive.getRequiredRefuels(self, true)
-                AutoDriveMessageEvent.sendMessageOrNotification(self, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Refuel_Station;", 5000, self.ad.stateModule:getName())
+                ADDiag.noRefuelStation(self, true)
             end
         end
     else
@@ -577,7 +577,7 @@ function AutoDrive:onCpBroken() -- repair
                     AutoDrive.debugPrint(self, AutoDrive.DC_EXTERNALINTERFACEINFO, "AutoDrive:onCpBroken - AD already active, should not happen")
                 end
             else
-                AutoDriveMessageEvent.sendMessageOrNotification(self, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_No_Repair_Station;", 5000, self.ad.stateModule:getName())
+                ADDiag.noRepairStation(self)
             end
         end
     else
@@ -983,7 +983,7 @@ function AutoDrive:handleAIFinished(vehicle)
                 vehicle.ad.stateModule:setFirstMarker(parkDestinationAtJobFinished)
                 vehicle.ad.stateModule:getCurrentMode():start()
             else
-                AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_parkVehicle_noPosSet;", 5000, vehicle.ad.stateModule:getName())
+                ADDiag.noParkDestination(vehicle)
                 -- stop vehicle movement
                 vehicle.ad.trailerModule:handleTrailerReversing(false)
                 AutoDrive.driveInDirection(vehicle, 16, 30, 0, 0.2, 20, false, false, 0, 0, 0, 1)
@@ -1014,7 +1014,7 @@ function AutoDrive:handleAIFieldWorker(vehicle)
                         vehicle.ad.stateModule:getCurrentMode():start()
                     else
                         -- deactivate AI button
-                        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s: $l10n_AD_Wrong_Mode_takeover_from_CP;", 5000, vehicle.ad.stateModule:getName())
+                        ADDiag.wrongModeForHelper(vehicle)
                         vehicle.ad.stateModule:setStartHelper(false) -- do not continue AI job
                     end
                 end

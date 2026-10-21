@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="stojí" />
 		<text name="AD_ticker_waiting"							 text="čeká" />
 		<text name="AD_ticker_helpers"							 text="Pomocníci" />
+		<text name="AD_diag_to"							 text="do" />
+		<text name="AD_diag_from"							 text="z" />
+		<text name="AD_diag_nearestWp"							 text="nejbližší bod" />
+		<text name="AD_diag_offNetwork"							 text="od sítě tras" />
+		<text name="AD_diag_startWp"							 text="start z bodu" />
+		<text name="AD_diag_nextWp"							 text="další bod" />
+		<text name="AD_diag_blockedBy"							 text="blokováno" />
+		<text name="AD_diag_stations"							 text="nalezené stanice s tímto palivem" />
+		<text name="AD_diag_tankNotLow"							 text="nepotřebuje palivo: žádná nádrž pod" />
+		<text name="AD_diag_noWorkshop"							 text="nenašel dílnu k opravě" />
+		<text name="AD_diag_workshops"							 text="nalezené dílny" />
+		<text name="AD_diag_forTool"							 text="pro" />
+		<text name="AD_diag_mode"							 text="aktuální režim" />
+		<text name="AD_diag_byCourseplay"							 text="řídí ho Courseplay" />
+		<text name="AD_diag_byHelper"							 text="řídí ho pomocník hry" />
+		<text name="AD_diag_notOnField"							 text="nestojí na poli" />
+		<text name="AD_diag_noTarget"							 text="nemůže začít: není nastaven cíl (v tomto režimu je potřeba i cíl vykládky)" />
+		<text name="AD_diag_recordOffsets"							 text="Nahrávání dvou pruhů zastaveno: oba pruhy potřebují různé odsazení" />
+		<text name="AD_diag_recordReverse"							 text="Nahrávání dvou pruhů zastaveno: nelze nahrávat při couvání" />
+		<text name="AD_diag_attached"							 text="připojeno" />
+		<text name="AD_diag_bunkerEmpty"							 text="nenašel nic k naložení v žlabovém silu" />
+		<text name="AD_diag_ualUnsupported"							 text="Vyložit produkty: tato verze Universal Autoload není podporována, se seznamem produktů se nevykládají žádné palety" />
+		<text name="AD_hint_pfNoRoute"							 text="nejbližší bod nemá trasu k tomuto cíli. Zkontrolujte tam spojení (jednosměrné a couvací šipky) nebo spusťte kontrolu tras (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="nebyla nalezena sjízdná cesta od vozidla k síti tras. Hledejte budovy, ploty, stromy, vozidla nebo strmý terén; přijeďte blíž k síti, vypněte Vyhýbat se plodinám nebo Omezit na pole, nebo zvyšte čas hledání" />
+		<text name="AD_hint_noRoute"							 text="v síti není trasa z místa vozidla k tomuto cíli. Zkontrolujte šipky u vozidla (možná stojí v druhém pruhu) a po cestě, nebo spusťte kontrolu tras (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="8 sekund se nepřiblížil k dalšímu bodu. Obvyklé příčiny: něco v cestě, příliš ostrá zatáčka pro toto vozidlo s přívěsem, bod uvnitř objektu, nebo strmý či kluzký terén. AutoDrive úlohu spustí znovu" />
+		<text name="AD_hint_exitField"							 text="v síti není trasa odtud k cíli vykládky. Zkontrolujte, že oba cíle jsou nastavené a různé, a spojení mezi nimi (kontrola tras, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="cíl AutoDrive musí být do 15 m od stanice, která prodává toto palivo a má zásobu pro vaši farmu. Vytvořte cíl přímo u stojanu" />
+		<text name="AD_hint_repair"							 text="cíl AutoDrive musí být do 15 m od dílny nebo místa opravy. Vytvořte tam cíl nebo vypněte automatickou opravu" />
+		<text name="AD_hint_park"							 text="cíl parkování se ukládá pro každé připojené nářadí. S tímto nářadím vyberte cíl v HUD a klikněte pravým tlačítkem na tlačítko parkování (P), nebo vypněte Parkovat po dokončení" />
+		<text name="AD_hint_helperMode"							 text="převzetí od Courseplay nebo pomocníka hry funguje v režimech Vyzvednout a doručit, Naložit a Vyložit. Změňte režim AutoDrive nebo vypněte předávání AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="nejdřív zastavte druhého řidiče, pak spusťte AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive pokračuje v poslední polní práci pomocníka: vozidlo musí stát na tom poli do 30 m od prvního cíle a práce musí být platná (pole, nářadí, osivo)" />
+		<text name="AD_hint_shovel"							 text="režim žlabového sila potřebuje lopatu na nakladači" />
+		<text name="AD_hint_bunker"							 text="nakladač musí být při startu do 100 m od žlabového sila" />
+		<text name="AD_hint_bunkerEmpty"							 text="silo může být prázdné nebo ještě kvasí, nebo šířka lopaty nesedí" />
+		<text name="AD_hint_bgaTrailer"							 text="vozidlo s AutoDrive a přívěsem s volným místem musí 3 sekundy stát do 50 m" />
+		<text name="AD_hint_waitQueue"							 text="jiné vozidlo tam vykládá první" />
+		<text name="AD_hint_waitBlocked"							 text="detekce překážek vidí něco vpředu: vozidlo, objekt nebo osobu" />
+		<text name="AD_hint_waitNotFull"							 text="čeká na dosažení nastavení úrovně vykládky; zkontrolujte, že silo má tento produkt" />
+		<text name="AD_hint_waitNoFlow"							 text="místo možná nepřijímá tento produkt nebo je plné, nebo přívěs nemůže sklápět na tuto stranu" />
+		<text name="AD_hint_waitStanding"							 text="žádný známý důvod, podívejte se na vozidlo" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="je příliš daleko od kurzu (odstrčen nebo zablokován); vraťte ho na kurz nebo restartujte" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="žádná cesta kolem překážek k cíli; zkontrolujte vozidla, ploty, budovy nebo plodiny v cestě, okraj pole a nastavení vyhýbat se plodinám v Courseplay" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="tento přívěs nemůže na tu stranu sklápět na zem; zvolte jinou stranu nebo vykládejte do místa" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="tento žací stůl nelze připojit automaticky; připojte ho ručně" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="žádný žací stůl a automatické připojení je vypnuté; připojte ho nebo zapněte nastavení" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="tuto plodinu nelze v tomto měsíci sít; zkontrolujte kalendář nebo osivo" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="zakázka vyžaduje jinou plodinu; vyberte osivo zakázky" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="všechny palety na stroji jsou plné; vyložte je" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="nejdřív naložte prázdné palety" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="před startem přijeďte blíž k poli" />
+		<text name="AD_cpHint_IS_STUCK"							 text="chvíli se nemohl hnout: něco v cestě, svah, zapadlá kola nebo málo výkonu" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="něco stojí v cestě: vozidlo, paleta, balík nebo strom" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="farma nemá peníze na to, co kupuje cestou (osivo, hnojivo, palivo)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="na poli nejsou balíky zvoleného typu; zkontrolujte nastavení balíků" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="nádrž je prázdná; natankujte" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="poškození je 100 procent; opravte v dílně" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="zásobník osiva, hnojiva nebo postřiku je prázdný; doplňte ho" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="zásobník nebo přívěs je plný; vyložte ho nebo pošlete překladač" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="brzy natankujte" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="tato práce se v dešti zastaví a pokračuje sama" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="tato práce se zastaví, dokud leží sníh, a pokračuje sama" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="zásobník je plný: musí přijet překladač; zkontrolujte, že překladače jsou nastavené a nezasekly se" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

@@ -43,7 +43,8 @@ function RefuelTask:update(dt)
                 Logging.error("[AutoDrive] Could not calculate path - shutting down")
                 self.vehicle.ad.taskModule:abortAllTasks()
                 self.vehicle:stopAutoDrive()
-                AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path;", 5000, self.vehicle.ad.stateModule:getName())
+                -- Overdrive: what failed, where to, what to check
+                ADDiag.pathFailed(self.vehicle, self.destinationID)
             else
                 self.vehicle.ad.drivePathModule:setWayPoints(self.wayPoints)
                 --self.vehicle.ad.drivePathModule:appendPathTo(self.wayPoints[#self.wayPoints], self.destinationID)

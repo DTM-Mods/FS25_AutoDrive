@@ -54,6 +54,7 @@ def main():
         run("test_unloader_escape.py"),
         run("test_fill_levels.py"),
         run("test_ticker.py"),
+        run("test_diagnostics.py"),
     ]
     if not all(results):
         sys.exit(1)

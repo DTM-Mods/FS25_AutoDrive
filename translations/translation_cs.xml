@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="静止" />
 		<text name="AD_ticker_waiting"							 text="等待中" />
 		<text name="AD_ticker_helpers"							 text="帮手" />
+		<text name="AD_diag_to"							 text="前往" />
+		<text name="AD_diag_from"							 text="从" />
+		<text name="AD_diag_nearestWp"							 text="最近的航点" />
+		<text name="AD_diag_offNetwork"							 text="距离路线网络" />
+		<text name="AD_diag_startWp"							 text="起点航点" />
+		<text name="AD_diag_nextWp"							 text="下一个航点" />
+		<text name="AD_diag_blockedBy"							 text="被阻挡：" />
+		<text name="AD_diag_stations"							 text="个有此燃料的加油站" />
+		<text name="AD_diag_tankNotLow"							 text="无需加油：没有油箱低于" />
+		<text name="AD_diag_noWorkshop"							 text="找不到维修厂" />
+		<text name="AD_diag_workshops"							 text="个维修厂" />
+		<text name="AD_diag_forTool"							 text="用于" />
+		<text name="AD_diag_mode"							 text="当前模式" />
+		<text name="AD_diag_byCourseplay"							 text="Courseplay 正在驾驶" />
+		<text name="AD_diag_byHelper"							 text="游戏帮手正在驾驶" />
+		<text name="AD_diag_notOnField"							 text="不在田地上" />
+		<text name="AD_diag_noTarget"							 text="无法开始：未设置目标（此模式还需要卸货目标）" />
+		<text name="AD_diag_recordOffsets"							 text="双车道录制已停止：两条车道需要不同的偏移" />
+		<text name="AD_diag_recordReverse"							 text="双车道录制已停止：倒车时无法录制" />
+		<text name="AD_diag_attached"							 text="已连接" />
+		<text name="AD_diag_bunkerEmpty"							 text="在青贮窖中找不到可装的东西" />
+		<text name="AD_diag_ualUnsupported"							 text="卸载产品：不支持此版本的 Universal Autoload，设置了产品列表时不会卸下托盘" />
+		<text name="AD_hint_pfNoRoute"							 text="最近的航点没有通往此目标的路线。检查那里的连接（单向和倒车箭头）或运行路线检查（Ctrl+Alt+N）" />
+		<text name="AD_hint_pfBlocked"							 text="找不到从车辆到路线网络的可行驶道路。检查是否有建筑、围栏、树木、车辆或陡坡挡路；把车开近路线网络，关闭“避开作物”或“限制在田地内”，或增加寻路时间" />
+		<text name="AD_hint_noRoute"							 text="路线网络中从车辆所在位置到此目标没有路线。检查车辆附近（可能在另一条车道上）和沿途的箭头，或运行路线检查（Ctrl+Alt+N）" />
+		<text name="AD_hint_stuck"							 text="8 秒内没有靠近下一个航点。常见原因：有东西挡路、对此车辆和拖车来说转弯太急、航点在物体内部，或地面陡峭或湿滑。AutoDrive 会重新开始任务" />
+		<text name="AD_hint_exitField"							 text="路线网络中从那里到卸货目标没有路线。检查两个目标都已设置且不同，以及它们之间的连接（路线检查，Ctrl+Alt+N）" />
+		<text name="AD_hint_refuel"							 text="AutoDrive 目标必须在出售此燃料且对你的农场有库存的加油站 15 米内。在加油机旁创建一个目标" />
+		<text name="AD_hint_repair"							 text="AutoDrive 目标必须在维修厂或维修点 15 米内。在那里创建一个目标，或关闭自动维修" />
+		<text name="AD_hint_park"							 text="停车目标按每个连接的农具分别保存。在连接此农具时，在 HUD 中选择目标并右键点击停车按钮（P），或关闭“作业完成后停车”" />
+		<text name="AD_hint_helperMode"							 text="从 Courseplay 或游戏帮手接手只适用于“取货并送货”、“装货”和“卸货”模式。切换 AutoDrive 模式，或关闭移交给 AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="先停止另一个驾驶者，再启动 AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive 会继续帮手上一次的田间作业：车辆必须停在该田地上、距第一个目标 30 米内，且作业必须有效（田地、农具、种子）" />
+		<text name="AD_hint_shovel"							 text="青贮窖模式需要装载机上装有铲斗" />
+		<text name="AD_hint_bunker"							 text="装载机启动时必须在青贮窖 100 米内" />
+		<text name="AD_hint_bunkerEmpty"							 text="青贮窖可能是空的或仍在发酵，或铲斗宽度设置不合适" />
+		<text name="AD_hint_bgaTrailer"							 text="一辆带 AutoDrive 且拖车有空余的车辆必须在 50 米内停稳 3 秒" />
+		<text name="AD_hint_waitQueue"							 text="另一辆车先在那里卸货" />
+		<text name="AD_hint_waitBlocked"							 text="障碍检测看到前方有东西：车辆、物体或人" />
+		<text name="AD_hint_waitNotFull"							 text="它会等到达到卸货装载量设置；检查筒仓里是否有此产品" />
+		<text name="AD_hint_waitNoFlow"							 text="卸货点可能不收此产品或已满，或拖车不能向这一侧倾卸" />
+		<text name="AD_hint_waitStanding"							 text="原因不明，去看看车辆" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="离路线太远（被推开或被挡住）；把它开回路线或重新开始" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="找不到绕过障碍到目标的路；检查路上的车辆、围栏、建筑或作物、田地边缘，以及 Courseplay 的避开作物设置" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="这辆拖车不能向那一侧倾卸到地上；选择另一侧或卸到卸货点" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="这个割台不能自动连接；请手动连接" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="没有连接割台且自动连接已关闭；连接割台或打开该设置" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="这种作物这个月不能种植；检查日历或种子" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="合同需要另一种作物；选择合同的种子" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="机器上的托盘都满了；卸下它们" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="先装上空托盘" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="开始前把它开近田地" />
+		<text name="AD_cpHint_IS_STUCK"							 text="有一段时间无法移动：有东西挡路、斜坡、车轮卡住或动力不足" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="路上有东西：车辆、托盘、草捆或树" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="农场没钱购买途中需要的东西（种子、肥料、燃料）" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="田里没有所选类型的草捆；检查草捆设置" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="油箱空了；加油" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="损坏达到百分之百；去维修厂修理" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="种子、肥料或喷雾箱空了；重新加满" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="粮仓或拖车满了；卸货或派一辆运粮车" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="尽快加油" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="这项工作下雨时暂停，之后会自动继续" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="这项工作在有积雪时暂停，之后会自动继续" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="粮仓满了：需要运粮车过来；检查运粮车已设置好且没有卡住" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

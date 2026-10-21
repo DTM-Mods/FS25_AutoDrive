@@ -73,7 +73,8 @@ function ADDrivePathModule:setPathTo(wayPointId)
             target = mapMarker.name
         end
 
-        AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_reach; %s", 5000, self.vehicle.ad.stateModule:getName(), target)
+        -- Overdrive: the right target (not always the first one), where it starts, what to check
+        ADDiag.cannotReach(self.vehicle, wayPointId)
         self.vehicle.ad.taskModule:abortAllTasks()
         self.vehicle.ad.taskModule:addTask(StopAndDisableADTask:new(self.vehicle))
     else
@@ -106,7 +107,8 @@ function ADDrivePathModule:appendPathTo(startWayPointId, wayPointId)
             target = mapMarker.name
         end
 
-        AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_reach; %s", 5000, self.vehicle.ad.stateModule:getName(), target)
+        -- Overdrive: the right target (not always the first one), where it starts, what to check
+        ADDiag.cannotReach(self.vehicle, wayPointId)
         self.vehicle.ad.taskModule:abortAllTasks()
         self.vehicle.ad.taskModule:addTask(StopAndDisableADTask:new(self.vehicle))
     else
@@ -821,7 +823,8 @@ function ADDrivePathModule:handleBeingStuck()
         AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_VEHICLEINFO, "handleBeingStuck")
     end
     if self.vehicle.isServer then
-        AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_got_stuck;", 5000, self.vehicle.ad.stateModule:getName())
+        -- Overdrive: next waypoint, distance, speed, what blocks it, what to check
+        ADDiag.stuck(self.vehicle, self)
         self.vehicle.ad.taskModule:stopAndRestartAD()
     end
 end

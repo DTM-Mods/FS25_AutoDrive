@@ -57,9 +57,11 @@ s.execute("""
     g_server = {broadcastEvent = function(self, ev) table.insert(BROADCAST, ev) end}
     MESSAGES = {}
     ADMessagesManager = {messageTypes = {INFO = 1}}
-    AutoDriveMessageEvent = {sendMessageOrNotification = function(v, typ, text) table.insert(MESSAGES, text) end}
+    AutoDriveMessageEvent = {sendMessageOrNotification = function(v, typ, text, duration, ...) table.insert(MESSAGES, string.format(text, ...)) end}
+    ADDiag = {unitName = function(v) return v.unitName or "?" end}
 
     HARVESTER = vehicle(10, 50, 50, 0, 1, 4, 10)
+    HARVESTER.unitName = "Combine"
     HARVESTER.getIsAIActive = function() return HARVESTER_AI end
     HARVESTER_AI = true
     UNLOADER = vehicle(20, 50, 64, 0, 1, 3, 12)      -- right in front of the harvester
@@ -102,7 +104,7 @@ s.execute("POS[20] = {50, 64}")
 for _ in range(59):
     assert not s.eval("E.monitor(MODE, 100, false)")
 assert s.eval("E.monitor(MODE, 100, false)")
-assert s.eval("MODE.state") == "escape" and s.eval("#TASKS") == 1 and s.eval("MESSAGES[1]").endswith("$l10n_AD_escape_harvester;")
+assert s.eval("MODE.state") == "escape" and s.eval("#TASKS") == 1 and s.eval("MESSAGES[1]").endswith("$l10n_AD_escape_harvester; (Combine)"), s.eval("MESSAGES[1]")
 assert s.eval("E.monitor(MODE, 100, false)")         # while escaping the escape owns the vehicle
 s.execute("MODE.state = 'chase'; MODE.escapeHarvesterTime = 0")
 for _ in range(80):

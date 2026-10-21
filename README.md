@@ -106,6 +106,31 @@ A bar along the bottom edge of the screen scrolls, like a news ticker:
 
 It is hidden in menus and when the game's HUD is off; otherwise it is always there (with the numbers), even when nothing drives. Switch it off in the user settings (**Ticker at the bottom**).
 
+Every wait reason and every Courseplay info comes with a short hint in grey on what it means or what to check (e.g. "Blocked: the obstacle detection sees something in front: a vehicle, object or person").
+
+### Error messages that say what to check
+AutoDrive's error and warning messages tell what happened, with what, and what to look at. They are in all 18 languages, and the server writes each one to its log.txt as `[AD] ...`, so you can read them there later. For example:
+- **Can't calculate a path**: the target and how far the vehicle is from the route network. AutoDrive also tells the two cases apart:
+  - the nearest waypoint has no route to the target: check the arrows there, or run Route check;
+  - no drivable way to the network: buildings, fences, trees, vehicles or steep ground are in the way.
+- **Can't reach** a target: the waypoint it starts from. It may stand on the other lane of a one-way road.
+- **Got stuck**: the next waypoint, how far away it is, the speed, and what blocks it (the other vehicle's name).
+- **No refuel station**: each fuel it needs with the tank level, and how many stations with that fuel were found. A target has to be within 15 m of the pump.
+- **No workshop**: the damaged units with their damage, and how many workshops were found.
+- **No park destination**: which tool it is missing for. The park target is saved for each tool.
+- **Wrong mode to take over from Courseplay or the helper**: the current mode, and which modes work.
+- **AI helper still active**: whether Courseplay or the game's helper drives the vehicle.
+- **Can't start the helper**: not on a field, or the game's reason.
+- **Bunker silo**:
+  - the shovel: lists what is attached;
+  - no bunker in reach: it must be within 100 m;
+  - nothing to load: names the product;
+  - no trailer: what a trailer needs to be picked.
+- **Recording two roads stopped**: why (both offsets the same, or reversing).
+- **A mode started without its targets**: says so, instead of doing nothing.
+- **Leaving the field without a route to the unload target**: says it.
+- **Universal Autoload version not supported**: one warning per session.
+
 ### Waypoint actions
 In the editor, point the mouse at a waypoint (or select one) and press:
 - **Ctrl+Alt+W**: vehicles wait there (each press: 5, 10, 20, 30, 60, 120, 300 seconds, off)

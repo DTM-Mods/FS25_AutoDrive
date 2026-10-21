@@ -268,6 +268,9 @@ function ADUnloadFilter.unloadALSelected(trailer, vehicle, unloadPosition)
     if ual == nil or spec == nil or spec.loadedObjects == nil or ual.buildObjectsToUnloadTable == nil or ual.unloadObject == nil then
         -- an unknown Universal Autoload version: better unload nothing than everything
         Logging.warning("[AD] Unload products: this Universal Autoload version is not supported, nothing is unloaded")
+        if g_server ~= nil and ADDiag ~= nil then
+            ADDiag.ualNotSupported(vehicle)
+        end
         return true
     end
     local ok, err = pcall(function()

@@ -629,6 +629,70 @@
 		<text name="AD_wait_standing"							 text="standing still" />
 		<text name="AD_ticker_waiting"							 text="waiting" />
 		<text name="AD_ticker_helpers"							 text="Helpers" />
+		<text name="AD_diag_to"							 text="to" />
+		<text name="AD_diag_from"							 text="from" />
+		<text name="AD_diag_nearestWp"							 text="nearest waypoint" />
+		<text name="AD_diag_offNetwork"							 text="from the route network" />
+		<text name="AD_diag_startWp"							 text="starting at waypoint" />
+		<text name="AD_diag_nextWp"							 text="next waypoint" />
+		<text name="AD_diag_blockedBy"							 text="blocked by" />
+		<text name="AD_diag_stations"							 text="stations with this fuel found" />
+		<text name="AD_diag_tankNotLow"							 text="does not need fuel: no tank is below" />
+		<text name="AD_diag_noWorkshop"							 text="could not find a workshop to repair" />
+		<text name="AD_diag_workshops"							 text="workshops found" />
+		<text name="AD_diag_forTool"							 text="for" />
+		<text name="AD_diag_mode"							 text="current mode" />
+		<text name="AD_diag_byCourseplay"							 text="Courseplay is driving it" />
+		<text name="AD_diag_byHelper"							 text="the game's helper is driving it" />
+		<text name="AD_diag_notOnField"							 text="not standing on a field" />
+		<text name="AD_diag_noTarget"							 text="can't start: no target set (in this mode it also needs the unload target)" />
+		<text name="AD_diag_recordOffsets"							 text="Recording two roads stopped: both lanes need different offsets" />
+		<text name="AD_diag_recordReverse"							 text="Recording two roads stopped: it can't be recorded while reversing" />
+		<text name="AD_diag_attached"							 text="attached" />
+		<text name="AD_diag_bunkerEmpty"							 text="found nothing to load in the bunker silo" />
+		<text name="AD_diag_ualUnsupported"							 text="Unload products: this Universal Autoload version is not supported, so no pallets are unloaded while a product list is set" />
+		<text name="AD_hint_pfNoRoute"							 text="the nearest waypoint has no route to this target. Check the connections there (one-way and reverse arrows) or run Route check (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="no drivable way from the vehicle to the route network was found. Look for buildings, fences, trees, vehicles or steep ground in the way; drive it closer to the network, switch off Avoid fruit or Restrict to field, or raise Path finder time" />
+		<text name="AD_hint_noRoute"							 text="no route on the network from where the vehicle stands to this target. Check the arrows near the vehicle (it may stand on the other lane) and along the way, or run Route check (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="it got no closer to the next waypoint for 8 seconds. Usual causes: something in the way, a turn too tight for this vehicle and trailer, a waypoint inside an object, or steep or slippery ground. AutoDrive restarts the job" />
+		<text name="AD_hint_exitField"							 text="there is no route on the network from there to the unload target. Check that both targets are set and different, and the connections between them (Route check, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="an AutoDrive target has to be within 15 m of a fuel station that sells this fuel and has stock for your farm. Create a target right at the pump" />
+		<text name="AD_hint_repair"							 text="an AutoDrive target has to be within 15 m of a workshop or repair point. Create a target there, or switch off Auto repair" />
+		<text name="AD_hint_park"							 text="the park target is saved for each attached tool. With this tool attached, select the park target in the HUD and right-click the park button (P), or switch off Park at job finished" />
+		<text name="AD_hint_helperMode"							 text="taking over from Courseplay or the game's helper works in the modes Pickup and deliver, Load and Unload. Switch the AutoDrive mode, or turn off handing over to AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="stop the other driver first, then start AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive continues the field job the helper had last: the vehicle has to stand on that field within 30 m of the first target, and the job has to be valid (field, tools, seed)" />
+		<text name="AD_hint_shovel"							 text="bunker silo mode needs a shovel or bucket on the loader" />
+		<text name="AD_hint_bunker"							 text="the loader has to be within 100 m of a bunker silo when it starts" />
+		<text name="AD_hint_bunkerEmpty"							 text="the silo may be empty or still fermenting, or the Shovel width setting does not fit" />
+		<text name="AD_hint_bgaTrailer"							 text="a vehicle with AutoDrive and a trailer with free space has to stand still within 50 m for 3 seconds" />
+		<text name="AD_hint_waitQueue"							 text="another vehicle unloads there first" />
+		<text name="AD_hint_waitBlocked"							 text="the obstacle detection sees something in front: a vehicle, object or person" />
+		<text name="AD_hint_waitNotFull"							 text="it waits until the unload fill level setting is reached; check the silo has this product" />
+		<text name="AD_hint_waitNoFlow"							 text="the trigger may not take this product or be full, or the trailer can't tip on this side" />
+		<text name="AD_hint_waitStanding"							 text="no known reason, look at the vehicle" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="it is too far from its course (pushed off or blocked); drive it back onto the course or restart" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="no way around the obstacles to the target; check for vehicles, fences, buildings or crop in the way, the field edge, and Courseplay's avoid fruit setting" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="this trailer can't tip on the ground on that side; choose another tip side or unload into a trigger" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="this header can't be attached automatically; attach it by hand" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="no header attached and automatic attaching is off; attach it or switch the setting on" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="this crop can't be planted in this month; check the calendar or the seed" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="the contract needs another crop; select the contract's seed" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="all pallets on the machine are full; unload them" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="load empty pallets first" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="drive it closer to the field before starting" />
+		<text name="AD_cpHint_IS_STUCK"							 text="it could not move for a while: something in the way, a slope, stuck wheels or not enough power" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="something stands in its path: a vehicle, pallet, bale or tree" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="the farm has no money for what it buys on the way (seed, fertilizer, fuel)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="no bales of the selected type on the field; check the bale setting" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="the tank is empty; refuel it" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="damage is at 100 percent; repair it at a workshop" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="the seed, fertilizer or spray tank is empty; refill it" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="the tank or trailer is full; unload it or send an unloader" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="refuel soon" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="this work stops in rain and continues by itself" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="this work stops while snow lies and continues by itself" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="the tank is full: an unloader has to come; check that unloaders are set up and not stuck" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />

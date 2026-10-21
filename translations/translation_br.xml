@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="parado" />
 		<text name="AD_ticker_waiting"							 text="esperando" />
 		<text name="AD_ticker_helpers"							 text="Ajudantes" />
+		<text name="AD_diag_to"							 text="para" />
+		<text name="AD_diag_from"							 text="de" />
+		<text name="AD_diag_nearestWp"							 text="waypoint mais próximo" />
+		<text name="AD_diag_offNetwork"							 text="da rede de rotas" />
+		<text name="AD_diag_startWp"							 text="partindo do waypoint" />
+		<text name="AD_diag_nextWp"							 text="próximo waypoint" />
+		<text name="AD_diag_blockedBy"							 text="bloqueado por" />
+		<text name="AD_diag_stations"							 text="postos com este combustível encontrados" />
+		<text name="AD_diag_tankNotLow"							 text="não precisa de combustível: nenhum tanque abaixo de" />
+		<text name="AD_diag_noWorkshop"							 text="não encontrou oficina para reparar" />
+		<text name="AD_diag_workshops"							 text="oficinas encontradas" />
+		<text name="AD_diag_forTool"							 text="para" />
+		<text name="AD_diag_mode"							 text="modo atual" />
+		<text name="AD_diag_byCourseplay"							 text="o Courseplay está dirigindo" />
+		<text name="AD_diag_byHelper"							 text="o ajudante do jogo está dirigindo" />
+		<text name="AD_diag_notOnField"							 text="não está num campo" />
+		<text name="AD_diag_noTarget"							 text="não pode iniciar: nenhum destino definido (neste modo também precisa do destino de descarga)" />
+		<text name="AD_diag_recordOffsets"							 text="Gravação de duas vias parada: as duas faixas precisam de deslocamentos diferentes" />
+		<text name="AD_diag_recordReverse"							 text="Gravação de duas vias parada: não é possível gravar em ré" />
+		<text name="AD_diag_attached"							 text="acoplado" />
+		<text name="AD_diag_bunkerEmpty"							 text="não encontrou nada para carregar no silo trincheira" />
+		<text name="AD_diag_ualUnsupported"							 text="Descarregar produtos: esta versão do Universal Autoload não é suportada, com uma lista de produtos nenhum palete é descarregado" />
+		<text name="AD_hint_pfNoRoute"							 text="o waypoint mais próximo não tem rota até este destino. Verifique as conexões ali (setas de mão única e de ré) ou use a verificação de rotas (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="não foi encontrado caminho transitável do veículo até a rede de rotas. Procure prédios, cercas, árvores, veículos ou terreno íngreme no caminho; leve-o mais perto da rede, desligue Evitar cultivo ou Restringir ao campo, ou aumente o tempo de busca de caminho" />
+		<text name="AD_hint_noRoute"							 text="não há rota na rede de onde o veículo está até este destino. Verifique as setas perto do veículo (ele pode estar na outra faixa) e ao longo do caminho, ou use a verificação de rotas (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="não se aproximou do próximo waypoint por 8 segundos. Causas comuns: algo no caminho, curva fechada demais para este veículo e reboque, waypoint dentro de um objeto, ou terreno íngreme ou escorregadio. O AutoDrive reinicia o trabalho" />
+		<text name="AD_hint_exitField"							 text="não há rota na rede dali até o destino de descarga. Verifique se os dois destinos estão definidos e são diferentes, e as conexões entre eles (verificação de rotas, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="um destino do AutoDrive precisa estar a até 15 m de um posto que venda este combustível e tenha estoque para sua fazenda. Crie um destino junto à bomba" />
+		<text name="AD_hint_repair"							 text="um destino do AutoDrive precisa estar a até 15 m de uma oficina ou ponto de reparo. Crie um destino ali ou desligue o reparo automático" />
+		<text name="AD_hint_park"							 text="o destino de estacionamento é salvo para cada implemento acoplado. Com este implemento acoplado, escolha o destino no HUD e clique com o botão direito no botão de estacionar (P), ou desligue Estacionar ao terminar" />
+		<text name="AD_hint_helperMode"							 text="assumir do Courseplay ou do ajudante do jogo funciona nos modos Coletar e entregar, Carregar e Descarregar. Troque o modo do AutoDrive ou desligue a passagem para o AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="pare o outro motorista primeiro e depois inicie o AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="o AutoDrive continua o último trabalho de campo do ajudante: o veículo precisa estar nesse campo a até 30 m do primeiro destino, e o trabalho precisa ser válido (campo, implementos, sementes)" />
+		<text name="AD_hint_shovel"							 text="o modo silo trincheira precisa de uma pá ou caçamba na carregadeira" />
+		<text name="AD_hint_bunker"							 text="a carregadeira precisa estar a até 100 m de um silo trincheira ao iniciar" />
+		<text name="AD_hint_bunkerEmpty"							 text="o silo pode estar vazio ou ainda fermentando, ou a largura da pá não está certa" />
+		<text name="AD_hint_bgaTrailer"							 text="um veículo com AutoDrive e reboque com espaço livre precisa ficar parado a até 50 m por 3 segundos" />
+		<text name="AD_hint_waitQueue"							 text="outro veículo descarrega ali primeiro" />
+		<text name="AD_hint_waitBlocked"							 text="a detecção de obstáculos vê algo à frente: veículo, objeto ou pessoa" />
+		<text name="AD_hint_waitNotFull"							 text="espera até atingir a configuração de nível para descarregar; verifique se o silo tem este produto" />
+		<text name="AD_hint_waitNoFlow"							 text="o ponto pode não aceitar este produto ou estar cheio, ou o reboque não descarrega deste lado" />
+		<text name="AD_hint_waitStanding"							 text="motivo desconhecido, olhe o veículo" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="está longe demais do percurso (empurrado ou bloqueado); leve-o de volta ao percurso ou reinicie" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="nenhum caminho contornando os obstáculos até o destino; verifique veículos, cercas, prédios ou cultivo no caminho, a borda do campo e a configuração evitar cultivo do Courseplay" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="este reboque não descarrega no chão desse lado; escolha outro lado ou descarregue num ponto" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="esta plataforma não pode ser acoplada automaticamente; acople-a manualmente" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="nenhuma plataforma acoplada e o acoplamento automático está desligado; acople-a ou ligue a configuração" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="esta cultura não pode ser plantada neste mês; verifique o calendário ou a semente" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="o contrato pede outra cultura; selecione a semente do contrato" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="todos os paletes na máquina estão cheios; descarregue-os" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="carregue paletes vazios primeiro" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="leve-o mais perto do campo antes de iniciar" />
+		<text name="AD_cpHint_IS_STUCK"							 text="não conseguiu se mover por um tempo: algo no caminho, uma subida, rodas presas ou pouca potência" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="algo está no caminho: veículo, palete, fardo ou árvore" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="a fazenda não tem dinheiro para o que compra no caminho (sementes, fertilizante, combustível)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="nenhum fardo do tipo escolhido no campo; verifique a configuração de fardos" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="o tanque está vazio; abasteça" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="o dano está em 100 por cento; repare numa oficina" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="o tanque de sementes, fertilizante ou pulverização está vazio; reabasteça" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="o tanque ou reboque está cheio; descarregue ou envie um descarregador" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="abasteça em breve" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="este trabalho para com chuva e continua sozinho" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="este trabalho para enquanto há neve e continua sozinho" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="o tanque está cheio: um descarregador precisa vir; verifique se os descarregadores estão configurados e não presos" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />

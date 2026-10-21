@@ -23,7 +23,7 @@ function ParkTask:setUp()
             self.actualParkDestinationName = ADGraphManager:getMapMarkerById(actualParkDestination).name
             self.vehicle.ad.onRouteToPark = true
         else
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_parkVehicle_noPosSet;", 5000, self.vehicle.ad.stateModule:getName())
+            ADDiag.noParkDestination(self.vehicle)
         end
     end
 
@@ -56,7 +56,8 @@ function ParkTask:update(dt)
                 Logging.error("[AutoDrive] Could not calculate path - shutting down")
                 self:finished(ADTaskModule.DONT_PROPAGATE)
                 self.vehicle:stopAutoDrive()
-                AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path;", 5000, self.vehicle.ad.stateModule:getName())
+                -- Overdrive: what failed, where to, what to check
+                ADDiag.pathFailed(self.vehicle, self.destinationID)
             else
                 self.vehicle.ad.drivePathModule:setWayPoints(self.wayPoints)
                 self.state = ParkTask.STATE_DRIVING

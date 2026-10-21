@@ -1166,7 +1166,7 @@ function AutoDrive:startAutoDrive()
         if g_currentMission.aiSystem and g_currentMission.aiSystem.activeJobVehicles then
             for index, jobVehicle in pairs(g_currentMission.aiSystem.activeJobVehicles) do
                 if self == jobVehicle then
-                    AutoDriveMessageEvent.sendMessageOrNotification(self, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s: $l10n_AD_AIJob_active;", 5000, self.ad.stateModule:getName())
+                    ADDiag.aiJobActive(self)
                     return
                 end
             end
@@ -1355,7 +1355,7 @@ function AutoDrive:onStartAutoDrive()
             local actualParkDestination = self.ad.stateModule:getParkDestinationAtJobFinished()
             if actualParkDestination >= 1 then
             else
-                AutoDriveMessageEvent.sendMessageOrNotification(self, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s $l10n_AD_parkVehicle_noPosSet;", 5000, self.ad.stateModule:getName())
+                ADDiag.noParkDestination(self)
             end
         end
     end
@@ -1569,7 +1569,8 @@ function AutoDrive.passToExternalMod_AI(vehicle)
         else
             return
         end
-        AutoDriveMessageEvent.sendMessageOrNotification(vehicle, ADMessagesManager.messageTypes.ERROR, "$l10n_AD_Driver_of; %s: $l10n_AD_Unable_to_start_AIJob;", 5000, vehicle.ad.stateModule:getName())
+        -- Overdrive: the game's own reason (it was only in the debug output), or not on the field
+        ADDiag.cannotStartAIJob(vehicle, errorMessage, vehicle.getIsOnField ~= nil and vehicle:getIsOnField())
         AutoDrive.debugPrint(vehicle, AutoDrive.DC_EXTERNALINTERFACEINFO, "AutoDrive.passToExternalMod lastJob aiSystem:startJob errorMessage: %s"
         , tostring(errorMessage)
         )

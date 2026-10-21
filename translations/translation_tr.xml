@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="duruyor" />
 		<text name="AD_ticker_waiting"							 text="bekliyor" />
 		<text name="AD_ticker_helpers"							 text="Yardımcılar" />
+		<text name="AD_diag_to"							 text="hedef:" />
+		<text name="AD_diag_from"							 text="başlangıç:" />
+		<text name="AD_diag_nearestWp"							 text="en yakın nokta" />
+		<text name="AD_diag_offNetwork"							 text="rota ağından" />
+		<text name="AD_diag_startWp"							 text="başlangıç noktası" />
+		<text name="AD_diag_nextWp"							 text="sonraki nokta" />
+		<text name="AD_diag_blockedBy"							 text="engelleyen" />
+		<text name="AD_diag_stations"							 text="bu yakıta sahip istasyon bulundu" />
+		<text name="AD_diag_tankNotLow"							 text="yakıt gerekmiyor: hiçbir depo şunun altında değil" />
+		<text name="AD_diag_noWorkshop"							 text="onarım için atölye bulamadı" />
+		<text name="AD_diag_workshops"							 text="atölye bulundu" />
+		<text name="AD_diag_forTool"							 text="için:" />
+		<text name="AD_diag_mode"							 text="geçerli mod" />
+		<text name="AD_diag_byCourseplay"							 text="Courseplay sürüyor" />
+		<text name="AD_diag_byHelper"							 text="oyunun yardımcısı sürüyor" />
+		<text name="AD_diag_notOnField"							 text="tarlada durmuyor" />
+		<text name="AD_diag_noTarget"							 text="başlayamıyor: hedef seçilmedi (bu modda boşaltma hedefi de gerekli)" />
+		<text name="AD_diag_recordOffsets"							 text="İki şerit kaydı durdu: iki şeridin farklı kaydırması olmalı" />
+		<text name="AD_diag_recordReverse"							 text="İki şerit kaydı durdu: geri giderken kaydedilemez" />
+		<text name="AD_diag_attached"							 text="takılı" />
+		<text name="AD_diag_bunkerEmpty"							 text="silaj çukurunda yüklenecek bir şey bulamadı" />
+		<text name="AD_diag_ualUnsupported"							 text="Ürünleri boşalt: bu Universal Autoload sürümü desteklenmiyor, ürün listesiyle hiç palet boşaltılmaz" />
+		<text name="AD_hint_pfNoRoute"							 text="en yakın noktadan bu hedefe rota yok. Oradaki bağlantıları (tek yön ve geri okları) kontrol edin veya rota kontrolünü çalıştırın (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="araçtan rota ağına sürülebilir yol bulunamadı. Yoldaki binalara, çitlere, ağaçlara, araçlara veya dik araziye bakın; ağa yaklaştırın, Ekinden kaçın veya Tarlayla sınırla ayarını kapatın ya da yol bulma süresini artırın" />
+		<text name="AD_hint_noRoute"							 text="ağda aracın durduğu yerden bu hedefe rota yok. Aracın yakınındaki okları (diğer şeritte olabilir) ve yol boyunca kontrol edin veya rota kontrolünü çalıştırın (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="8 saniye boyunca sonraki noktaya yaklaşmadı. Olağan nedenler: yolda bir şey, bu araç ve römork için fazla dar viraj, bir nesnenin içinde nokta ya da dik veya kaygan zemin. AutoDrive işi yeniden başlatır" />
+		<text name="AD_hint_exitField"							 text="ağda oradan boşaltma hedefine rota yok. İki hedefin de seçili ve farklı olduğunu ve aralarındaki bağlantıları kontrol edin (rota kontrolü, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="bir AutoDrive hedefi, bu yakıtı satan ve çiftliğiniz için stoğu olan bir istasyona en fazla 15 m uzakta olmalı. Pompanın yanına bir hedef oluşturun" />
+		<text name="AD_hint_repair"							 text="bir AutoDrive hedefi bir atölyeye veya onarım noktasına en fazla 15 m uzakta olmalı. Orada bir hedef oluşturun veya otomatik onarımı kapatın" />
+		<text name="AD_hint_park"							 text="park hedefi takılı her ekipman için ayrı kaydedilir. Bu ekipman takılıyken HUD'da hedefi seçin ve park düğmesine (P) sağ tıklayın ya da İş bitince park et ayarını kapatın" />
+		<text name="AD_hint_helperMode"							 text="Courseplay'den veya oyunun yardımcısından devralma Al ve teslim et, Yükle ve Boşalt modlarında çalışır. AutoDrive modunu değiştirin veya AutoDrive'a devretmeyi kapatın" />
+		<text name="AD_hint_aiActive"							 text="önce diğer sürücüyü durdurun, sonra AutoDrive'ı başlatın" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive yardımcının son tarla işine devam eder: araç o tarlada ilk hedefe en fazla 30 m uzakta durmalı ve iş geçerli olmalı (tarla, ekipman, tohum)" />
+		<text name="AD_hint_shovel"							 text="silaj çukuru modu için yükleyicide kova gerekir" />
+		<text name="AD_hint_bunker"							 text="yükleyici başlarken bir silaj çukuruna en fazla 100 m uzakta olmalı" />
+		<text name="AD_hint_bunkerEmpty"							 text="silo boş olabilir veya hâlâ mayalanıyor olabilir ya da kova genişliği ayarı uymuyor" />
+		<text name="AD_hint_bgaTrailer"							 text="AutoDrive'lı ve boş yeri olan römorklu bir araç 50 m içinde 3 saniye durmalı" />
+		<text name="AD_hint_waitQueue"							 text="orada önce başka bir araç boşaltıyor" />
+		<text name="AD_hint_waitBlocked"							 text="engel algılama önde bir şey görüyor: araç, nesne veya kişi" />
+		<text name="AD_hint_waitNotFull"							 text="boşaltma doluluk ayarına ulaşana kadar bekler; siloda bu ürünün olduğunu kontrol edin" />
+		<text name="AD_hint_waitNoFlow"							 text="nokta bu ürünü kabul etmiyor veya dolu olabilir ya da römork bu tarafa boşaltamıyor" />
+		<text name="AD_hint_waitStanding"							 text="bilinen bir neden yok, araca bakın" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="rotasından çok uzak (itildi veya engellendi); rotaya geri götürün veya yeniden başlatın" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="engellerin etrafından hedefe yol yok; yoldaki araçları, çitleri, binaları veya ekinleri, tarla kenarını ve Courseplay'in ekinden kaçın ayarını kontrol edin" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="bu römork o tarafa yere boşaltamaz; başka bir taraf seçin veya bir noktaya boşaltın" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="bu tabla otomatik takılamaz; elle takın" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="tabla takılı değil ve otomatik takma kapalı; takın veya ayarı açın" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="bu ekin bu ay ekilemez; takvimi veya tohumu kontrol edin" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="sözleşme başka bir ekin istiyor; sözleşmenin tohumunu seçin" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="makinedeki tüm paletler dolu; boşaltın" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="önce boş palet yükleyin" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="başlamadan önce tarlaya yaklaştırın" />
+		<text name="AD_cpHint_IS_STUCK"							 text="bir süre hareket edemedi: yolda bir şey, yokuş, saplanmış tekerler veya yetersiz güç" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="yolda bir şey duruyor: araç, palet, balya veya ağaç" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="çiftliğin yolda aldıkları için parası yok (tohum, gübre, yakıt)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="tarlada seçili türde balya yok; balya ayarını kontrol edin" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="depo boş; yakıt alın" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="hasar yüzde 100; bir atölyede onarın" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="tohum, gübre veya ilaç deposu boş; doldurun" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="depo veya römork dolu; boşaltın veya bir aktarma aracı gönderin" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="yakında yakıt alın" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="bu iş yağmurda durur ve kendiliğinden devam eder" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="bu iş kar varken durur ve kendiliğinden devam eder" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="depo dolu: bir aktarma aracı gelmeli; aktarma araçlarının ayarlı ve sıkışmamış olduğunu kontrol edin" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />

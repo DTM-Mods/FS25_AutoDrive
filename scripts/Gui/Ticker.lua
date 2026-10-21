@@ -28,6 +28,7 @@ ADTicker.COLOR_REASON = {1, 0.7, 0.2, 1}
 ADTicker.COLOR_WARN = {1, 0.85, 0.2, 1}
 ADTicker.COLOR_ERROR = {1, 0.35, 0.3, 1}
 ADTicker.COLOR_STATS = {0.5, 0.8, 1, 1}
+ADTicker.COLOR_HINT = {0.8, 0.8, 0.8, 1}
 
 ADTicker.messages = {}             -- {text, type, time}
 ADTicker.segments = {}             -- {text, color, width}
@@ -93,11 +94,16 @@ local function litres(value)
     return string.format("%d l", math.floor((value or 0) / 100 + 0.5) * 100)
 end
 
-local function reasonText(key, detail)
+-- the reason, a detail in brackets, and what to check (a hint key)
+local function reasonText(key, detail, hint)
+    local text = string.format("$l10n_%s;", key)
     if detail ~= nil and detail ~= "" then
-        return string.format("$l10n_%s; (%s)", key, detail)
+        text = text .. string.format(" (%s)", detail)
     end
-    return string.format("$l10n_%s;", key)
+    if hint ~= nil then
+        text = text .. string.format(": $l10n_%s;", hint)
+    end
+    return text
 end
 
 -- the fill level went down a moment ago: the load runs
@@ -133,7 +139,7 @@ function ADTicker.getWaitReason(vehicle)
 
     local drivePath = ad.drivePathModule
     if drivePath ~= nil and drivePath.isPaused then
-        return reasonText("AD_wait_queue")
+        return reasonText("AD_wait_queue", nil, "AD_hint_waitQueue")
     end
     if ad.actionWaitUntil ~= nil and now <= ad.actionWaitUntil then
         return reasonText("AD_wait_waypoint", string.format("%d s", math.ceil((ad.actionWaitUntil - now) / 1000)))
@@ -143,7 +149,7 @@ function ADTicker.getWaitReason(vehicle)
         return reasonText("AD_wait_traffic", collision.trafficVehicle.ad.stateModule:getName())
     end
     if collision ~= nil and collision.detectedObstable then
-        return reasonText("AD_wait_blocked")
+        return reasonText("AD_wait_blocked", nil, "AD_hint_waitBlocked")
     end
 
     local task = ad.taskModule ~= nil and ad.taskModule.activeTask or nil
@@ -156,7 +162,7 @@ function ADTicker.getWaitReason(vehicle)
                 return reasonText("AD_wait_loading", litres(fillLevel) .. " / " .. litres(fillCapacity))
             end
             if drivePath ~= nil and drivePath:isTargetReached() then
-                return reasonText("AD_wait_notFull", litres(fillFree) .. " " .. g_i18n:getText("AD_wait_free"))
+                return reasonText("AD_wait_notFull", litres(fillFree) .. " $l10n_AD_wait_free;", "AD_hint_waitNotFull")
             end
         elseif isTask(task, UnloadAtDestinationTask) then
             local flowing = isFlowing(vehicle, fillLevel)
@@ -165,7 +171,7 @@ function ADTicker.getWaitReason(vehicle)
                     return reasonText("AD_wait_tipping", litres(fillLevel))
                 end
                 local since = now - math.max(ad.tickerFlow.lastFlow, ad.tickerStandingSince)
-                return reasonText("AD_wait_noFlow", string.format("%d s", math.floor(since / 1000)))
+                return reasonText("AD_wait_noFlow", string.format("%d s", math.floor(since / 1000)), "AD_hint_waitNoFlow")
             end
             if drivePath ~= nil and drivePath:isTargetReached() then
                 return reasonText("AD_wait_unloadPoint", litres(fillLevel))
@@ -173,7 +179,7 @@ function ADTicker.getWaitReason(vehicle)
         end
     end
     if standing >= 10000 then
-        return reasonText("AD_wait_standing", string.format("%d s", math.floor(standing / 10000) * 10))
+        return reasonText("AD_wait_standing", string.format("%d s", math.floor(standing / 10000) * 10), "AD_hint_waitStanding")
     end
     return ""
 end
@@ -224,6 +230,22 @@ ADTicker.CP_ERRORS = {IS_STUCK = true, BLOCKED_BY_OBJECT = true, OUT_OF_MONEY = 
 ADTicker.CP_WARNINGS = {FUEL_IS_LOW = true, NEEDS_FILLING = true, NEEDS_UNLOADING = true, WAITING_FOR_RAIN_TO_FINISH = true,
     WAITING_FOR_SNOW_TO_CLEAR = true}
 
+-- what a Courseplay info text means and what to check (AD_cpHint_<name>), or nil
+function ADTicker.getCpHint(name)
+    if name == nil or g_i18n == nil then
+        return nil
+    end
+    local key = "AD_cpHint_" .. name
+    if g_i18n.hasText ~= nil and not g_i18n:hasText(key) then
+        return nil
+    end
+    local ok, text = pcall(g_i18n.getText, g_i18n, key)
+    if ok and text ~= nil and text ~= "" and not text:find("Missing", 1, true) then
+        return text
+    end
+    return nil
+end
+
 function ADTicker.getCpInfoColor(name)
     name = name or ""
     if name:sub(1, 6) == "ERROR_" or ADTicker.CP_ERRORS[name] then
@@ -245,7 +267,7 @@ function ADTicker.getCourseplayInfos()
                     local text = infoText.getText ~= nil and infoText:getText() or infoText.text
                     if text ~= nil and text ~= "" then
                         table.insert(infos, {vehicle = vehicle, name = vehicle.getName ~= nil and vehicle:getName() or "?", text = text,
-                            color = ADTicker.getCpInfoColor(infoText.name), id = infoText.id or 0})
+                            color = ADTicker.getCpInfoColor(infoText.name), id = infoText.id or 0, hint = ADTicker.getCpHint(infoText.name)})
                     end
                 end
             end
@@ -342,6 +364,9 @@ function ADTicker.buildSegments()
         add(ADTicker.SEPARATOR, ADTicker.COLOR_TEXT)
         add(info.name .. " (Courseplay): ", ADTicker.COLOR_NAME)
         add(info.text, info.color)
+        if info.hint ~= nil then
+            add(" - " .. info.hint, ADTicker.COLOR_HINT)
+        end
     end
     local now = g_time or 0
     for _, message in ipairs(ADTicker.messages) do

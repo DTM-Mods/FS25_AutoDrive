@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="holder stille" />
 		<text name="AD_ticker_waiting"							 text="venter" />
 		<text name="AD_ticker_helpers"							 text="Hjælpere" />
+		<text name="AD_diag_to"							 text="til" />
+		<text name="AD_diag_from"							 text="fra" />
+		<text name="AD_diag_nearestWp"							 text="nærmeste vejpunkt" />
+		<text name="AD_diag_offNetwork"							 text="fra rutenettet" />
+		<text name="AD_diag_startWp"							 text="start ved vejpunkt" />
+		<text name="AD_diag_nextWp"							 text="næste vejpunkt" />
+		<text name="AD_diag_blockedBy"							 text="blokeret af" />
+		<text name="AD_diag_stations"							 text="tankstationer med dette brændstof fundet" />
+		<text name="AD_diag_tankNotLow"							 text="behøver ikke brændstof: ingen tank er under" />
+		<text name="AD_diag_noWorkshop"							 text="kunne ikke finde et værksted til reparation" />
+		<text name="AD_diag_workshops"							 text="værksteder fundet" />
+		<text name="AD_diag_forTool"							 text="for" />
+		<text name="AD_diag_mode"							 text="aktuel tilstand" />
+		<text name="AD_diag_byCourseplay"							 text="Courseplay kører den" />
+		<text name="AD_diag_byHelper"							 text="spillets hjælper kører den" />
+		<text name="AD_diag_notOnField"							 text="står ikke på en mark" />
+		<text name="AD_diag_noTarget"							 text="kan ikke starte: intet mål valgt (i denne tilstand kræves også aflæsningsmålet)" />
+		<text name="AD_diag_recordOffsets"							 text="Optagelse af to spor stoppet: begge spor skal have forskellig forskydning" />
+		<text name="AD_diag_recordReverse"							 text="Optagelse af to spor stoppet: kan ikke optages i bakgear" />
+		<text name="AD_diag_attached"							 text="påmonteret" />
+		<text name="AD_diag_bunkerEmpty"							 text="fandt intet at læsse i plansiloen" />
+		<text name="AD_diag_ualUnsupported"							 text="Aflæs produkter: denne Universal Autoload-version understøttes ikke, med en produktliste aflæsses ingen paller" />
+		<text name="AD_hint_pfNoRoute"							 text="det nærmeste vejpunkt har ingen rute til dette mål. Tjek forbindelserne der (ensrettede pile og bakpile) eller brug rutetjek (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="der blev ikke fundet nogen kørbar vej fra køretøjet til rutenettet. Se efter bygninger, hegn, træer, køretøjer eller stejlt terræn; kør den tættere på nettet, slå Undgå afgrøde eller Begræns til mark fra, eller hæv søgetiden" />
+		<text name="AD_hint_noRoute"							 text="ingen rute i nettet fra hvor køretøjet står til dette mål. Tjek pilene ved køretøjet (det står måske i det andet spor) og undervejs, eller brug rutetjek (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="det kom ikke tættere på næste vejpunkt i 8 sekunder. Typiske årsager: noget i vejen, et for skarpt sving for køretøj og anhænger, et vejpunkt inde i et objekt, eller stejlt eller glat terræn. AutoDrive genstarter opgaven" />
+		<text name="AD_hint_exitField"							 text="der er ingen rute i nettet derfra til aflæsningsmålet. Tjek at begge mål er valgt og forskellige, og forbindelserne imellem (rutetjek, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="et AutoDrive-mål skal være højst 15 m fra en tankstation, der sælger dette brændstof og har lager til din gård. Opret et mål lige ved standeren" />
+		<text name="AD_hint_repair"							 text="et AutoDrive-mål skal være højst 15 m fra et værksted eller reparationssted. Opret et mål der, eller slå automatisk reparation fra" />
+		<text name="AD_hint_park"							 text="parkeringsmålet gemmes for hvert påmonteret redskab. Med dette redskab påmonteret, vælg målet i HUD'en og højreklik på parkeringsknappen (P), eller slå Parkér når opgaven er færdig fra" />
+		<text name="AD_hint_helperMode"							 text="overtagelse fra Courseplay eller spillets hjælper virker i tilstandene Afhent og lever, Læs og Aflæs. Skift AutoDrive-tilstand, eller slå overdragelse til AutoDrive fra" />
+		<text name="AD_hint_aiActive"							 text="stop først den anden fører, start så AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive fortsætter hjælperens sidste markopgave: køretøjet skal stå på den mark højst 30 m fra det første mål, og opgaven skal være gyldig (mark, redskaber, sæd)" />
+		<text name="AD_hint_shovel"							 text="plansilo-tilstand kræver en skovl på læsseren" />
+		<text name="AD_hint_bunker"							 text="læsseren skal være højst 100 m fra en plansilo, når den starter" />
+		<text name="AD_hint_bunkerEmpty"							 text="siloen er måske tom eller gærer stadig, eller skovlbredden passer ikke" />
+		<text name="AD_hint_bgaTrailer"							 text="et køretøj med AutoDrive og en anhænger med plads skal holde stille højst 50 m væk i 3 sekunder" />
+		<text name="AD_hint_waitQueue"							 text="et andet køretøj aflæsser der først" />
+		<text name="AD_hint_waitBlocked"							 text="forhindringsdetektionen ser noget foran: et køretøj, objekt eller en person" />
+		<text name="AD_hint_waitNotFull"							 text="den venter til indstillingen aflæsningsniveau er nået; tjek at siloen har dette produkt" />
+		<text name="AD_hint_waitNoFlow"							 text="stedet tager måske ikke dette produkt eller er fuldt, eller anhængeren kan ikke tippe til denne side" />
+		<text name="AD_hint_waitStanding"							 text="ingen kendt årsag, se på køretøjet" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="den er for langt fra kursen (skubbet væk eller blokeret); kør den tilbage eller genstart" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="ingen vej uden om forhindringerne til målet; tjek køretøjer, hegn, bygninger eller afgrøde i vejen, markkanten og Courseplays indstilling undgå afgrøde" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="denne anhænger kan ikke tippe på jorden til den side; vælg en anden tipside eller aflæs i et aflæsningssted" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="dette skærebord kan ikke monteres automatisk; montér det i hånden" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="intet skærebord monteret og automatisk montering er slået fra; montér det eller slå indstillingen til" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="denne afgrøde kan ikke sås i denne måned; tjek kalenderen eller sæden" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="kontrakten kræver en anden afgrøde; vælg kontraktens sæd" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="alle paller på maskinen er fulde; aflæs dem" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="læs tomme paller først" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="kør den tættere på marken før start" />
+		<text name="AD_cpHint_IS_STUCK"							 text="den kunne ikke bevæge sig et stykke tid: noget i vejen, en skråning, fastkørte hjul eller for lidt kraft" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="noget står i vejen: et køretøj, en palle, en balle eller et træ" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="gården har ingen penge til det, den køber undervejs (sæd, gødning, brændstof)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="ingen baller af den valgte type på marken; tjek balleindstillingen" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="tanken er tom; tank den op" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="skaden er på 100 procent; reparér den på et værksted" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="sæd-, gødnings- eller sprøjtetanken er tom; fyld den op" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="tanken eller anhængeren er fuld; aflæs den eller send en overlæsser" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="tank snart" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="dette arbejde stopper i regn og fortsætter af sig selv" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="dette arbejde stopper mens der ligger sne og fortsætter af sig selv" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="tanken er fuld: en overlæsser skal komme; tjek at overlæssere er sat op og ikke sidder fast" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

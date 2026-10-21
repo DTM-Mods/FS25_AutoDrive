@@ -103,7 +103,8 @@ function ExitFieldTask:startPathPlanning()
                 self:finished()
             end
         else
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.WARN, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path;", 5000, self.vehicle.ad.stateModule:getName())
+            -- Overdrive: from where to where, what to check
+            ADDiag.exitFieldNoRoute(self.vehicle, "#" .. tostring(closest), self.vehicle.ad.stateModule:getSecondWayPoint())
             self.vehicle.ad.taskModule:abortAllTasks()
             self.vehicle.ad.taskModule:addTask(StopAndDisableADTask:new(self.vehicle))
         end
@@ -120,7 +121,8 @@ function ExitFieldTask:startPathPlanning()
             self.vehicle.ad.pathFinderModule:startPathPlanningTo(targetNode, vecToNextPoint)
             return true
         else
-            AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.WARN, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path;", 5000, self.vehicle.ad.stateModule:getName())
+            -- Overdrive: from where to where, what to check
+            ADDiag.exitFieldNoRoute(self.vehicle, ADDiag.targetName(self.vehicle.ad.stateModule:getFirstWayPoint()), self.vehicle.ad.stateModule:getSecondWayPoint())
             self.vehicle.ad.taskModule:abortAllTasks()
             self.vehicle.ad.taskModule:addTask(StopAndDisableADTask:new(self.vehicle))
         end

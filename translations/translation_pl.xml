@@ -626,6 +626,70 @@
 		<text name="AD_wait_standing"							 text="stoi" />
 		<text name="AD_ticker_waiting"							 text="czeka" />
 		<text name="AD_ticker_helpers"							 text="Pomocnicy" />
+		<text name="AD_diag_to"							 text="do" />
+		<text name="AD_diag_from"							 text="z" />
+		<text name="AD_diag_nearestWp"							 text="najbliższy punkt" />
+		<text name="AD_diag_offNetwork"							 text="od sieci tras" />
+		<text name="AD_diag_startWp"							 text="start z punktu" />
+		<text name="AD_diag_nextWp"							 text="następny punkt" />
+		<text name="AD_diag_blockedBy"							 text="zablokowany przez" />
+		<text name="AD_diag_stations"							 text="znalezione stacje z tym paliwem" />
+		<text name="AD_diag_tankNotLow"							 text="nie potrzebuje paliwa: żaden zbiornik poniżej" />
+		<text name="AD_diag_noWorkshop"							 text="nie znalazł warsztatu do naprawy" />
+		<text name="AD_diag_workshops"							 text="znalezione warsztaty" />
+		<text name="AD_diag_forTool"							 text="dla" />
+		<text name="AD_diag_mode"							 text="obecny tryb" />
+		<text name="AD_diag_byCourseplay"							 text="prowadzi go Courseplay" />
+		<text name="AD_diag_byHelper"							 text="prowadzi go pomocnik gry" />
+		<text name="AD_diag_notOnField"							 text="nie stoi na polu" />
+		<text name="AD_diag_noTarget"							 text="nie może ruszyć: brak celu (w tym trybie potrzebny też cel rozładunku)" />
+		<text name="AD_diag_recordOffsets"							 text="Nagrywanie dwóch pasów zatrzymane: oba pasy muszą mieć różne przesunięcia" />
+		<text name="AD_diag_recordReverse"							 text="Nagrywanie dwóch pasów zatrzymane: nie można nagrywać na wstecznym" />
+		<text name="AD_diag_attached"							 text="podłączone" />
+		<text name="AD_diag_bunkerEmpty"							 text="nie znalazł nic do załadunku w silosie przejazdowym" />
+		<text name="AD_diag_ualUnsupported"							 text="Rozładuj produkty: ta wersja Universal Autoload nie jest obsługiwana, z listą produktów żadne palety nie są rozładowywane" />
+		<text name="AD_hint_pfNoRoute"							 text="najbliższy punkt nie ma trasy do tego celu. Sprawdź tam połączenia (strzałki jednokierunkowe i wsteczne) lub uruchom sprawdzanie tras (Ctrl+Alt+N)" />
+		<text name="AD_hint_pfBlocked"							 text="nie znaleziono przejezdnej drogi od pojazdu do sieci tras. Szukaj budynków, ogrodzeń, drzew, pojazdów lub stromego terenu; podjedź bliżej sieci, wyłącz Omijaj uprawy lub Ogranicz do pola, albo zwiększ czas wyszukiwania" />
+		<text name="AD_hint_noRoute"							 text="brak trasy w sieci od miejsca pojazdu do tego celu. Sprawdź strzałki przy pojeździe (może stać na drugim pasie) i po drodze, lub uruchom sprawdzanie tras (Ctrl+Alt+N)" />
+		<text name="AD_hint_stuck"							 text="przez 8 sekund nie zbliżył się do następnego punktu. Typowe przyczyny: coś na drodze, za ciasny zakręt dla tego pojazdu z przyczepą, punkt w obiekcie, albo stromy lub śliski teren. AutoDrive uruchamia zadanie ponownie" />
+		<text name="AD_hint_exitField"							 text="w sieci nie ma trasy stamtąd do celu rozładunku. Sprawdź, czy oba cele są ustawione i różne, oraz połączenia między nimi (sprawdzanie tras, Ctrl+Alt+N)" />
+		<text name="AD_hint_refuel"							 text="cel AutoDrive musi być w promieniu 15 m od stacji, która sprzedaje to paliwo i ma zapas dla twojego gospodarstwa. Utwórz cel tuż przy dystrybutorze" />
+		<text name="AD_hint_repair"							 text="cel AutoDrive musi być w promieniu 15 m od warsztatu lub punktu naprawy. Utwórz tam cel lub wyłącz automatyczną naprawę" />
+		<text name="AD_hint_park"							 text="cel parkowania jest zapisywany dla każdego podłączonego narzędzia. Z tym narzędziem podłączonym wybierz cel w HUD i kliknij prawym przyciskiem przycisk parkowania (P), lub wyłącz Parkuj po zakończeniu" />
+		<text name="AD_hint_helperMode"							 text="przejęcie od Courseplay lub pomocnika gry działa w trybach Odbierz i dostarcz, Załaduj i Rozładuj. Zmień tryb AutoDrive lub wyłącz przekazywanie do AutoDrive" />
+		<text name="AD_hint_aiActive"							 text="najpierw zatrzymaj drugiego kierowcę, potem uruchom AutoDrive" />
+		<text name="AD_hint_aiJob"							 text="AutoDrive kontynuuje ostatnie zadanie polowe pomocnika: pojazd musi stać na tym polu w promieniu 30 m od pierwszego celu, a zadanie musi być ważne (pole, narzędzia, nasiona)" />
+		<text name="AD_hint_shovel"							 text="tryb silosu przejazdowego wymaga łyżki na ładowarce" />
+		<text name="AD_hint_bunker"							 text="ładowarka musi być w promieniu 100 m od silosu przejazdowego przy starcie" />
+		<text name="AD_hint_bunkerEmpty"							 text="silos może być pusty lub jeszcze fermentuje, albo szerokość łyżki nie pasuje" />
+		<text name="AD_hint_bgaTrailer"							 text="pojazd z AutoDrive i przyczepą z wolnym miejscem musi stać w promieniu 50 m przez 3 sekundy" />
+		<text name="AD_hint_waitQueue"							 text="inny pojazd rozładowuje tam pierwszy" />
+		<text name="AD_hint_waitBlocked"							 text="wykrywanie przeszkód widzi coś z przodu: pojazd, obiekt lub osobę" />
+		<text name="AD_hint_waitNotFull"							 text="czeka na osiągnięcie ustawienia poziomu rozładunku; sprawdź, czy silos ma ten produkt" />
+		<text name="AD_hint_waitNoFlow"							 text="punkt może nie przyjmować tego produktu lub być pełny, albo przyczepa nie może wysypać na tę stronę" />
+		<text name="AD_hint_waitStanding"							 text="brak znanej przyczyny, spójrz na pojazd" />
+		<text name="AD_cpHint_ERROR_STOPPED"							 text="jest za daleko od kursu (zepchnięty lub zablokowany); wróć nim na kurs lub uruchom ponownie" />
+		<text name="AD_cpHint_ERROR_NO_PATH_FOUND"							 text="brak drogi wokół przeszkód do celu; sprawdź pojazdy, ogrodzenia, budynki lub uprawy na drodze, krawędź pola i ustawienie omijaj uprawy w Courseplay" />
+		<text name="AD_cpHint_ERROR_GROUND_UNLOAD_NOT_SUPPORTED"							 text="ta przyczepa nie może wysypać na ziemię na tę stronę; wybierz inną stronę lub rozładuj w punkcie" />
+		<text name="AD_cpHint_ERROR_CUTTER_NOT_SUPPORTED"							 text="tego hedera nie da się podłączyć automatycznie; podłącz go ręcznie" />
+		<text name="AD_cpHint_ERROR_AUTOMATIC_CUTTER_ATTACH_DISABLED"							 text="brak hedera, a automatyczne podłączanie jest wyłączone; podłącz go lub włącz ustawienie" />
+		<text name="AD_cpHint_ERROR_WRONG_SEASON"							 text="tej uprawy nie można siać w tym miesiącu; sprawdź kalendarz lub nasiona" />
+		<text name="AD_cpHint_ERROR_WRONG_MISSION_FRUIT_TYPE"							 text="zlecenie wymaga innej uprawy; wybierz nasiona ze zlecenia" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_FULL"							 text="wszystkie palety na maszynie są pełne; rozładuj je" />
+		<text name="AD_cpHint_ERROR_PALLETS_ARE_EMPTY"							 text="najpierw załaduj puste palety" />
+		<text name="AD_cpHint_ERROR_TOO_FAR_FROM_FIELD"							 text="podjedź bliżej pola przed startem" />
+		<text name="AD_cpHint_IS_STUCK"							 text="przez chwilę nie mógł ruszyć: coś na drodze, zbocze, zakopane koła lub za mało mocy" />
+		<text name="AD_cpHint_BLOCKED_BY_OBJECT"							 text="coś stoi na drodze: pojazd, paleta, bela lub drzewo" />
+		<text name="AD_cpHint_OUT_OF_MONEY"							 text="gospodarstwo nie ma pieniędzy na to, co kupuje po drodze (nasiona, nawóz, paliwo)" />
+		<text name="AD_cpHint_WRONG_BALE_WRAP_TYPE"							 text="brak bel wybranego typu na polu; sprawdź ustawienie bel" />
+		<text name="AD_cpHint_FUEL_IS_EMPTY"							 text="zbiornik jest pusty; zatankuj" />
+		<text name="AD_cpHint_IS_COMPLETELY_BROKEN"							 text="uszkodzenie wynosi 100 procent; napraw w warsztacie" />
+		<text name="AD_cpHint_NEEDS_FILLING"							 text="zbiornik nasion, nawozu lub oprysku jest pusty; uzupełnij go" />
+		<text name="AD_cpHint_NEEDS_UNLOADING"							 text="zbiornik lub przyczepa jest pełna; rozładuj lub wyślij przyczepę odbierającą" />
+		<text name="AD_cpHint_FUEL_IS_LOW"							 text="wkrótce zatankuj" />
+		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="ta praca zatrzymuje się w deszczu i wznowi się sama" />
+		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="ta praca zatrzymuje się, gdy leży śnieg, i wznowi się sama" />
+		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="zbiornik jest pełny: musi przyjechać przyczepa odbierająca; sprawdź, czy są ustawione i nie utknęły" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />
