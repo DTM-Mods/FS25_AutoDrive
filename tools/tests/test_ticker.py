@@ -131,6 +131,32 @@ text = s.eval("line(SEGMENTS)")
 assert text.startswith("AutoDrive 2 (1 waiting)     |     Courseplay 1     |     Helpers 1     |     8RX 410: Drive to loading point     |     Truck 1: Drive to unload point  - standing still (20 s)"), text
 assert "Driver of Truck 1 has reached Silo" in text and "no parking destination" in text and "Neighbour" not in text
 assert s.eval("SEGMENTS[#SEGMENTS].color == T.COLOR_WARN")
+# --- errors in red: Courseplay info texts (errors red, look-after yellow, the rest white) and AutoDrive vehicles
+# stopped because of an error (red, as long as they stand)
+s.execute("""
+    CP.getName = function() return "8RX 310" end
+    CP.getOwnerFarmId = function() return 1 end
+    CP_TEXTS = {[1] = {name = "ERROR_NO_PATH_FOUND", text = "no path found", id = 2},
+        [2] = {name = "FUEL_IS_LOW", text = "should refuel", id = 16384}, [3] = {name = "DRIVING_TO_COMBINE", text = "driving to combine", id = 1048576}}
+    CP.getCpActiveInfoTexts = function() return CP_TEXTS end
+    BROKEN = vehicle('Tatra'); BROKEN.ad.stateModule.active = false
+    ADFleetGui = {getLastProblem = function(v) if v == BROKEN then return {text = "cannot reach the target", messageType = 3} end end}
+    SEGS = T.buildSegments()
+    function find(txt) for _, sgm in ipairs(SEGS) do if sgm.text == txt then return sgm end end end
+""")
+assert s.eval("find('no path found').color == T.COLOR_ERROR")
+assert s.eval("find('should refuel').color == T.COLOR_WARN")
+assert s.eval("find('driving to combine').color == T.COLOR_TEXT")
+assert s.eval("find('8RX 310 (Courseplay): ') ~= nil")
+assert s.eval("find('cannot reach the target').color == T.COLOR_ERROR") and s.eval("find('Tatra: ') ~= nil")
+# a Courseplay vehicle of another farm: not shown
+s.execute("CP.getOwnerFarmId = function() return 2 end; SEGS = T.buildSegments()")
+assert s.eval("find('no path found')") is None
+# started again: no longer listed as stopped
+s.execute("BROKEN.ad.stateModule.active = true; SEGS = T.buildSegments()")
+assert s.eval("find('cannot reach the target')") is None
+s.execute("BROKEN.ad.stateModule.active = false; ADFleetGui = nil")
+
 s.execute("g_time = g_time + T.MESSAGE_LIFETIME + 1")
 assert "reached Silo" not in s.eval("line(T.buildSegments())")
 
@@ -167,4 +193,4 @@ read = state[state.index("function ADStateModule:doReadStream"):state.index("fun
 assert "streamWriteString(streamId, self.waitReason or " in write.split("streamWriteUInt8(streamId, self.actualFarmId)")[1]
 assert "self.waitReason = streamReadString(streamId)" in read.split("self.actualFarmId = streamReadUInt8(streamId)")[1]
 assert "self.waitReasonLocalized = AutoDrive.localize(self.waitReason)" in read
-print("OK: ticker (driver counts AutoDrive / waiting / Courseplay / helpers; why it waits: queue, waypoint, traffic, blocked, loading, not full, tipping, nothing comes out, unload point, standing; messages copied once; line; scrolling; synced reason)")
+print("OK: ticker (errors red: Courseplay info texts and AutoDrive vehicles stopped by an error; driver counts AutoDrive / waiting / Courseplay / helpers; why it waits: queue, waypoint, traffic, blocked, loading, not full, tipping, nothing comes out, unload point, standing; messages copied once; line; scrolling; synced reason)")

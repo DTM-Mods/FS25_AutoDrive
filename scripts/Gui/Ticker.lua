@@ -3,6 +3,8 @@
 --     the game's own helpers
 --   - what each AutoDrive vehicle of the player's farm is doing (the task line of the HUD), and why it waits
 --     when it stands (worked out on the server, sent along with the vehicle's state: ADStateModule.waitReason)
+--   - AutoDrive vehicles stopped because of a problem (errors red, warnings yellow) for as long as they stand
+--   - Courseplay vehicles with their Courseplay info texts (errors red, things to look after yellow)
 --   - the AutoDrive messages of the last minutes (the pop-ups at the top stay as they are)
 -- User setting showTicker.
 ADTicker = {}
@@ -216,6 +218,71 @@ function ADTicker.getActiveVehicles()
     return vehicles
 end
 
+-- Courseplay info texts (config/InfoTexts.xml of Courseplay, by name): errors and things to look after
+ADTicker.CP_ERRORS = {IS_STUCK = true, BLOCKED_BY_OBJECT = true, OUT_OF_MONEY = true, WRONG_BALE_WRAP_TYPE = true,
+    FUEL_IS_EMPTY = true, IS_COMPLETELY_BROKEN = true}
+ADTicker.CP_WARNINGS = {FUEL_IS_LOW = true, NEEDS_FILLING = true, NEEDS_UNLOADING = true, WAITING_FOR_RAIN_TO_FINISH = true,
+    WAITING_FOR_SNOW_TO_CLEAR = true}
+
+function ADTicker.getCpInfoColor(name)
+    name = name or ""
+    if name:sub(1, 6) == "ERROR_" or ADTicker.CP_ERRORS[name] then
+        return ADTicker.COLOR_ERROR
+    elseif ADTicker.CP_WARNINGS[name] then
+        return ADTicker.COLOR_WARN
+    end
+    return ADTicker.COLOR_TEXT
+end
+
+-- the Courseplay info texts of the player's farm's vehicles: {vehicle, text, color}, sorted by vehicle and text
+function ADTicker.getCourseplayInfos()
+    local infos = {}
+    for _, vehicle in pairs(AutoDrive.getAllVehicles() or {}) do
+        if vehicle.getCpActiveInfoTexts ~= nil and ADTicker.isOwnVehicle(vehicle) then
+            local ok, active = pcall(vehicle.getCpActiveInfoTexts, vehicle)
+            if ok and active ~= nil then
+                for _, infoText in pairs(active) do
+                    local text = infoText.getText ~= nil and infoText:getText() or infoText.text
+                    if text ~= nil and text ~= "" then
+                        table.insert(infos, {vehicle = vehicle, name = vehicle.getName ~= nil and vehicle:getName() or "?", text = text,
+                            color = ADTicker.getCpInfoColor(infoText.name), id = infoText.id or 0})
+                    end
+                end
+            end
+        end
+    end
+    table.sort(infos, function(a, b)
+        if a.name ~= b.name then
+            return a.name < b.name
+        end
+        return a.id < b.id
+    end)
+    return infos
+end
+
+-- AutoDrive vehicles of the player's farm that stand switched off because of a problem: {vehicle, text, color}
+function ADTicker.getStoppedWithProblem()
+    local stopped = {}
+    if ADFleetGui == nil or ADFleetGui.getLastProblem == nil then
+        return stopped
+    end
+    for _, vehicle in pairs(AutoDrive.getAllVehicles() or {}) do
+        local state = vehicle.ad ~= nil and vehicle.ad.stateModule or nil
+        if state ~= nil and not state:isActive() and ADTicker.isOwnVehicle(vehicle) then
+            local problem = ADFleetGui.getLastProblem(vehicle)
+            if problem ~= nil and problem.text ~= nil then
+                local color = ADTicker.COLOR_WARN
+                if ADMessagesManager ~= nil and problem.messageType == ADMessagesManager.messageTypes.ERROR then
+                    color = ADTicker.COLOR_ERROR
+                end
+                table.insert(stopped, {vehicle = vehicle, name = state:getName() or "?", text = problem.text, color = color})
+            end
+        end
+    end
+    table.sort(stopped, function(a, b) return a.name < b.name end)
+    return stopped
+end
+
 -- vehicles driving by themselves on the server, all farms: AutoDrive (and of these waiting), Courseplay, helpers.
 -- AutoDrive vehicles also report themselves as AI active, so AutoDrive is checked first, then Courseplay.
 function ADTicker.countDrivers()
@@ -264,6 +331,17 @@ function ADTicker.buildSegments()
         if reason ~= "" then
             add("  - " .. reason, ADTicker.COLOR_REASON)
         end
+    end
+    -- stopped by a problem (AutoDrive), then Courseplay's info texts
+    for _, entry in ipairs(ADTicker.getStoppedWithProblem()) do
+        add(ADTicker.SEPARATOR, ADTicker.COLOR_TEXT)
+        add(entry.name .. ": ", ADTicker.COLOR_NAME)
+        add(entry.text, entry.color)
+    end
+    for _, info in ipairs(ADTicker.getCourseplayInfos()) do
+        add(ADTicker.SEPARATOR, ADTicker.COLOR_TEXT)
+        add(info.name .. " (Courseplay): ", ADTicker.COLOR_NAME)
+        add(info.text, info.color)
     end
     local now = g_time or 0
     for _, message in ipairs(ADTicker.messages) do

@@ -100,6 +100,8 @@ A bar along the bottom edge of the screen scrolls, like a news ticker:
 - first the numbers for the whole server: how many vehicles AutoDrive drives right now (and how many of them wait), how many Courseplay drives, and how many the game's own helpers drive
 - every AutoDrive vehicle of your farm that is switched on, with what it is doing (the line from its HUD, e.g. "Drive to unload point")
 - **why it waits** when it stands, worked out by the server: waiting in line to unload, at a waypoint (seconds left), giving way to another vehicle (its name), blocked by something ahead, loading (litres), waiting for more load (litres still free), tipping (litres left), tipping but nothing comes out (for how long), at the unload point with load on board, or just standing (for how long)
+- AutoDrive vehicles that stopped because of a problem, for as long as they stand: errors in **red**, warnings in yellow
+- Courseplay vehicles of your farm with their Courseplay info texts: errors (no path found, stuck, blocked, out of fuel, broken, ...) in **red**, things to look after (fuel low, needs filling / unloading, waiting for rain) in yellow, the rest in white
 - the AutoDrive messages of the last 3 minutes (warnings in yellow, errors in red). The pop-ups at the top stay as they are.
 
 It is hidden in menus and when the game's HUD is off; otherwise it is always there (with the numbers), even when nothing drives. Switch it off in the user settings (**Ticker at the bottom**).
