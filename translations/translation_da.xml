@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Slet vejpunkt" />
 		<text name="AD_wpPanel_height"							 text="Højde %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m væk" />
+		<text name="gui_ad_showTicker"							 text="Nyhedsbånd forneden" />
+		<text name="gui_ad_showTicker_tooltip"							 text="En bjælke nederst på skærmen: hvad hver AutoDrive-maskine laver, hvorfor den venter, og de seneste AutoDrive-beskeder" />
+		<text name="AD_wait_queue"							 text="venter i kø for at aflæsse" />
+		<text name="AD_wait_waypoint"							 text="venter ved et vejpunkt" />
+		<text name="AD_wait_traffic"							 text="holder tilbage for" />
+		<text name="AD_wait_blocked"							 text="blokeret af noget foran" />
+		<text name="AD_wait_loading"							 text="læsser" />
+		<text name="AD_wait_notFull"							 text="venter på mere læs" />
+		<text name="AD_wait_free"							 text="fri" />
+		<text name="AD_wait_tipping"							 text="tipper, stadig om bord" />
+		<text name="AD_wait_noFlow"							 text="tipper, men intet kommer ud" />
+		<text name="AD_wait_unloadPoint"							 text="venter ved aflæsningsstedet, om bord" />
+		<text name="AD_wait_standing"							 text="holder stille" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

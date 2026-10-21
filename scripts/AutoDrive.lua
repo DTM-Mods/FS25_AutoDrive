@@ -735,6 +735,8 @@ function AutoDrive:update(dt)
 	end
 
 	ADMessagesManager:update(dt)
+	-- Overdrive: the ticker at the bottom (reasons on the server, the bar on clients)
+	ADTicker:update(dt)
 	ADTriggerManager:update(dt)
 	ADRoutesManager:update(dt)
 	ADUndoManager:update(dt)
@@ -747,6 +749,7 @@ end
 function AutoDrive:draw()
 	ADDrawingManager:draw()
 	ADMessagesManager:draw()
+	ADTicker:safeDraw()
 end
 
 function AutoDrive:constructionScreenDraw()

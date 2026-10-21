@@ -95,6 +95,14 @@ In the editor, **left-click a waypoint** to select it: a panel opens next to the
 
 Every click is one undo step and works in multiplayer like the keys. The panel stays while the waypoint is selected, also while you move the mouse onto it; **X**, clicking the waypoint again, or connecting it to another waypoint closes it. It moves to the left of the HUD when there is no room on the right. Switch it off in the user settings (**Waypoint panel**).
 
+### Ticker at the bottom
+A bar along the bottom edge of the screen scrolls, like a news ticker:
+- every AutoDrive vehicle of your farm that is switched on, with what it is doing (the line from its HUD, e.g. "Drive to unload point")
+- **why it waits** when it stands, worked out by the server: waiting in line to unload, at a waypoint (seconds left), giving way to another vehicle (its name), blocked by something ahead, loading (litres), waiting for more load (litres still free), tipping (litres left), tipping but nothing comes out (for how long), at the unload point with load on board, or just standing (for how long)
+- the AutoDrive messages of the last 3 minutes (warnings in yellow, errors in red). The pop-ups at the top stay as they are.
+
+It is hidden in menus and when the game's HUD is off. Switch it off in the user settings (**Ticker at the bottom**).
+
 ### Waypoint actions
 In the editor, point the mouse at a waypoint (or select one) and press:
 - **Ctrl+Alt+W**: vehicles wait there (each press: 5, 10, 20, 30, 60, 120, 300 seconds, off)

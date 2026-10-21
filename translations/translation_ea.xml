@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Borrar punto" />
 		<text name="AD_wpPanel_height"							 text="Altura %s m" />
 		<text name="AD_wpPanel_away"							 text="a %s m" />
+		<text name="gui_ad_showTicker"							 text="Cinta de avisos abajo" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Una franja en la parte de abajo de la pantalla: qué hace cada vehículo AutoDrive, por qué espera, y los últimos mensajes de AutoDrive" />
+		<text name="AD_wait_queue"							 text="en la cola para descargar" />
+		<text name="AD_wait_waypoint"							 text="esperando en un punto" />
+		<text name="AD_wait_traffic"							 text="cediendo el paso a" />
+		<text name="AD_wait_blocked"							 text="bloqueado por algo delante" />
+		<text name="AD_wait_loading"							 text="cargando" />
+		<text name="AD_wait_notFull"							 text="esperando más carga" />
+		<text name="AD_wait_free"							 text="libre" />
+		<text name="AD_wait_tipping"							 text="descargando, aún a bordo" />
+		<text name="AD_wait_noFlow"							 text="descargando, pero no sale nada" />
+		<text name="AD_wait_unloadPoint"							 text="esperando en el punto de descarga, a bordo" />
+		<text name="AD_wait_standing"							 text="parado" />
 		<text name="AD_routeCheck_loose"								 text="Punto de ruta suelto sin ninguna conexión" />
 		<text name="AD_routeCheck_deadEnd"							 text="Callejón sin salida: no hay forma de seguir desde este punto de ruta" />
 		<text name="AD_routeCheck_trap"								 text="Trampa de sentido único: %s puntos de ruta en los que se puede entrar pero no salir" />

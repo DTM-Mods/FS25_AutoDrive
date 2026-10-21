@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Smazat bod" />
 		<text name="AD_wpPanel_height"							 text="Výška %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m odsud" />
+		<text name="gui_ad_showTicker"							 text="Pruh dole" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Pruh dole na obrazovce: co dělá každé vozidlo AutoDrive, proč čeká, a poslední zprávy AutoDrive" />
+		<text name="AD_wait_queue"							 text="čeká ve frontě na vykládku" />
+		<text name="AD_wait_waypoint"							 text="čeká na bodu" />
+		<text name="AD_wait_traffic"							 text="dává přednost" />
+		<text name="AD_wait_blocked"							 text="blokováno něčím vpředu" />
+		<text name="AD_wait_loading"							 text="nakládá" />
+		<text name="AD_wait_notFull"							 text="čeká na další náklad" />
+		<text name="AD_wait_free"							 text="volno" />
+		<text name="AD_wait_tipping"							 text="vysypává, ještě na palubě" />
+		<text name="AD_wait_noFlow"							 text="vysypává, ale nic nevychází" />
+		<text name="AD_wait_unloadPoint"							 text="čeká na místě vykládky, na palubě" />
+		<text name="AD_wait_standing"							 text="stojí" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

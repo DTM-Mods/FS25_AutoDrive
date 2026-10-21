@@ -614,6 +614,19 @@
 		<text name="AD_wpPanel_delete"							 text="Delete waypoint" />
 		<text name="AD_wpPanel_height"							 text="Height %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m away" />
+		<text name="gui_ad_showTicker"							 text="Ticker at the bottom" />
+		<text name="gui_ad_showTicker_tooltip"							 text="A bar along the bottom of the screen with what each AutoDrive vehicle is doing, why it waits, and the latest AutoDrive messages" />
+		<text name="AD_wait_queue"							 text="waiting in line to unload" />
+		<text name="AD_wait_waypoint"							 text="waiting at a waypoint" />
+		<text name="AD_wait_traffic"							 text="giving way to" />
+		<text name="AD_wait_blocked"							 text="blocked by something ahead" />
+		<text name="AD_wait_loading"							 text="loading" />
+		<text name="AD_wait_notFull"							 text="waiting for more load" />
+		<text name="AD_wait_free"							 text="free" />
+		<text name="AD_wait_tipping"							 text="tipping, left on board" />
+		<text name="AD_wait_noFlow"							 text="tipping, but nothing comes out" />
+		<text name="AD_wait_unloadPoint"							 text="waiting at the unload point, on board" />
+		<text name="AD_wait_standing"							 text="standing still" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />

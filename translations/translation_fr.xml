@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Supprimer le point" />
 		<text name="AD_wpPanel_height"							 text="Hauteur %s m" />
 		<text name="AD_wpPanel_away"							 text="à %s m" />
+		<text name="gui_ad_showTicker"							 text="Bandeau en bas" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Une bande en bas de l'écran : ce que fait chaque véhicule AutoDrive, pourquoi il attend, et les derniers messages d'AutoDrive" />
+		<text name="AD_wait_queue"							 text="attend son tour pour décharger" />
+		<text name="AD_wait_waypoint"							 text="attend à un point" />
+		<text name="AD_wait_traffic"							 text="laisse passer" />
+		<text name="AD_wait_blocked"							 text="bloqué par quelque chose devant" />
+		<text name="AD_wait_loading"							 text="chargement" />
+		<text name="AD_wait_notFull"							 text="attend plus de chargement" />
+		<text name="AD_wait_free"							 text="libre" />
+		<text name="AD_wait_tipping"							 text="décharge, encore à bord" />
+		<text name="AD_wait_noFlow"							 text="décharge, mais rien ne sort" />
+		<text name="AD_wait_unloadPoint"							 text="attend au point de déchargement, à bord" />
+		<text name="AD_wait_standing"							 text="à l'arrêt" />
 		<text name="AD_routeCheck_loose"								 text="Point de passage isolé sans aucune connexion" />
 		<text name="AD_routeCheck_deadEnd"							 text="Impasse : aucun chemin à partir de ce point de passage" />
 		<text name="AD_routeCheck_trap"								 text="Piège à sens unique : %s points de passage où l'on peut entrer mais d'où l'on ne peut pas sortir" />

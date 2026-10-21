@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Wegpunkt löschen" />
 		<text name="AD_wpPanel_height"							 text="Höhe %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m entfernt" />
+		<text name="gui_ad_showTicker"							 text="Laufband unten" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Ein Band am unteren Bildschirmrand: was jedes AutoDrive-Fahrzeug macht, warum es wartet, und die letzten AutoDrive-Meldungen" />
+		<text name="AD_wait_queue"							 text="wartet in der Schlange zum Abladen" />
+		<text name="AD_wait_waypoint"							 text="wartet an einem Wegpunkt" />
+		<text name="AD_wait_traffic"							 text="lässt Vorfahrt für" />
+		<text name="AD_wait_blocked"							 text="blockiert durch etwas vorne" />
+		<text name="AD_wait_loading"							 text="lädt" />
+		<text name="AD_wait_notFull"							 text="wartet auf mehr Ladung" />
+		<text name="AD_wait_free"							 text="frei" />
+		<text name="AD_wait_tipping"							 text="kippt, noch an Bord" />
+		<text name="AD_wait_noFlow"							 text="kippt, aber es kommt nichts" />
+		<text name="AD_wait_unloadPoint"							 text="wartet am Abladepunkt, an Bord" />
+		<text name="AD_wait_standing"							 text="steht still" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />

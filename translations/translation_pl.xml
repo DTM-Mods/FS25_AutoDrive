@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Usuń punkt" />
 		<text name="AD_wpPanel_height"							 text="Wysokość %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m stąd" />
+		<text name="gui_ad_showTicker"							 text="Pasek na dole" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Pasek na dole ekranu: co robi każdy pojazd AutoDrive, dlaczego czeka, i ostatnie komunikaty AutoDrive" />
+		<text name="AD_wait_queue"							 text="czeka w kolejce do rozładunku" />
+		<text name="AD_wait_waypoint"							 text="czeka na punkcie" />
+		<text name="AD_wait_traffic"							 text="ustępuje pierwszeństwa" />
+		<text name="AD_wait_blocked"							 text="zablokowany przez coś z przodu" />
+		<text name="AD_wait_loading"							 text="załadunek" />
+		<text name="AD_wait_notFull"							 text="czeka na więcej ładunku" />
+		<text name="AD_wait_free"							 text="wolne" />
+		<text name="AD_wait_tipping"							 text="wysypuje, jeszcze na pokładzie" />
+		<text name="AD_wait_noFlow"							 text="wysypuje, ale nic nie leci" />
+		<text name="AD_wait_unloadPoint"							 text="czeka w punkcie rozładunku, na pokładzie" />
+		<text name="AD_wait_standing"							 text="stoi" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />

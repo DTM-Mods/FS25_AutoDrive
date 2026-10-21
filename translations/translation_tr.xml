@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Noktayı sil" />
 		<text name="AD_wpPanel_height"							 text="Yükseklik %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m uzakta" />
+		<text name="gui_ad_showTicker"							 text="Altta kayan yazı" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Ekranın altında bir şerit: her AutoDrive aracının ne yaptığı, neden beklediği ve son AutoDrive mesajları" />
+		<text name="AD_wait_queue"							 text="boşaltmak için sırada" />
+		<text name="AD_wait_waypoint"							 text="bir noktada bekliyor" />
+		<text name="AD_wait_traffic"							 text="yol veriyor" />
+		<text name="AD_wait_blocked"							 text="önde bir şey engelliyor" />
+		<text name="AD_wait_loading"							 text="yükleniyor" />
+		<text name="AD_wait_notFull"							 text="daha fazla yük bekliyor" />
+		<text name="AD_wait_free"							 text="boş" />
+		<text name="AD_wait_tipping"							 text="boşaltıyor, hâlâ araçta" />
+		<text name="AD_wait_noFlow"							 text="boşaltıyor ama hiçbir şey çıkmıyor" />
+		<text name="AD_wait_unloadPoint"							 text="boşaltma noktasında bekliyor, araçta" />
+		<text name="AD_wait_standing"							 text="duruyor" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />

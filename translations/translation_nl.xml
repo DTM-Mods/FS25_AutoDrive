@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Routepunt verwijderen" />
 		<text name="AD_wpPanel_height"							 text="Hoogte %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m verderop" />
+		<text name="gui_ad_showTicker"							 text="Lichtkrant onderaan" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Een balk onderaan het scherm: wat elk AutoDrive-voertuig doet, waarom het wacht, en de laatste AutoDrive-meldingen" />
+		<text name="AD_wait_queue"							 text="wacht in de rij om te lossen" />
+		<text name="AD_wait_waypoint"							 text="wacht bij een routepunt" />
+		<text name="AD_wait_traffic"							 text="geeft voorrang aan" />
+		<text name="AD_wait_blocked"							 text="geblokkeerd door iets vooraan" />
+		<text name="AD_wait_loading"							 text="laadt" />
+		<text name="AD_wait_notFull"							 text="wacht op meer lading" />
+		<text name="AD_wait_free"							 text="vrij" />
+		<text name="AD_wait_tipping"							 text="lost, nog aan boord" />
+		<text name="AD_wait_noFlow"							 text="lost, maar er komt niets uit" />
+		<text name="AD_wait_unloadPoint"							 text="wacht bij het lospunt, aan boord" />
+		<text name="AD_wait_standing"							 text="staat stil" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />

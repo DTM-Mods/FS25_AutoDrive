@@ -33,6 +33,9 @@ function ADStateModule:new(vehicle)
 end
 
 function ADStateModule:reset()
+    -- Overdrive: why the vehicle waits (ADTicker), worked out on the server
+    self.waitReason = ""
+    self.waitReasonLocalized = ""
     self.active = false
     self.mode = AutoDrive.MODE_DRIVETO
     self.firstMarker = ADGraphManager:getMapMarkerById(1)
@@ -251,6 +254,8 @@ function ADStateModule:doWriteStream(streamId)
     streamWriteUInt8(streamId, self.currentHelperIndex)
     streamWriteUInt8(streamId, self.playerFarmId)
     streamWriteUInt8(streamId, self.actualFarmId)
+    -- Overdrive: why the vehicle waits (ADTicker)
+    streamWriteString(streamId, self.waitReason or "")
 end
 
 function ADStateModule:doReadStream(streamId)
@@ -283,6 +288,9 @@ function ADStateModule:doReadStream(streamId)
     self.currentHelperIndex = streamReadUInt8(streamId)
     self.playerFarmId = streamReadUInt8(streamId)
     self.actualFarmId = streamReadUInt8(streamId)
+    -- Overdrive: why the vehicle waits (ADTicker)
+    self.waitReason = streamReadString(streamId)
+    self.waitReasonLocalized = AutoDrive.localize(self.waitReason)
 
     self.currentLocalizedTaskInfo = AutoDrive.localize(self.currentTaskInfo)
 end
@@ -589,6 +597,19 @@ end
 
 function ADStateModule:getCurrentLocalizedTaskInfo()
     return self.currentLocalizedTaskInfo
+end
+
+-- Overdrive: why the vehicle waits, a text key and a detail in brackets or "" (server, ADTicker)
+function ADStateModule:setWaitReason(text)
+    if text ~= nil and text ~= self.waitReason then
+        self.waitReason = text
+        self.waitReasonLocalized = AutoDrive.localize(text)
+        self:raiseDirtyFlag()
+    end
+end
+
+function ADStateModule:getWaitReasonLocalized()
+    return self.waitReasonLocalized or ""
 end
 
 function ADStateModule:setCurrentTaskInfo(text)

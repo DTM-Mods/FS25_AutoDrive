@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Apagar waypoint" />
 		<text name="AD_wpPanel_height"							 text="Altura %s m" />
 		<text name="AD_wpPanel_away"							 text="a %s m" />
+		<text name="gui_ad_showTicker"							 text="Faixa de avisos embaixo" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Uma faixa na parte de baixo da tela: o que cada veículo AutoDrive está fazendo, por que espera, e as últimas mensagens do AutoDrive" />
+		<text name="AD_wait_queue"							 text="na fila para descarregar" />
+		<text name="AD_wait_waypoint"							 text="esperando num ponto" />
+		<text name="AD_wait_traffic"							 text="dando passagem a" />
+		<text name="AD_wait_blocked"							 text="bloqueado por algo à frente" />
+		<text name="AD_wait_loading"							 text="carregando" />
+		<text name="AD_wait_notFull"							 text="esperando mais carga" />
+		<text name="AD_wait_free"							 text="livre" />
+		<text name="AD_wait_tipping"							 text="descarregando, ainda a bordo" />
+		<text name="AD_wait_noFlow"							 text="descarregando, mas nada sai" />
+		<text name="AD_wait_unloadPoint"							 text="esperando no ponto de descarga, a bordo" />
+		<text name="AD_wait_standing"							 text="parado" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />

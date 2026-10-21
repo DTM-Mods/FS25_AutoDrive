@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="删除航点" />
 		<text name="AD_wpPanel_height"							 text="高度 %s 米" />
 		<text name="AD_wpPanel_away"							 text="距离 %s 米" />
+		<text name="gui_ad_showTicker"							 text="底部滚动条" />
+		<text name="gui_ad_showTicker_tooltip"							 text="屏幕底部的一条横条：每辆 AutoDrive 车辆在做什么、为什么在等，以及最新的 AutoDrive 消息" />
+		<text name="AD_wait_queue"							 text="排队等待卸货" />
+		<text name="AD_wait_waypoint"							 text="在航点等待" />
+		<text name="AD_wait_traffic"							 text="让行给" />
+		<text name="AD_wait_blocked"							 text="被前方物体阻挡" />
+		<text name="AD_wait_loading"							 text="装货中" />
+		<text name="AD_wait_notFull"							 text="等待更多货物" />
+		<text name="AD_wait_free"							 text="空余" />
+		<text name="AD_wait_tipping"							 text="卸货中，车上还有" />
+		<text name="AD_wait_noFlow"							 text="卸货中，但什么也没出来" />
+		<text name="AD_wait_unloadPoint"							 text="在卸货点等待，车上有" />
+		<text name="AD_wait_standing"							 text="静止" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

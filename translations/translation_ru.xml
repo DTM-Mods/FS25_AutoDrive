@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Удалить точку" />
 		<text name="AD_wpPanel_height"							 text="Высота %s м" />
 		<text name="AD_wpPanel_away"							 text="%s м отсюда" />
+		<text name="gui_ad_showTicker"							 text="Бегущая строка внизу" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Полоса внизу экрана: что делает каждая техника AutoDrive, почему она ждёт, и последние сообщения AutoDrive" />
+		<text name="AD_wait_queue"							 text="ждёт в очереди на разгрузку" />
+		<text name="AD_wait_waypoint"							 text="ждёт на точке" />
+		<text name="AD_wait_traffic"							 text="уступает дорогу" />
+		<text name="AD_wait_blocked"							 text="заблокирован чем-то впереди" />
+		<text name="AD_wait_loading"							 text="погрузка" />
+		<text name="AD_wait_notFull"							 text="ждёт ещё груза" />
+		<text name="AD_wait_free"							 text="свободно" />
+		<text name="AD_wait_tipping"							 text="разгружается, ещё на борту" />
+		<text name="AD_wait_noFlow"							 text="разгружается, но ничего не выходит" />
+		<text name="AD_wait_unloadPoint"							 text="ждёт на точке разгрузки, на борту" />
+		<text name="AD_wait_standing"							 text="стоит" />
 		<text name="AD_routeCheck_loose"								 text="Одиночная путевая точка без соединений" />
 		<text name="AD_routeCheck_deadEnd"							 text="Тупик: от этой путевой точки дальше пути нет" />
 		<text name="AD_routeCheck_trap"								 text="Односторонняя ловушка: путевых точек, куда можно въехать, но нельзя выехать: %s" />

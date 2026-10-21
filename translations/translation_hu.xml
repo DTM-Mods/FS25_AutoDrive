@@ -611,6 +611,19 @@
 		<text name="AD_wpPanel_delete"							 text="Útpont törlése" />
 		<text name="AD_wpPanel_height"							 text="Magasság %s m" />
 		<text name="AD_wpPanel_away"							 text="%s m-re" />
+		<text name="gui_ad_showTicker"							 text="Hírszalag alul" />
+		<text name="gui_ad_showTicker_tooltip"							 text="Egy sáv a képernyő alján: mit csinál minden AutoDrive jármű, miért vár, és a legutóbbi AutoDrive üzenetek" />
+		<text name="AD_wait_queue"							 text="sorban áll lerakodásra" />
+		<text name="AD_wait_waypoint"							 text="vár egy útponton" />
+		<text name="AD_wait_traffic"							 text="elsőbbséget ad" />
+		<text name="AD_wait_blocked"							 text="valami blokkolja elöl" />
+		<text name="AD_wait_loading"							 text="rakodás" />
+		<text name="AD_wait_notFull"							 text="több rakományra vár" />
+		<text name="AD_wait_free"							 text="szabad" />
+		<text name="AD_wait_tipping"							 text="billent, még a fedélzeten" />
+		<text name="AD_wait_noFlow"							 text="billent, de semmi nem jön ki" />
+		<text name="AD_wait_unloadPoint"							 text="a lerakodási ponton vár, a fedélzeten" />
+		<text name="AD_wait_standing"							 text="áll" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />
