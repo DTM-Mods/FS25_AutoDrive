@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="розвантажується, але нічого не виходить" />
 		<text name="AD_wait_unloadPoint"							 text="чекає на точці розвантаження, на борту" />
 		<text name="AD_wait_standing"							 text="стоїть" />
+		<text name="AD_ticker_waiting"							 text="чекають" />
+		<text name="AD_ticker_helpers"							 text="Помічники" />
 		<text name="AD_routeCheck_loose"								 text="Окрема точка шляху без з'єднань" />
 		<text name="AD_routeCheck_deadEnd"							 text="Глухий кут: від цієї точки шляху далі немає шляху" />
 		<text name="AD_routeCheck_trap"								 text="Одностороння пастка: точок шляху, куди можна заїхати, але не можна виїхати: %s" />

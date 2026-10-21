@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="tipper, men intet kommer ud" />
 		<text name="AD_wait_unloadPoint"							 text="venter ved aflæsningsstedet, om bord" />
 		<text name="AD_wait_standing"							 text="holder stille" />
+		<text name="AD_ticker_waiting"							 text="venter" />
+		<text name="AD_ticker_helpers"							 text="Hjælpere" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

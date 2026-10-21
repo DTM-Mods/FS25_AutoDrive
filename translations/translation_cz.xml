@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="vysypává, ale nic nevychází" />
 		<text name="AD_wait_unloadPoint"							 text="čeká na místě vykládky, na palubě" />
 		<text name="AD_wait_standing"							 text="stojí" />
+		<text name="AD_ticker_waiting"							 text="čeká" />
+		<text name="AD_ticker_helpers"							 text="Pomocníci" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

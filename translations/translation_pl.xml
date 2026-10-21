@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="wysypuje, ale nic nie leci" />
 		<text name="AD_wait_unloadPoint"							 text="czeka w punkcie rozładunku, na pokładzie" />
 		<text name="AD_wait_standing"							 text="stoi" />
+		<text name="AD_ticker_waiting"							 text="czeka" />
+		<text name="AD_ticker_helpers"							 text="Pomocnicy" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />

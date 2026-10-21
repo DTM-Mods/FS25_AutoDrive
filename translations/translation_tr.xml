@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="boşaltıyor ama hiçbir şey çıkmıyor" />
 		<text name="AD_wait_unloadPoint"							 text="boşaltma noktasında bekliyor, araçta" />
 		<text name="AD_wait_standing"							 text="duruyor" />
+		<text name="AD_ticker_waiting"							 text="bekliyor" />
+		<text name="AD_ticker_helpers"							 text="Yardımcılar" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />

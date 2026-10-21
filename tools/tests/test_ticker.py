@@ -115,13 +115,20 @@ assert s.eval("T.messages[1].text") == "Driver of Truck 1 has reached Silo"
 # --- the line: active own vehicles with status and reason, then the messages; old messages drop out
 s.execute("""
     TEXTS.AD_wait_standing = "standing still"
+    TEXTS.AD_ticker_waiting = "waiting"; TEXTS.AD_ticker_helpers = "Helpers"
+    -- other drivers on the server: a Courseplay tractor, a game helper, and an implement of an active vehicle (not counted)
+    CP = {getIsCpActive = function() return true end, getIsAIActive = function() return true end}
+    HELPER = {getIsAIActive = function() return true end}
+    IMPLEMENT = {getIsAIActive = function() return true end, getRootVehicle = function() return HELPER end}
+    PARKED = {getIsAIActive = function() return false end}
+    table.insert(VEHICLES, CP); table.insert(VEHICLES, HELPER); table.insert(VEHICLES, IMPLEMENT); table.insert(VEHICLES, PARKED)
     TRUCK.ad.stateModule.reason = "$l10n_AD_wait_standing; (20 s)"
     OTHER.ad.stateModule.info = "Drive to loading point"
     SEGMENTS = T.buildSegments()
     function line(segs) local x = {} for _, sgm in ipairs(segs) do table.insert(x, sgm.text) end return table.concat(x) end
 """)
 text = s.eval("line(SEGMENTS)")
-assert text.startswith("8RX 410: Drive to loading point     |     Truck 1: Drive to unload point  - standing still (20 s)"), text
+assert text.startswith("AutoDrive 2 (1 waiting)     |     Courseplay 1     |     Helpers 1     |     8RX 410: Drive to loading point     |     Truck 1: Drive to unload point  - standing still (20 s)"), text
 assert "Driver of Truck 1 has reached Silo" in text and "no parking destination" in text and "Neighbour" not in text
 assert s.eval("SEGMENTS[#SEGMENTS].color == T.COLOR_WARN")
 s.execute("g_time = g_time + T.MESSAGE_LIFETIME + 1")
@@ -160,4 +167,4 @@ read = state[state.index("function ADStateModule:doReadStream"):state.index("fun
 assert "streamWriteString(streamId, self.waitReason or " in write.split("streamWriteUInt8(streamId, self.actualFarmId)")[1]
 assert "self.waitReason = streamReadString(streamId)" in read.split("self.actualFarmId = streamReadUInt8(streamId)")[1]
 assert "self.waitReasonLocalized = AutoDrive.localize(self.waitReason)" in read
-print("OK: ticker (why it waits: queue, waypoint, traffic, blocked, loading, not full, tipping, nothing comes out, unload point, standing; messages copied once; line; scrolling; synced reason)")
+print("OK: ticker (driver counts AutoDrive / waiting / Courseplay / helpers; why it waits: queue, waypoint, traffic, blocked, loading, not full, tipping, nothing comes out, unload point, standing; messages copied once; line; scrolling; synced reason)")

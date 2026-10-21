@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="a descarregar, mas nada sai" />
 		<text name="AD_wait_unloadPoint"							 text="à espera no ponto de descarga, a bordo" />
 		<text name="AD_wait_standing"							 text="parado" />
+		<text name="AD_ticker_waiting"							 text="à espera" />
+		<text name="AD_ticker_helpers"							 text="Ajudantes" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem qualquer ligação" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há caminho a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de sentido único: %s waypoints onde se pode entrar mas não sair" />

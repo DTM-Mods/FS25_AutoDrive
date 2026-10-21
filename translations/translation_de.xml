@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="kippt, aber es kommt nichts" />
 		<text name="AD_wait_unloadPoint"							 text="wartet am Abladepunkt, an Bord" />
 		<text name="AD_wait_standing"							 text="steht still" />
+		<text name="AD_ticker_waiting"							 text="wartend" />
+		<text name="AD_ticker_helpers"							 text="Helfer" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />

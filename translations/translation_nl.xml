@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="lost, maar er komt niets uit" />
 		<text name="AD_wait_unloadPoint"							 text="wacht bij het lospunt, aan boord" />
 		<text name="AD_wait_standing"							 text="staat stil" />
+		<text name="AD_ticker_waiting"							 text="wachtend" />
+		<text name="AD_ticker_helpers"							 text="Helpers" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />

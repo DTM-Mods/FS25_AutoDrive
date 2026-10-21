@@ -1,4 +1,6 @@
 -- Ticker: a bar along the bottom edge of the screen with scrolling text, like a news ticker. It carries
+--   - how many vehicles drive by themselves on the server: AutoDrive (and how many of them wait), Courseplay, and
+--     the game's own helpers
 --   - what each AutoDrive vehicle of the player's farm is doing (the task line of the HUD), and why it waits
 --     when it stands (worked out on the server, sent along with the vehicle's state: ADStateModule.waitReason)
 --   - the AutoDrive messages of the last minutes (the pop-ups at the top stay as they are)
@@ -23,6 +25,7 @@ ADTicker.COLOR_NAME = {0.55, 0.85, 0.35, 1}
 ADTicker.COLOR_REASON = {1, 0.7, 0.2, 1}
 ADTicker.COLOR_WARN = {1, 0.85, 0.2, 1}
 ADTicker.COLOR_ERROR = {1, 0.35, 0.3, 1}
+ADTicker.COLOR_STATS = {0.5, 0.8, 1, 1}
 
 ADTicker.messages = {}             -- {text, type, time}
 ADTicker.segments = {}             -- {text, color, width}
@@ -213,12 +216,43 @@ function ADTicker.getActiveVehicles()
     return vehicles
 end
 
+-- vehicles driving by themselves on the server, all farms: AutoDrive (and of these waiting), Courseplay, helpers.
+-- AutoDrive vehicles also report themselves as AI active, so AutoDrive is checked first, then Courseplay.
+function ADTicker.countDrivers()
+    local counts = {autoDrive = 0, waiting = 0, courseplay = 0, helpers = 0}
+    for _, vehicle in pairs(AutoDrive.getAllVehicles() or {}) do
+        local isRoot = vehicle.getRootVehicle == nil or vehicle:getRootVehicle() == vehicle
+        if isRoot and not vehicle.isDeleted then
+            local state = vehicle.ad ~= nil and vehicle.ad.stateModule or nil
+            if state ~= nil and state:isActive() then
+                counts.autoDrive = counts.autoDrive + 1
+                if state.getWaitReasonLocalized ~= nil and state:getWaitReasonLocalized() ~= "" then
+                    counts.waiting = counts.waiting + 1
+                end
+            elseif vehicle.getIsCpActive ~= nil and vehicle:getIsCpActive() then
+                counts.courseplay = counts.courseplay + 1
+            elseif vehicle.getIsAIActive ~= nil and vehicle:getIsAIActive() then
+                counts.helpers = counts.helpers + 1
+            end
+        end
+    end
+    return counts
+end
+
 -- the pieces of the line: {text, color}
 function ADTicker.buildSegments()
     local segments = {}
     local function add(text, color)
         table.insert(segments, {text = text, color = color})
     end
+    -- the numbers first
+    local counts = ADTicker.countDrivers()
+    local autoDrive = string.format("AutoDrive %d", counts.autoDrive)
+    if counts.waiting > 0 then
+        autoDrive = autoDrive .. string.format(" (%d %s)", counts.waiting, g_i18n:getText("AD_ticker_waiting"))
+    end
+    add(autoDrive .. ADTicker.SEPARATOR .. string.format("Courseplay %d", counts.courseplay) .. ADTicker.SEPARATOR
+        .. string.format("%s %d", g_i18n:getText("AD_ticker_helpers"), counts.helpers), ADTicker.COLOR_STATS)
     for _, vehicle in ipairs(ADTicker.getActiveVehicles()) do
         local state = vehicle.ad.stateModule
         if #segments > 0 then

@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="billent, de semmi nem jön ki" />
 		<text name="AD_wait_unloadPoint"							 text="a lerakodási ponton vár, a fedélzeten" />
 		<text name="AD_wait_standing"							 text="áll" />
+		<text name="AD_ticker_waiting"							 text="vár" />
+		<text name="AD_ticker_helpers"							 text="Segítők" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

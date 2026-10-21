@@ -624,6 +624,8 @@
 		<text name="AD_wait_noFlow"							 text="卸货中，但什么也没出来" />
 		<text name="AD_wait_unloadPoint"							 text="在卸货点等待，车上有" />
 		<text name="AD_wait_standing"							 text="静止" />
+		<text name="AD_ticker_waiting"							 text="等待中" />
+		<text name="AD_ticker_helpers"							 text="帮手" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

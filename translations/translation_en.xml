@@ -627,6 +627,8 @@
 		<text name="AD_wait_noFlow"							 text="tipping, but nothing comes out" />
 		<text name="AD_wait_unloadPoint"							 text="waiting at the unload point, on board" />
 		<text name="AD_wait_standing"							 text="standing still" />
+		<text name="AD_ticker_waiting"							 text="waiting" />
+		<text name="AD_ticker_helpers"							 text="Helpers" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />
