@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Sortie du champ" />
 		<text name="AD_task_reversing_from_collision"					text="Recherche d'une zone dégagée" />
 		<text name="AD_task_drive_to_park"								text="Conduire vers le parking" />
-		<text name="AD_task_unload_area_in_fruit"						text="Zone de déchargement bloquée" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="off" />
 		<text name="gui_CPAD_simple"									text="simple" />
 		<text name="gui_CPAD_full"										text="full" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="ce travail s'arrête sous la pluie et reprend tout seul" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="ce travail s'arrête tant qu'il y a de la neige et reprend tout seul" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="la trémie est pleine : une benne doit venir ; vérifiez que les bennes sont configurées et pas bloquées" />
+		<text name="gui_ad_allowDriveThrough"							 text="Traverser les obstacles (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Uniquement avec le mod No AI Collisions : Oui permet au mod de couper les collisions et de faire traverser l'obstacle à ce véhicule après 2 secondes d'arrêt. Non : il attend comme AutoDrive normalement. Nécessite une version de No AI Collisions qui lit ce réglage" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Réglages Overdrive - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Ce véhicule" />
+		<text name="gui_ad_od_noVehicle"							 text="Montez dans un véhicule pour changer ses réglages Overdrive" />
+		<text name="gui_ad_od_you"							 text="Vous (pour vous seulement)" />
 		<text name="AD_routeCheck_loose"								 text="Point de passage isolé sans aucune connexion" />
 		<text name="AD_routeCheck_deadEnd"							 text="Impasse : aucun chemin à partir de ce point de passage" />
 		<text name="AD_routeCheck_trap"								 text="Piège à sens unique : %s points de passage où l'on peut entrer mais d'où l'on ne peut pas sortir" />

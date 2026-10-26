@@ -785,6 +785,19 @@ function AutoDrive:getIsEntered(vehicle)
     return user ~= nil
 end
 
+-- Overdrive: is a player sitting in the vehicle right now? On a dedicated server getIsEntered only asks whether
+-- controllerUserId belongs to a user, and that id can stay set after the player got out, so a finished job left
+-- the motor running (and costing money). Here it also has to be controlled. Used for switching the motor off.
+function AutoDrive:isPlayerInVehicle(vehicle)
+    if not AutoDrive:getIsEntered(vehicle) then
+        return false
+    end
+    if g_dedicatedServer ~= nil and vehicle.getIsControlled ~= nil then
+        return vehicle:getIsControlled() == true
+    end
+    return true
+end
+
 function AutoDrive:getAIFrameFarmId()
     local actualFarmId = nil
     if AutoDrive.aiFrameOpen and AutoDrive.aiFrameVehicle and AutoDrive.aiFrameVehicle.ad and AutoDrive.aiFrameVehicle.ad.stateModule then

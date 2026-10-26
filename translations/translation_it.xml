@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Uscita dal campo" />
 		<text name="AD_task_reversing_from_collision"					text="Retromarcia per collisione" />
 		<text name="AD_task_drive_to_park"								text="Guida al parcheggio" />
-		<text name="AD_task_unload_area_in_fruit"						text="Area di scarico bloccata" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="Spento" />
 		<text name="gui_CPAD_simple"									text="Semplice" />
 		<text name="gui_CPAD_full"										text="Completo" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="questo lavoro si ferma con la pioggia e riprende da solo" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="questo lavoro si ferma finché c'è neve e riprende da solo" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="il serbatoio è pieno: deve arrivare uno scaricatore; controlla che gli scaricatori siano impostati e non bloccati" />
+		<text name="gui_ad_allowDriveThrough"							 text="Attraversa gli ostacoli (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Solo con la mod No AI Collisions: Sì permette alla mod di disattivare le collisioni e far attraversare l'ostacolo a questo veicolo dopo 2 secondi da fermo. No: aspetta come AutoDrive normale. Serve una versione di No AI Collisions che legga questa impostazione" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Impostazioni Overdrive - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Questo veicolo" />
+		<text name="gui_ad_od_noVehicle"							 text="Sali su un veicolo per cambiarne le impostazioni Overdrive" />
+		<text name="gui_ad_od_you"							 text="Tu (solo per te)" />
 		<text name="AD_routeCheck_loose"								 text="Nodo isolato senza alcun collegamento" />
 		<text name="AD_routeCheck_deadEnd"							 text="Vicolo cieco: nessuna via per proseguire da questo nodo" />
 		<text name="AD_routeCheck_trap"								 text="Trappola a senso unico: %s nodi in cui si può entrare ma da cui non si può uscire" />

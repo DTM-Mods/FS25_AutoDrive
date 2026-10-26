@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Opouštím pole" />
 		<text name="AD_task_reversing_from_collision"					text="Vyhledávám čistou oblast" />
 		<text name="AD_task_drive_to_park"								text="Jedu na parkovací místo" />
-		<text name="AD_task_unload_area_in_fruit"						text="Plocha pro vykládku je blokována" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="vypnutý" />
 		<text name="gui_CPAD_simple"									text="jednoduchý" />
 		<text name="gui_CPAD_full"										text="plný" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="tato práce se v dešti zastaví a pokračuje sama" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="tato práce se zastaví, dokud leží sníh, a pokračuje sama" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="zásobník je plný: musí přijet překladač; zkontrolujte, že překladače jsou nastavené a nezasekly se" />
+		<text name="gui_ad_allowDriveThrough"							 text="Projíždět překážkami (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Jen s modem No AI Collisions: Ano dovolí modu vypnout kolize a projet tímto vozidlem překážkou po 2 sekundách stání. Ne: čeká jako běžný AutoDrive. Vyžaduje verzi No AI Collisions, která toto nastavení čte" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Nastavení Overdrive - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Toto vozidlo" />
+		<text name="gui_ad_od_noVehicle"							 text="Nastupte do vozidla, abyste změnili jeho nastavení Overdrive" />
+		<text name="gui_ad_od_you"							 text="Vy (jen pro vás)" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

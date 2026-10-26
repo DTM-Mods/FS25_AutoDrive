@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI name="autoDriveOverdriveSettings">
+	<GuiElement profile="fs25_menuContainer">
+		<GuiElement profile="fs25_menuHeaderPanel">
+			<Bitmap profile="fs25_menuHeaderIconBg">
+				<Bitmap profile="fs25_menuHeaderIcon" imageSliceId="ad_gui.speedmeter"/>
+			</Bitmap>
+			<Text profile="fs25_menuHeaderTitle" text="$l10n_gui_ad_overdriveSettingsPage_title"/>
+		</GuiElement>
+
+		<ScrollingLayout profile="fs25_settingsLayout" id="boxLayout">
+			<Text profile="fs25_settingsSectionHeader" onCreate="onCreateOverdriveSectionHeader" text="$l10n_gui_ad_od_thisVehicle" id="odVehicleHeader" />
+			<Text profile="fs25_settingsSectionHeader" onCreate="onCreateOverdriveSectionHeader" text="$l10n_gui_ad_od_noVehicle" id="odNoVehicleText" />
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="bestPriceUnload" id="bestPriceUnload">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_bestPriceUnload_tooltip"/>
+				</MultiTextOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_bestPriceUnload"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="whileTipping" id="whileTipping">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_groundUnload_tooltip"/>
+				</MultiTextOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_groundUnload"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="unloaderEscape" id="unloaderEscape">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_unloaderEscape_tooltip"/>
+				</BinaryOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_unloaderEscape"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="allowDriveThrough" id="allowDriveThrough">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_allowDriveThrough_tooltip"/>
+				</BinaryOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_allowDriveThrough"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="scheduleStart" id="scheduleStart">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_scheduleStart_tooltip"/>
+				</MultiTextOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_scheduleStart"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="scheduleStop" id="scheduleStop">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_scheduleStop_tooltip"/>
+				</MultiTextOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_scheduleStop"/>
+			</Bitmap>
+			<Text profile="fs25_settingsSectionHeader" onCreate="onCreateOverdriveSectionHeader" text="$l10n_gui_ad_od_you" />
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="waypointPanel" id="waypointPanel">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_waypointPanel_tooltip"/>
+				</BinaryOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_waypointPanel"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="tickerBar" id="tickerBar">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_showTicker_tooltip"/>
+				</BinaryOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_showTicker"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="showFleetOnMap" id="showFleetOnMap">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_showFleetOnMap_tooltip"/>
+				</BinaryOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_showFleetOnMap"/>
+			</Bitmap>
+		</ScrollingLayout>
+	</GuiElement>
+	<ThreePartBitmap profile="fs25_sliderDockedBg">
+		<ThreePartBitmap profile="fs25_sliderDockedBox">
+			<Slider profile="fs25_helpLineSlider" dataElementId="boxLayout"/>
+		</ThreePartBitmap>
+	</ThreePartBitmap>
+</GUI>

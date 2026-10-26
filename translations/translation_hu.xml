@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Kilépés a fölről" />
 		<text name="AD_task_reversing_from_collision"					text="Tiszta terület keresése" />
 		<text name="AD_task_drive_to_park"								text="Parkolás a területen" />
-		<text name="AD_task_unload_area_in_fruit"						text="Kirakodási terület blokkolva" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="ki" />
 		<text name="gui_CPAD_simple"									text="egyszerű" />
 		<text name="gui_CPAD_full"										text="teljes" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="ez a munka esőben leáll és magától folytatódik" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="ez a munka hó idején leáll és magától folytatódik" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="a tartály tele van: jönnie kell egy átrakónak; ellenőrizd, hogy az átrakók be vannak-e állítva és nem akadtak-e el" />
+		<text name="gui_ad_allowDriveThrough"							 text="Áthajtás akadályokon (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Csak a No AI Collisions moddal: Igen esetén a mod 2 másodperc állás után kikapcsolja az ütközést, és átviszi a járművet az akadályon. Nem: úgy vár, mint az AutoDrive általában. Olyan No AI Collisions verzió kell, amely olvassa ezt a beállítást" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Overdrive beállítások - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Ez a jármű" />
+		<text name="gui_ad_od_noVehicle"							 text="Ülj be egy járműbe, hogy módosítsd az Overdrive beállításait" />
+		<text name="gui_ad_od_you"							 text="Te (csak neked)" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

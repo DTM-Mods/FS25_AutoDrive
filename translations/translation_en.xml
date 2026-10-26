@@ -399,7 +399,12 @@
 		<text name="AD_task_exiting_field"								text="Exiting field" />
 		<text name="AD_task_reversing_from_collision"					text="Searching clear area" />
 		<text name="AD_task_drive_to_park"								text="Drive to parking place" />
-		<text name="AD_task_unload_area_in_fruit"						text="Unload area blocked" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="off" />
 		<text name="gui_CPAD_simple"									text="simple" />
 		<text name="gui_CPAD_full"										text="full" />
@@ -693,6 +698,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="this work stops in rain and continues by itself" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="this work stops while snow lies and continues by itself" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="the tank is full: an unloader has to come; check that unloaders are set up and not stuck" />
+		<text name="gui_ad_allowDriveThrough"							 text="Drive through obstructions (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Only with the No AI Collisions mod: Yes lets the mod switch collisions off and drive this vehicle through an obstruction after it has been stopped for 2 seconds. No: it waits like normal AutoDrive. Needs a No AI Collisions version that reads this setting" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Overdrive Settings - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="This vehicle" />
+		<text name="gui_ad_od_noVehicle"							 text="Get into a vehicle to change its Overdrive settings" />
+		<text name="gui_ad_od_you"							 text="You (only for you)" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />

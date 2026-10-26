@@ -9,6 +9,7 @@
         <FrameReference ref="autoDriveUserSettings" name="autoDriveUserSettings" id="autoDriveUserSettings"/>
         <FrameReference ref="autoDriveGlobalSettings" name="autoDriveGlobalSettings" id="autoDriveGlobalSettings"/>
         <FrameReference ref="autoDriveEnvironmentSettings" name="autoDriveEnvironmentSettings" id="autoDriveEnvironmentSettings"/>
+        <FrameReference ref="autoDriveOverdriveSettings" name="autoDriveOverdriveSettings" id="autoDriveOverdriveSettings"/>
         <FrameReference ref="autoDriveDebugSettings" name="autoDriveDebugSettings" id="autoDriveDebugSettings"/>
     </Paging>
 

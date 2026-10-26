@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Покидає поле" />
 		<text name="AD_task_reversing_from_collision"					text="Шукає вільний простір" />
 		<text name="AD_task_drive_to_park"								text="Рухається на місце паркування" />
-		<text name="AD_task_unload_area_in_fruit"						text="Зона розвантаження зайнята" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="ВИМК" />
 		<text name="gui_CPAD_simple"									text="просте" />
 		<text name="gui_CPAD_full"										text="повне" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="ця робота зупиняється в дощ і продовжиться сама" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="ця робота зупиняється, поки лежить сніг, і продовжиться сама" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="бункер повний: має приїхати перевантажувач; перевірте, що перевантажувачі налаштовані й не застрягли" />
+		<text name="gui_ad_allowDriveThrough"							 text="Проїжджати крізь перешкоди (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Лише з модом No AI Collisions: Так дозволяє моду після 2 секунд зупинки вимкнути зіткнення й провести техніку крізь перешкоду. Ні: вона чекає, як звичайно в AutoDrive. Потрібна версія No AI Collisions, яка читає це налаштування" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Налаштування Overdrive - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Ця техніка" />
+		<text name="gui_ad_od_noVehicle"							 text="Сядьте в техніку, щоб змінити її налаштування Overdrive" />
+		<text name="gui_ad_od_you"							 text="Ви (лише для вас)" />
 		<text name="AD_routeCheck_loose"								 text="Окрема точка шляху без з'єднань" />
 		<text name="AD_routeCheck_deadEnd"							 text="Глухий кут: від цієї точки шляху далі немає шляху" />
 		<text name="AD_routeCheck_trap"								 text="Одностороння пастка: точок шляху, куди можна заїхати, але не можна виїхати: %s" />

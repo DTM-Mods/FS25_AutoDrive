@@ -129,7 +129,7 @@ block = block[block.index("AutoDrive.settings.whileTipping = {"):]
 block = block[:block.index(chr(10) + "}") + 2]
 assert "default = 2," in block and "values = {1, 2}," in block and "isVehicleSpecific = true" in block
 assert "AutoDrive.settings.groundUnload" not in settings
-assert 'name="whileTipping"' in t.read(os.path.join(t.MOD, "gui", "vehicleSettingsPage.xml"))
+assert 'name="whileTipping"' in t.read(os.path.join(t.MOD, "gui", "overdriveSettingsPage.xml"))
 assert s.eval("G.STAND_STILL") == 2
 
 print("OK: while tipping (default stand still; bunker rescue works once nothing comes out; hard hold: no throttle, handbrake, full brake on truck and trailer, released after; silo pit / truck + trailer hold while the load runs; ground: waits for the tipper body): stand still while it runs, move on when the heap is full, drive through / reversing unchanged")

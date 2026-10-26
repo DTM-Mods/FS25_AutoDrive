@@ -54,6 +54,12 @@ function ADBestPrice.getLoad(vehicle)
                 load[fillType] = (load[fillType] or 0) + litres
             end
         end
+        -- pallets / bales strapped on ordinary trailers
+        if ADStrappedLoad ~= nil then
+            for fillType, litres in pairs(ADStrappedLoad.getLoad(unit)) do
+                load[fillType] = (load[fillType] or 0) + litres
+            end
+        end
         if unit.getFillUnits ~= nil then
             for index, _ in ipairs(unit:getFillUnits()) do
                 local fillType = unit:getFillUnitFillType(index)

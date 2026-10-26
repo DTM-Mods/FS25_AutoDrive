@@ -732,6 +732,8 @@ function AutoDrive:update(dt)
 		ADStatistics:update(dt)
 		ADUnloaderEscape:update(dt)
 		ADGroundUnload:update(dt)
+		-- Overdrive: taller pallet areas at selling points (pallets stacked high on tall trucks)
+		ADPalletAreas:update(dt)
 	end
 
 	ADMessagesManager:update(dt)

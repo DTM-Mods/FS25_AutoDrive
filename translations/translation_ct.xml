@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="離開田地" />
 		<text name="AD_task_reversing_from_collision"					text="查找空位" />
 		<text name="AD_task_drive_to_park"								text="前往到停車位" />
-		<text name="AD_task_unload_area_in_fruit"						text="收割機卸貨區卡住" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="關閉" />
 		<text name="gui_CPAD_simple"									text="簡略" />
 		<text name="gui_CPAD_full"										text="詳細" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="這項工作下雨時暫停，之後會自動繼續" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="這項工作在有積雪時暫停，之後會自動繼續" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="糧倉滿了：需要運糧車過來；檢查運糧車已設定好且沒有卡住" />
+		<text name="gui_ad_allowDriveThrough"							 text="穿過障礙物（No AI Collisions）" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="僅限 No AI Collisions 模組：選「是」時，車輛被擋住 2 秒後，模組可關閉碰撞並讓其穿過障礙物。選「否」：像一般 AutoDrive 一樣等待。需要能讀取此設定的 No AI Collisions 版本" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Overdrive 設定 - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="此車輛" />
+		<text name="gui_ad_od_noVehicle"							 text="進入車輛以變更其 Overdrive 設定" />
+		<text name="gui_ad_od_you"							 text="你（僅對你）" />
 		<text name="AD_routeCheck_loose"								 text="沒有任何連接的孤立航點" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：從此航點無法繼續前進" />
 		<text name="AD_routeCheck_trap"								 text="單向陷阱：%s 個航點只能駛入無法駛出" />

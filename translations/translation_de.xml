@@ -396,7 +396,12 @@
 		<text name="AD_task_exiting_field"								text="Verlasse Feld" />
 		<text name="AD_task_reversing_from_collision"					text="Freiraum suchen" />
 		<text name="AD_task_drive_to_park"								text="Fahre zum Parkplatz" />
-		<text name="AD_task_unload_area_in_fruit"						text="Drescher Entladebereich blockiert" />
+		<text name="AD_task_catch_planning"					text="Plane den Weg zum Drescher" />
+		<text name="AD_task_catch_no_path"					text="Kein Weg zum Drescher gefunden, versuche es erneut" />
+		<text name="AD_task_catch_combine_moved"				text="Drescher ist weitergefahren, plane neu" />
+		<text name="AD_task_catch_not_lined_up"				text="Nicht am Drescher ausgerichtet, versuche es erneut" />
+		<text name="AD_task_catch_chase_off_field"			text="Platz hinter dem Drescher liegt nicht auf seinem Feld, warte" />
+		<text name="AD_task_catch_combine_almost_full"		text="Drescher fast voll, warte bis er anhält" />
 		<text name="gui_CPAD_off"										text="aus" />
 		<text name="gui_CPAD_simple"									text="einfach" />
 		<text name="gui_CPAD_full"										text="voll" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="diese Arbeit pausiert bei Regen und geht von selbst weiter" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="diese Arbeit pausiert, solange Schnee liegt, und geht von selbst weiter" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="der Tank ist voll: ein Überladefahrzeug muss kommen; prüfe, ob Überlader eingerichtet sind und nicht feststecken" />
+		<text name="gui_ad_allowDriveThrough"							 text="Durch Hindernisse fahren (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Nur mit der Mod No AI Collisions: Ja erlaubt der Mod, nach 2 Sekunden Stillstand die Kollisionen abzuschalten und dieses Fahrzeug durch das Hindernis zu fahren. Nein: es wartet wie sonst bei AutoDrive. Braucht eine No-AI-Collisions-Version, die diese Einstellung liest" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Overdrive-Einstellungen - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Dieses Fahrzeug" />
+		<text name="gui_ad_od_noVehicle"							 text="Steig in ein Fahrzeug, um seine Overdrive-Einstellungen zu ändern" />
+		<text name="gui_ad_od_you"							 text="Du (nur für dich)" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />

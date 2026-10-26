@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Saindo do campo" />
 		<text name="AD_task_reversing_from_collision"					text="Pesquisando área limpa" />
 		<text name="AD_task_drive_to_park"								text="Dirigir até o estacionamento" />
-		<text name="AD_task_unload_area_in_fruit"						text="Área de descarga bloqueada" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="desligado" />
 		<text name="gui_CPAD_simple"									text="simples" />
 		<text name="gui_CPAD_full"										text="completo" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="este trabalho para com chuva e continua sozinho" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="este trabalho para enquanto há neve e continua sozinho" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="o tanque está cheio: um descarregador precisa vir; verifique se os descarregadores estão configurados e não presos" />
+		<text name="gui_ad_allowDriveThrough"							 text="Atravessar obstáculos (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Só com o mod No AI Collisions: Sim deixa o mod desligar as colisões e passar este veículo pelo obstáculo depois de 2 segundos parado. Não: ele espera como o AutoDrive normal. Precisa de uma versão do No AI Collisions que leia esta configuração" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Configurações Overdrive - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Este veículo" />
+		<text name="gui_ad_od_noVehicle"							 text="Entre em um veículo para mudar as configurações Overdrive dele" />
+		<text name="gui_ad_od_you"							 text="Você (só para você)" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />

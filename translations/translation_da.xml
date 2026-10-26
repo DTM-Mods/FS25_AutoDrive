@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Forlader mark" />
 		<text name="AD_task_reversing_from_collision"					text="Søger fri plads" />
 		<text name="AD_task_drive_to_park"								text="Kør til parkerings plads" />
-		<text name="AD_task_unload_area_in_fruit"						text="Aflæs område er blokeret" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="fra" />
 		<text name="gui_CPAD_simple"									text="simpel" />
 		<text name="gui_CPAD_full"										text="fuld" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="dette arbejde stopper i regn og fortsætter af sig selv" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="dette arbejde stopper mens der ligger sne og fortsætter af sig selv" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="tanken er fuld: en overlæsser skal komme; tjek at overlæssere er sat op og ikke sidder fast" />
+		<text name="gui_ad_allowDriveThrough"							 text="Kør gennem forhindringer (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Kun med modden No AI Collisions: Ja lader modden slå kollisioner fra og køre dette køretøj gennem forhindringen efter 2 sekunders stop. Nej: det venter som normalt i AutoDrive. Kræver en No AI Collisions-version, der læser denne indstilling" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Overdrive-indstillinger - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Dette køretøj" />
+		<text name="gui_ad_od_noVehicle"							 text="Sæt dig i et køretøj for at ændre dets Overdrive-indstillinger" />
+		<text name="gui_ad_od_you"							 text="Dig (kun for dig)" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

@@ -14,6 +14,11 @@ Versions are `<AutoDrive version>-od.<build>`, e.g. `3.0.1.4-od.1` is the first 
 
 ## What Overdrive adds
 
+### Overdrive tab in the settings
+All settings Overdrive adds have their own tab in the AutoDrive settings window (speedometer icon), so the other tabs are the same as in AutoDrive:
+- **This vehicle:** Best price unloading, While tipping, Drive clear when blocked, Drive through obstructions (No AI Collisions), Start work at, Stop work at. Shown only while you sit in a vehicle; they are saved on that vehicle, and "Make default" works as on the vehicle tab.
+- **You:** Waypoint panel, Ticker at the bottom, Fleet on the map. Only for you; the server keeps them per player.
+
 ### Undo and redo in the route editor
 With the editor turned on, **Ctrl+Z** undoes and **Ctrl+Y** redoes your last change to the route network.
 
@@ -75,7 +80,7 @@ The route between the two waypoints is the shortest by distance. Only waypoints 
 
 **Statistics** switches the list to the driver statistics, counted while AutoDrive drives the vehicle: distance, time driving, time standing and waiting (with its share of the total), deliveries, the amount unloaded, the crops hauled most and their estimated value at today's best selling price. The button cycles through total, today, the last 7 in-game days and back to the status. A delivery is counted when the vehicle's load goes down by at least 500 l (or a quarter of a smaller trailer) and then stays. In this view, **Reset statistics** sets the selected vehicle back to zero. The numbers are saved with the savegame.
 
-**Fleet on the map:** the big map (ESC > Map) shows every AutoDrive vehicle of your farm as a coloured square with its name: green driving, yellow switched on but standing, red stopped with a problem, grey idle. Switch it off in the user settings (**Fleet on the map**).
+**Fleet on the map:** the big map (ESC > Map) shows every AutoDrive vehicle of your farm as a coloured square with its name: green driving, yellow switched on but standing, red stopped with a problem, grey idle. Switch it off on the Overdrive tab of the settings (**Fleet on the map**).
 
 ### Waypoint panel
 In the editor, **left-click a waypoint** to select it: a panel opens next to the AutoDrive HUD with everything about that waypoint, as buttons:
@@ -93,7 +98,7 @@ In the editor, **left-click a waypoint** to select it: a panel opens next to the
 - **Direction:** **One-way** (the way most of it already goes), **Two-way**, or **Flip** to turn it round. The junctions at both ends are connected the same way; their other roads stay as they are
 - **Tidy up:** **Even**, **Straight** or **Smooth**, like Ctrl+Alt+J / K / U, without pointing at a second waypoint. The junctions stay where they are
 
-Every click is one undo step and works in multiplayer like the keys. The panel stays while the waypoint is selected, also while you move the mouse onto it; **X**, clicking the waypoint again, or connecting it to another waypoint closes it. It moves to the left of the HUD when there is no room on the right. Switch it off in the user settings (**Waypoint panel**).
+Every click is one undo step and works in multiplayer like the keys. The panel stays while the waypoint is selected, also while you move the mouse onto it; **X**, clicking the waypoint again, or connecting it to another waypoint closes it. It moves to the left of the HUD when there is no room on the right. Switch it off on the Overdrive tab of the settings (**Waypoint panel**).
 
 ### Ticker at the bottom
 A bar along the bottom edge of the screen scrolls, like a news ticker:
@@ -104,7 +109,7 @@ A bar along the bottom edge of the screen scrolls, like a news ticker:
 - Courseplay vehicles of your farm with their Courseplay info texts: errors (no path found, stuck, blocked, out of fuel, broken, ...) in **red**, things to look after (fuel low, needs filling / unloading, waiting for rain) in yellow, the rest in white
 - the AutoDrive messages of the last 3 minutes (warnings in yellow, errors in red). The pop-ups at the top stay as they are.
 
-It is **off until you switch it on**: AutoDrive settings, user page, **Ticker at the bottom**. Each player chooses for themselves (the server keeps the choice per player). When on, it is hidden in menus and when the game's HUD is off; otherwise it is always there (with the numbers), even when nothing drives.
+It is **off until you switch it on**: AutoDrive settings, Overdrive tab, **Ticker at the bottom**. Each player chooses for themselves (the server keeps the choice per player). When on, it is hidden in menus and when the game's HUD is off; otherwise it is always there (with the numbers), even when nothing drives.
 
 Every wait reason and every Courseplay info comes with a short hint in grey on what it means or what to check (e.g. "Blocked: the obstacle detection sees something in front: a vehicle, object or person").
 
@@ -159,6 +164,8 @@ Choose what is unloaded at the unload target, the rest stays on board:
 
 **Pallets (Universal Autoload):** the list shows the pallets on board. When AutoDrive unloads at the target, only the pallets of the chosen products are set down, the others stay on the trailer and are strapped again. This needs the vehicle setting **"Autoload: Unload Position"** on left, behind or right: with "center" Universal Autoload only opens the belts, and a selling point then takes every pallet it accepts (the dialog shows a hint). Best price counts the pallets too. AutoDrive's "what to load" list in the HUD shows what is on board first, with the amount and a loaded-trailer icon.
 
+**Strapped pallets and bales:** pallets and bales held by the game's tension belts (strapped with L) count as load, on ordinary trailers and also on Universal Autoload vehicles for the pallets Autoload did not load itself (put on by forklift): AutoDrive sees them as soon as the belts are fastened, and a strapped load counts as full, so in pickup and deliver strapping it (L) is the sign that the truck can go. Best price and the unload products list see these products too. At the unload target AutoDrive releases from the belts **only the pallets and bales of the products it sells there** (with best price "each product": the ones that get their best price at this stop), one by one, wherever they sit on the trailer; the belts stay closed and everything else stays locked, and a locked pallet cannot be sold. It waits while the selling point takes them (until all released ones are sold, 5 seconds after the last sale, at most 60 seconds). The pallet areas of all selling points (and other unloading stations) are made three times as tall when the map loads, so a pallet stacked high on a tall truck is reached too. Whatever is still left is locked again, and drives on to the next stop, until everything is sold at its best price. Set it and forget it: load and strap the trucks any way you like. The target has to be placed so that the trailers stand in the selling point's pallet area. Tractors or machines on a low-loader never count and are never released.
+
 A trailer only tips if its product is allowed by the vehicle, by the target, and by best price "each product". A stop with something left on board is done when nothing has been tipped for 3 seconds. Best price only plans with the products the vehicle unloads and only at targets that take them. This works per trailer (or per compartment that tips on its own).
 
 ### Load products (pallets)
@@ -181,6 +188,13 @@ New vehicle setting for combine unloaders, **Drive clear when blocked** (off by 
 - is stuck against another vehicle (where AutoDrive would otherwise reverse),
 
 it switches off its collisions with other vehicles (its trailers too; the ground, buildings and trees still count), drives through to the nearest field edge and a few metres past it, waits there until no other vehicle is near, switches its collisions back on and carries on with its job. Collisions only come back when nothing overlaps, otherwise the physics would throw the vehicles apart; if AutoDrive is stopped during the escape they come back by themselves once the unloader is clear. A message tells you when a driver does this, and it happens at most every 90 seconds per vehicle.
+
+### Drive through obstructions (with No AI Collisions)
+The **No AI Collisions** mod (by PropaineX) lets a helper that has been stopped by an obstruction for 2 seconds switch its collisions off and drive through it. With that mod loaded, the Overdrive tab of the settings shows **Drive through obstructions (No AI Collisions)**, right below Drive clear when blocked (without the mod the row is hidden):
+- **Yes** (default): the mod decides, as before.
+- **No**: the mod leaves this vehicle alone, and it waits like AutoDrive normally does. Useful for a long unloader that the mod would otherwise push into its own combine.
+
+AutoDrive only publishes the choice as `vehicle.ad.allowDriveThrough` (on the root vehicle; nil counts as yes). No AI Collisions has to read it; a version that doesn't simply ignores the setting.
 
 ### While tipping
 New vehicle setting **While tipping**, **Stand still** by default (since od.37, also for vehicles saved before):

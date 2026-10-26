@@ -16,11 +16,20 @@ CatchCombinePipeTask.MAX_REVERSE_TIME = 5000
 CatchCombinePipeTask.MAX_STUCK_TIME = 60000
 CatchCombinePipeTask.MAX_COUNT_NEW_PATHFINDING = 20
 
+-- Why the task waits before planning (again), shown in the HUD instead of one text for all of them
+CatchCombinePipeTask.DELAY_STARTING = "AD_task_catch_planning"
+CatchCombinePipeTask.DELAY_NO_PATH = "AD_task_catch_no_path"
+CatchCombinePipeTask.DELAY_COMBINE_MOVED = "AD_task_catch_combine_moved"
+CatchCombinePipeTask.DELAY_NOT_LINED_UP = "AD_task_catch_not_lined_up"
+CatchCombinePipeTask.DELAY_CHASE_OFF_FIELD = "AD_task_catch_chase_off_field"
+CatchCombinePipeTask.DELAY_COMBINE_ALMOST_FULL = "AD_task_catch_combine_almost_full"
+
 function CatchCombinePipeTask:new(vehicle, combine)
     local o = CatchCombinePipeTask:create()
     o.vehicle = vehicle
     o.combine = combine
     o.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+    o.delayReason = CatchCombinePipeTask.DELAY_STARTING
     o.wayPoints = nil
     o.stuckTimer = AutoDriveTON:new()
     o.reverseTimer = AutoDriveTON:new()
@@ -85,6 +94,7 @@ function CatchCombinePipeTask:update(dt)
                 self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:notifyAboutFailedPathfinder()
                 --AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.WARN, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path; %s", 5000, self.vehicle.ad.stateModule:getName(), self.combine.ad.stateModule:getName())
                 CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - STATE_PATHPLANNING restarting path finder - with delay")
+                self.delayReason = CatchCombinePipeTask.DELAY_NO_PATH
                 self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
                 return
             else
@@ -124,6 +134,7 @@ function CatchCombinePipeTask:update(dt)
         if combineTravelDistance > 85 then
             CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - combine travelled - recalculate path")
             self.waitForCheckTimer.elapsedTime = 4000
+            self.delayReason = CatchCombinePipeTask.DELAY_COMBINE_MOVED
             self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
             return
         else
@@ -140,6 +151,7 @@ function CatchCombinePipeTask:update(dt)
                     return
                 else
                     CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - angle or distance to combine too high - recalculate path now")
+                    self.delayReason = CatchCombinePipeTask.DELAY_NOT_LINED_UP
                     self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
                     return
                 end
@@ -217,6 +229,12 @@ function CatchCombinePipeTask:startNewPathFinding()
         return true
     else
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:startNewPathFinding() - chase pos looks bad, is not on the same field or combine's fill level is approaching limit - aborting for now")
+        -- the spot to chase is behind the combine here: either not on the combine's field, or the combine is almost full
+        if targetFieldId ~= combineFieldId then
+            self.delayReason = CatchCombinePipeTask.DELAY_CHASE_OFF_FIELD
+        else
+            self.delayReason = CatchCombinePipeTask.DELAY_COMBINE_ALMOST_FULL
+        end
         self.waitForCheckTimer:timer(false)
     end
     return false
@@ -265,7 +283,11 @@ function CatchCombinePipeTask:getI18nInfo()
         local actualState, maxStates, steps, max_pathfinder_steps = self.vehicle.ad.pathFinderModule:getCurrentState()
         text = text .. " - " .. "$l10n_AD_task_pathfinding;" .. string.format(" %d / %d - %d / %d", actualState, maxStates, steps, max_pathfinder_steps)
     elseif self.state == CatchCombinePipeTask.STATE_DELAY_PATHPLANNING then
-        text = text .. " - " .. "$l10n_AD_task_unload_area_in_fruit;"
+        text = text .. " - " .. "$l10n_" .. (self.delayReason or CatchCombinePipeTask.DELAY_STARTING) .. ";"
+        if self.delayReason == CatchCombinePipeTask.DELAY_CHASE_OFF_FIELD or self.delayReason == CatchCombinePipeTask.DELAY_COMBINE_ALMOST_FULL then
+            -- waiting like this, it gives up after this many tries (the count starts again with every finished path finding)
+            text = text .. string.format(" (%d/%d)", self.newPathFindingCounter, self.MAX_COUNT_NEW_PATHFINDING)
+        end
     elseif self.state == CatchCombinePipeTask.STATE_REVERSING then
         text = text .. " - " .. "$l10n_AD_task_reversing_from_combine;"
     elseif self.state == CatchCombinePipeTask.STATE_WAIT_BEFORE_FINISH then

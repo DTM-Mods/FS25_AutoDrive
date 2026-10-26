@@ -199,6 +199,13 @@ function AutoDrive.getObjectFillLevels(object)
             end
         end
     end
+    -- Overdrive: pallets / bales strapped on an ordinary trailer count as its load (ADStrappedLoad)
+    if ADStrappedLoad ~= nil then
+        local strappedLevel, strappedCapacity, strappedFull, strappedFree = ADStrappedLoad.getFillLevels(object, fillCapacity)
+        if strappedLevel ~= nil then
+            return strappedLevel, strappedCapacity, strappedFull, strappedFree
+        end
+    end
     local filledToUnload = AutoDrive.isUnloadFillLevelReached(rootVehicle, fillLevel, fillFreeCapacity, fillCapacity)
 
     AutoDrive.debugPrint(object, AutoDrive.DC_TRAILERINFO, "AutoDrive.getObjectFillLevels end fillLevel %.1f fillCapacity %.1f filledToUnload %s fillFreeCapacity %.1f", fillLevel, fillCapacity, tostring(filledToUnload), fillFreeCapacity)

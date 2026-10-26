@@ -94,6 +94,9 @@ source(Utils.getFilename("scripts/Manager/RouteCheck.lua", g_currentModDirectory
 source(Utils.getFilename("scripts/Manager/BestPrice.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/GroundUnload.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/UnloaderEscape.lua", g_currentModDirectory))
+source(Utils.getFilename("scripts/Manager/DriveThrough.lua", g_currentModDirectory))
+source(Utils.getFilename("scripts/Manager/StrappedLoad.lua", g_currentModDirectory))
+source(Utils.getFilename("scripts/Manager/PalletAreas.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/WorkSchedule.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/Statistics.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/WaypointActions.lua", g_currentModDirectory))
@@ -170,6 +173,7 @@ source(Utils.getFilename("scripts/Gui/ScanConfirmationGUI.lua", g_currentModDire
 
 source(Utils.getFilename("scripts/Gui/EnterDestinationFilterGUI.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Gui/SettingsPage.lua", g_currentModDirectory))
+source(Utils.getFilename("scripts/Gui/OverdriveSettingsPage.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Gui/DebugSettingsPage.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Gui/Settings.lua", g_currentModDirectory))
 

@@ -320,10 +320,15 @@ function ADUnloadFilter.getVehicleChoices(vehicle)
             end
         end
     end
-    -- pallets and bales on Universal Autoload trailers
+    -- pallets and bales on Universal Autoload trailers, and strapped on ordinary trailers
     for _, unit in ipairs(AutoDrive.getAllUnits(vehicle) or {}) do
         for fillType, litres in pairs(ADUnloadFilter.getALLoad(unit)) do
             choices[fillType] = (choices[fillType] or 0) + litres
+        end
+        if ADStrappedLoad ~= nil then
+            for fillType, litres in pairs(ADStrappedLoad.getLoad(unit)) do
+                choices[fillType] = (choices[fillType] or 0) + litres
+            end
         end
     end
     -- the vehicles' own tanks are no products

@@ -100,6 +100,10 @@ function UnloadAtDestinationTask:update(dt)
         end
         if self.vehicle.ad.drivePathModule:isTargetReached() then
             --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isTargetReached")
+            -- Overdrive: strapped pallets / bales: release what is sold here (also while tipping at a trigger)
+            if ADStrappedLoad.updateStop(self, dt) then
+                return
+            end
             if not self.vehicle.ad.trailerModule:isActiveAtTrigger() then
                 --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isTargetReached isActiveAtTrigger")
                 AutoDrive.setTrailerCoverOpen(self.vehicle, self.trailers, true)
@@ -114,6 +118,8 @@ function UnloadAtDestinationTask:update(dt)
                     )
                     -- Overdrive: unload products / best price leave products on board, done when nothing is tipped any more
                     or (ADUnloadFilter.finishesUnloadEarly(self.vehicle) and not (self.vehicle.ad.drivePathModule:getIsReversing() and self.vehicle.ad.trailerModule:getBunkerTrigger() ~= nil))
+                    -- Overdrive: the strapped load was offered here and nothing else is left to tip
+                    or ADStrappedLoad.stopFinished(self)
                     then
                     --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_VEHICLEINFO, "UnloadAtDestinationTask:update fillLevel < 0.1")
                     AutoDrive.setAugerPipeOpen(self.trailers, false)

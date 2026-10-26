@@ -70,24 +70,6 @@
 				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_iconSetToUse"/>
 			</Bitmap>
 			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
-				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="waypointPanel" id="waypointPanel">
-					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_waypointPanel_tooltip"/>
-				</BinaryOption>
-				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_waypointPanel"/>
-			</Bitmap>
-			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
-				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="tickerBar" id="tickerBar">
-					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_showTicker_tooltip"/>
-				</BinaryOption>
-				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_showTicker"/>
-			</Bitmap>
-			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
-				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="showFleetOnMap" id="showFleetOnMap">
-					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_showFleetOnMap_tooltip"/>
-				</BinaryOption>
-				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_showFleetOnMap"/>
-			</Bitmap>
-			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
 				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="wideHUD" id="wideHUD">
 					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_wideHUD_tooltip"/>
 				</BinaryOption>

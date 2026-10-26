@@ -389,7 +389,12 @@
 		<text name="AD_task_exiting_field"								text="Wyjazd z pola" />
 		<text name="AD_task_reversing_from_collision"					text="Poszukiwanie wolnej przestrzeni" />
 		<text name="AD_task_drive_to_park"								text="Jazda do miejsca parkowania" />
-		<text name="AD_task_unload_area_in_fruit"						text="Strefa wyładowywania zablokowana" />
+		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
+		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
+		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
+		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />
+		<text name="AD_task_catch_combine_almost_full"		text="Combine almost full, waiting for it to stop" />
 		<text name="gui_CPAD_off"										text="wyłączone" />
 		<text name="gui_CPAD_simple"									text="proste" />
 		<text name="gui_CPAD_full"										text="pełne" />
@@ -690,6 +695,12 @@
 		<text name="AD_cpHint_WAITING_FOR_RAIN_TO_FINISH"							 text="ta praca zatrzymuje się w deszczu i wznowi się sama" />
 		<text name="AD_cpHint_WAITING_FOR_SNOW_TO_CLEAR"							 text="ta praca zatrzymuje się, gdy leży śnieg, i wznowi się sama" />
 		<text name="AD_cpHint_WAITING_FOR_UNLOADER"							 text="zbiornik jest pełny: musi przyjechać przyczepa odbierająca; sprawdź, czy są ustawione i nie utknęły" />
+		<text name="gui_ad_allowDriveThrough"							 text="Przejeżdżaj przez przeszkody (No AI Collisions)" />
+		<text name="gui_ad_allowDriveThrough_tooltip"							 text="Tylko z modem No AI Collisions: Tak pozwala modowi wyłączyć kolizje i przejechać tym pojazdem przez przeszkodę po 2 sekundach postoju. Nie: czeka jak zwykle w AutoDrive. Wymaga wersji No AI Collisions, która odczytuje to ustawienie" />
+		<text name="gui_ad_overdriveSettingsPage_title"							 text="Ustawienia Overdrive - AutoDrive" />
+		<text name="gui_ad_od_thisVehicle"							 text="Ten pojazd" />
+		<text name="gui_ad_od_noVehicle"							 text="Wsiądź do pojazdu, aby zmienić jego ustawienia Overdrive" />
+		<text name="gui_ad_od_you"							 text="Ty (tylko dla ciebie)" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />

@@ -200,6 +200,6 @@ _settings = t.read(os.path.join(t.MOD, "scripts", "Settings.lua"))
 _block = _re.search(r"AutoDrive\.settings\.tickerBar = \{(.*?)\n\}", _settings.replace("\r\n", "\n"), _re.S).group(1)
 assert "values = {false, true}" in _block and "default = 1," in _block and "current = 1," in _block and "isUserSpecific = true" in _block
 assert "AutoDrive.settings.showTicker" not in _settings
-assert 'name="tickerBar" id="tickerBar"' in t.read(os.path.join(t.MOD, "gui", "userSettingsPage.xml"))
+assert 'name="tickerBar" id="tickerBar"' in t.read(os.path.join(t.MOD, "gui", "overdriveSettingsPage.xml"))
 
 print("OK: ticker (errors red: Courseplay info texts and AutoDrive vehicles stopped by an error; driver counts AutoDrive / waiting / Courseplay / helpers; why it waits: queue, waypoint, traffic, blocked, loading, not full, tipping, nothing comes out, unload point, standing; messages copied once; line; scrolling; synced reason)")

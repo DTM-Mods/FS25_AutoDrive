@@ -855,6 +855,10 @@ function AutoDrive:getALObjectFillLevels(object) -- used by getIsFillUnitEmpty, 
     end
     local filledToUnload = AutoDrive.isUnloadFillLevelReached(rootVehicle, fillLevel, fillFreeCapacity, fillCapacity)
     AutoDrive.debugPrint(object, AutoDrive.DC_EXTERNALINTERFACEINFO, "AutoDrive:getALObjectFillLevels filledToUnload %s ", tostring(filledToUnload))
+    -- Overdrive: pallets / bales strapped with the game's belts that Autoload does not track (ADStrappedLoad)
+    if ADStrappedLoad ~= nil then
+        return ADStrappedLoad.addToAutoloadLevels(object, fillLevel, fillCapacity, filledToUnload, fillFreeCapacity)
+    end
     return fillLevel, fillCapacity, filledToUnload, fillFreeCapacity
 end
 

@@ -64,6 +64,8 @@ function ADSettings:setupPages()
         {self.autoDriveUserSettings, alwaysEnabled, "gui.wardrobe_character", {btnBack, btnApply, btnReset}},
         {self.autoDriveGlobalSettings, alwaysEnabled, "gui.icon_options_generalSettings2", {btnBack, btnApply, btnReset}},
         {self.autoDriveEnvironmentSettings, vehicleEnabled, "gui.icon_weather_partiallyCloudy", {btnBack, btnApply, btnReset}},
+        -- Overdrive: all Overdrive settings (vehicle ones only while in a vehicle, see ADOverdriveSettings)
+        {self.autoDriveOverdriveSettings, alwaysEnabled, "ad_gui.speedmeter", {btnBack, btnApply, btnReset, btnRestoreDefault, btnMakeDefault}},
         {self.autoDriveDebugSettings, developmentControlsEnabled, "ad_gui.settings_debug", {btnBack}},
     }
 

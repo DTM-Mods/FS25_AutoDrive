@@ -440,6 +440,20 @@ AutoDrive.settings.unloaderEscape = {
     isCopyPaste = true
 }
 
+-- Overdrive: may the No AI Collisions mod drive this vehicle through obstructions (ADDriveThrough, published as
+-- vehicle.ad.allowDriveThrough). The row only shows when that mod is loaded.
+AutoDrive.settings.allowDriveThrough = {
+    values = {false, true},
+    texts = {"gui_ad_no", "gui_ad_yes"},
+    default = 2,
+    current = 2,
+    text = "gui_ad_allowDriveThrough",
+    tooltip = "gui_ad_allowDriveThrough_tooltip",
+    translate = true,
+    isVehicleSpecific = true,
+    isCopyPaste = true
+}
+
 AutoDrive.settings.unloadFillLevel = {
     values = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.90, 0.95, 0.99, 1},
     texts = {"0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "85%", "90%", "95%", "99%", "100%"},

@@ -471,6 +471,8 @@ function AutoDrive:onWriteUpdateStream(streamId, connection, dirtyMask)
 end
 
 function AutoDrive:onUpdate(dt)
+    -- Overdrive: publish vehicle.ad.allowDriveThrough for the No AI Collisions mod
+    ADDriveThrough.update(self)
     if self.isServer and self.ad.stateModule:isActive() then
         self.ad.recordingModule:update(dt)
         local shouldUStopVehicle = false
@@ -1290,7 +1292,13 @@ function AutoDrive:stopAutoDrive()
             local isPassingToAI = not self.ad.isStoppingWithError and self.ad.stateModule:getStartHelper() and self.ad.stateModule:getUsedHelper() == ADStateModule.HELPER_AI
 
             if not isStartingAIVE and not isPassingToCP and not isPassingToAI then
-                if not AutoDrive:getIsEntered(self) then
+                -- Overdrive: only leave the motor running while a player really sits in it (see isPlayerInVehicle),
+                -- and say in the server log what happened
+                local playerInVehicle = AutoDrive:isPlayerInVehicle(self)
+                Logging.info("[AD] %s: AutoDrive switched off, motor %s (controllerUserId user: %s, controlled: %s)",
+                    tostring(self.ad.stateModule:getName()), playerInVehicle and "left running, a player is in it" or "off",
+                    tostring(AutoDrive:getIsEntered(self)), tostring(self.getIsControlled ~= nil and self:getIsControlled()))
+                if not playerInVehicle then
                     if self.deactivateLights ~= nil then
                         self:deactivateLights()
                     end

@@ -55,6 +55,12 @@ def main():
         run("test_fill_levels.py"),
         run("test_ticker.py"),
         run("test_diagnostics.py"),
+        run("test_catch_combine_reasons.py"),
+        run("test_drive_through.py"),
+        run("test_motor_off.py"),
+        run("test_overdrive_settings.py"),
+        run("test_strapped_load.py"),
+        run("test_pallet_areas.py"),
     ]
     if not all(results):
         sys.exit(1)

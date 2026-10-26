@@ -104,6 +104,8 @@ function AutoDrive:loadGUI()
 	AutoDrive.gui.ADCombineUnloadSettingsPage = ADSettingsPage.new()
 	AutoDrive.gui.ADEnvironmentSettingsPage = ADSettingsPage.new()
 	AutoDrive.gui.ADDebugSettingsPage = ADDebugSettingsPage.new()
+	-- Overdrive: its own tab with all Overdrive settings
+	AutoDrive.gui.ADOverdriveSettingsPage = ADOverdriveSettings.attach(ADSettingsPage.new())
 
 	AutoDrive.gui.ADSettings = ADSettings.new()
 
@@ -132,6 +134,12 @@ function AutoDrive:loadGUI()
     end
 
 	result = g_gui:loadGui(AutoDrive.directory .. "gui/environmentSettingsPage.xml", "autoDriveEnvironmentSettings", AutoDrive.gui.ADEnvironmentSettingsPage, true)
+    count = count + 1
+    if result == nil then
+        AutoDrive.debugMsg(nil, "AutoDrive:loadGUI failed count %d", count)
+    end
+
+	result = g_gui:loadGui(AutoDrive.directory .. "gui/overdriveSettingsPage.xml", "autoDriveOverdriveSettings", AutoDrive.gui.ADOverdriveSettingsPage, true)
     count = count + 1
     if result == nil then
         AutoDrive.debugMsg(nil, "AutoDrive:loadGUI failed count %d", count)
