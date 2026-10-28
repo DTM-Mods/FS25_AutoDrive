@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Napraw" />
 		<text name="AD_routeCheck_fixed"							 text="Naprawiono: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Sieć tras zmieniła się, najpierw sprawdź ponownie" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Oba punkty trasy mają cele, nie można ich połączyć" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Brak punktu trasy w promieniu 30 m do połączenia" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Tego problemu nie można naprawić automatycznie, użyj Pokaż, aby go znaleźć" />
 		<text name="button_ad_statsToday"							 text="Dzisiaj" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Ten pojazd" />
 		<text name="gui_ad_od_noVehicle"							 text="Wsiądź do pojazdu, aby zmienić jego ustawienia Overdrive" />
 		<text name="gui_ad_od_you"							 text="Ty (tylko dla ciebie)" />
+		<text name="AD_nodeSelection_count" text="punktów zaznaczonych" />
+		<text name="AD_nodeSelection_move" text="Przesuń" />
+		<text name="AD_nodeSelection_ground" text="Połóż na ziemi" />
+		<text name="AD_nodeSelection_delete" text="Usuń" />
+		<text name="AD_nodeSelection_deselect" text="Odznacz" />
+		<text name="AD_nodeSelection_place" text="Kliknij, aby je położyć" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />
 		<text name="AD_routeCheck_unreachable"						 text="Nie można dotrzeć do celu &quot;%s&quot;" />
 		<text name="AD_routeCheck_isolated"							 text="Cel &quot;%s&quot; nie jest połączony z siecią" />
 		<text name="AD_routeCheck_noWayBack"							 text="Brak drogi powrotnej z celu &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Dwa punkty trasy na sobie (odległość %s m)" />
 		<text name="input_ADMoveNode"								 text="AD: Przytrzymaj + przeciągnij lewym przyciskiem, aby przesunąć punkt trasy" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Utwórz podfolder w %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Zmień nazwę folderu %s" />

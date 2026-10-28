@@ -61,6 +61,7 @@ def main():
         run("test_overdrive_settings.py"),
         run("test_strapped_load.py"),
         run("test_pallet_areas.py"),
+        run("test_node_selection.py"),
     ]
     if not all(results):
         sys.exit(1)

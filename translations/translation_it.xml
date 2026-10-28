@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Correggi" />
 		<text name="AD_routeCheck_fixed"							 text="Corretto: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="La rete dei percorsi è cambiata, controlla prima di nuovo" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Entrambi i nodi hanno destinazioni, non possono essere uniti" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Nessun nodo entro 30 m a cui collegarsi" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Questo problema non può essere corretto automaticamente, usa Mostra per trovarlo" />
 		<text name="button_ad_statsToday"							 text="Oggi" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Questo veicolo" />
 		<text name="gui_ad_od_noVehicle"							 text="Sali su un veicolo per cambiarne le impostazioni Overdrive" />
 		<text name="gui_ad_od_you"							 text="Tu (solo per te)" />
+		<text name="AD_nodeSelection_count" text="punti selezionati" />
+		<text name="AD_nodeSelection_move" text="Sposta" />
+		<text name="AD_nodeSelection_ground" text="Metti a terra" />
+		<text name="AD_nodeSelection_delete" text="Elimina" />
+		<text name="AD_nodeSelection_deselect" text="Deseleziona" />
+		<text name="AD_nodeSelection_place" text="Clic per posarli" />
 		<text name="AD_routeCheck_loose"								 text="Nodo isolato senza alcun collegamento" />
 		<text name="AD_routeCheck_deadEnd"							 text="Vicolo cieco: nessuna via per proseguire da questo nodo" />
 		<text name="AD_routeCheck_trap"								 text="Trappola a senso unico: %s nodi in cui si può entrare ma da cui non si può uscire" />
 		<text name="AD_routeCheck_unreachable"						 text="La destinazione &quot;%s&quot; non è raggiungibile" />
 		<text name="AD_routeCheck_isolated"							 text="La destinazione &quot;%s&quot; non è collegata alla rete" />
 		<text name="AD_routeCheck_noWayBack"							 text="Nessuna via di ritorno dalla destinazione &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Due nodi sovrapposti (a %s m di distanza)" />
 		<text name="input_ADMoveNode"								 text="AD: Tieni premuto + trascina con il tasto sinistro per spostare il nodo" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Crea sottocartella in %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Rinomina cartella %s" />

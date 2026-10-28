@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="修复" />
 		<text name="AD_routeCheck_fixed"							 text="已修复：%s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="路线网络已更改，请先重新检查" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="两个航点都有目标，无法合并" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="30 米内没有可连接的航点" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="此问题无法自动修复，请使用“显示”找到它" />
 		<text name="button_ad_statsToday"							 text="今天" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="此车辆" />
 		<text name="gui_ad_od_noVehicle"							 text="进入车辆以更改其 Overdrive 设置" />
 		<text name="gui_ad_od_you"							 text="你（仅对你）" />
+		<text name="AD_nodeSelection_count" text="bodů vybráno" />
+		<text name="AD_nodeSelection_move" text="Přesunout" />
+		<text name="AD_nodeSelection_ground" text="Položit na zem" />
+		<text name="AD_nodeSelection_delete" text="Smazat" />
+		<text name="AD_nodeSelection_deselect" text="Zrušit výběr" />
+		<text name="AD_nodeSelection_place" text="Klikněte pro položení" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />
 		<text name="AD_routeCheck_unreachable"						 text="无法到达目标“%s”" />
 		<text name="AD_routeCheck_isolated"							 text="目标“%s”未连接到路线网络" />
 		<text name="AD_routeCheck_noWayBack"							 text="无法从目标“%s”返回" />
-		<text name="AD_routeCheck_duplicate"							 text="两个航点重叠（相距 %s 米）" />
 		<text name="input_ADMoveNode"								 text="AD: 按住 + 鼠标左键拖动以移动航点" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="在 %s 中创建子文件夹" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="重命名文件夹 %s" />

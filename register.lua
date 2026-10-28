@@ -100,6 +100,7 @@ source(Utils.getFilename("scripts/Manager/PalletAreas.lua", g_currentModDirector
 source(Utils.getFilename("scripts/Manager/WorkSchedule.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/Statistics.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/WaypointActions.lua", g_currentModDirectory))
+source(Utils.getFilename("scripts/Manager/NodeSelection.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/UnloadFilter.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/RoutePreview.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Manager/TriggerManager.lua", g_currentModDirectory))

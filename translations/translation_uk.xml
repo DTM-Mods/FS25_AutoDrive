@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Виправити" />
 		<text name="AD_routeCheck_fixed"							 text="Виправлено: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Мережа маршрутів змінилася, спочатку перевірте знову" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Обидві точки шляху мають локації, їх не можна об'єднати" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Немає точки шляху в радіусі 30 м для з'єднання" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Цю проблему не можна виправити автоматично, знайдіть її кнопкою Показати" />
 		<text name="button_ad_statsToday"							 text="Сьогодні" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Ця техніка" />
 		<text name="gui_ad_od_noVehicle"							 text="Сядьте в техніку, щоб змінити її налаштування Overdrive" />
 		<text name="gui_ad_od_you"							 text="Ви (лише для вас)" />
+		<text name="AD_nodeSelection_count" text="точок вибрано" />
+		<text name="AD_nodeSelection_move" text="Перемістити" />
+		<text name="AD_nodeSelection_ground" text="Покласти на землю" />
+		<text name="AD_nodeSelection_delete" text="Видалити" />
+		<text name="AD_nodeSelection_deselect" text="Зняти вибір" />
+		<text name="AD_nodeSelection_place" text="Клацніть, щоб поставити" />
 		<text name="AD_routeCheck_loose"								 text="Окрема точка шляху без з'єднань" />
 		<text name="AD_routeCheck_deadEnd"							 text="Глухий кут: від цієї точки шляху далі немає шляху" />
 		<text name="AD_routeCheck_trap"								 text="Одностороння пастка: точок шляху, куди можна заїхати, але не можна виїхати: %s" />
 		<text name="AD_routeCheck_unreachable"						 text="Локація &quot;%s&quot; недосяжна" />
 		<text name="AD_routeCheck_isolated"							 text="Локація &quot;%s&quot; не під'єднана до мережі" />
 		<text name="AD_routeCheck_noWayBack"							 text="Немає шляху назад від локації &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Дві точки шляху одна на одній (відстань %s м)" />
 		<text name="input_ADMoveNode"								 text="AD: Утримувати + тягнути лівою кнопкою миші для переміщення точки шляху" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Створити підпапку в %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Перейменувати папку %s" />

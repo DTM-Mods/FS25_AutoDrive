@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Javítás" />
 		<text name="AD_routeCheck_fixed"							 text="Javítva: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Az útvonalhálózat megváltozott, előbb ellenőrizd újra" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Mindkét útpontnak van célja, nem vonhatók össze" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Nincs csatlakoztatható útpont 30 m-en belül" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Ez a probléma nem javítható automatikusan, a Megjelenítés gombbal megtalálod" />
 		<text name="button_ad_statsToday"							 text="Ma" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Ez a jármű" />
 		<text name="gui_ad_od_noVehicle"							 text="Ülj be egy járműbe, hogy módosítsd az Overdrive beállításait" />
 		<text name="gui_ad_od_you"							 text="Te (csak neked)" />
+		<text name="AD_nodeSelection_count" text="pont kijelölve" />
+		<text name="AD_nodeSelection_move" text="Mozgatás" />
+		<text name="AD_nodeSelection_ground" text="Földre helyezés" />
+		<text name="AD_nodeSelection_delete" text="Törlés" />
+		<text name="AD_nodeSelection_deselect" text="Kijelölés megszüntetése" />
+		<text name="AD_nodeSelection_place" text="Kattints a lerakáshoz" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />
 		<text name="AD_routeCheck_unreachable"						 text="A(z) &quot;%s&quot; cél nem érhető el" />
 		<text name="AD_routeCheck_isolated"							 text="A(z) &quot;%s&quot; cél nincs a hálózathoz kapcsolva" />
 		<text name="AD_routeCheck_noWayBack"							 text="Nincs visszaút a(z) &quot;%s&quot; célból" />
-		<text name="AD_routeCheck_duplicate"							 text="Két útpont egymáson (%s m távolságra)" />
 		<text name="input_ADMoveNode"								 text="AD: Nyomva tartás + bal egérgombos húzás az útpont mozgatásához" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Almappa létrehozása itt: %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="%s mappa átnevezése" />

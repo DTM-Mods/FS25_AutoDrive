@@ -524,8 +524,7 @@
 		<text name="button_ad_fix"							 text="Fix" />
 		<text name="AD_routeCheck_fixed"							 text="Fixed: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="The route network has changed, check again first" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Both waypoints have targets, they can not be merged" />
-		<text name="AD_routeCheck_fixNoNeighbour"							 text="No waypoint within 30 m to connect to" />
+		<text name="AD_routeCheck_fixNoNeighbour"							 text="No road ahead within 30 m to connect the dead end to" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="This problem can not be fixed automatically, use Show to find it" />
 		<text name="button_ad_statsToday"							 text="Today" />
 		<text name="button_ad_statsWeek"							 text="Last 7 days" />
@@ -704,12 +703,17 @@
 		<text name="gui_ad_od_thisVehicle"							 text="This vehicle" />
 		<text name="gui_ad_od_noVehicle"							 text="Get into a vehicle to change its Overdrive settings" />
 		<text name="gui_ad_od_you"							 text="You (only for you)" />
+		<text name="AD_nodeSelection_count" text="waypoints selected" />
+		<text name="AD_nodeSelection_move" text="Move" />
+		<text name="AD_nodeSelection_ground" text="Put on the ground" />
+		<text name="AD_nodeSelection_delete" text="Delete" />
+		<text name="AD_nodeSelection_deselect" text="Deselect" />
+		<text name="AD_nodeSelection_place" text="Click to put them down" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />
 		<text name="AD_routeCheck_unreachable"						 text="Target &quot;%s&quot; can not be reached" />
 		<text name="AD_routeCheck_isolated"							 text="Target &quot;%s&quot; is not connected to the network" />
 		<text name="AD_routeCheck_noWayBack"							 text="No way back from target &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Two waypoints on top of each other (%s m apart)" />
 	</texts>
 </l10n>

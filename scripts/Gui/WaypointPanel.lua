@@ -298,9 +298,20 @@ end
 
 -- the whole road one-way (in its driving order), two-way, or turned round; one undo step
 function ADWaypointPanel.setRoadDirection(chain, mode)
+    local steps = {}
+    for i = 1, #chain - 1 do
+        steps[i] = {chain[i], chain[i + 1]}
+    end
+    ADWaypointPanel.setPairsDirection(steps, mode)
+end
+
+-- the same for any connected pairs of waypoints {a, b} ("oneWay": from a to b); one undo step
+function ADWaypointPanel.setPairsDirection(pairs, mode)
     local links = {}
-    for i, direction in ipairs(ADWaypointPanel.getChainDirections(chain)) do
-        local a, b = chain[i], chain[i + 1]
+    for _, pair in ipairs(pairs) do
+        local a, b = pair[1], pair[2]
+        local wpA, wpB = ADGraphManager:getWayPointById(a), ADGraphManager:getWayPointById(b)
+        local direction = (wpA ~= nil and wpB ~= nil) and ADWaypointPanel.getDirection(wpA, wpB) or false
         if mode == "oneWay" and direction ~= ADWaypointPanel.OUT then
             table.insert(links, {a, b, ADWaypointPanel.OUT})
         elseif mode == "twoWay" and direction ~= ADWaypointPanel.DUAL then

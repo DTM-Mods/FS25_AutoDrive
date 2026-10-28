@@ -521,8 +521,7 @@
 		<text name="button_ad_fix"							 text="Beheben" />
 		<text name="AD_routeCheck_fixed"							 text="Behoben: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Das Routennetz wurde geändert, bitte zuerst erneut prüfen" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Beide Wegpunkte haben Ziele, sie können nicht zusammengeführt werden" />
-		<text name="AD_routeCheck_fixNoNeighbour"							 text="Kein Wegpunkt innerhalb von 30 m zum Verbinden" />
+		<text name="AD_routeCheck_fixNoNeighbour"							 text="Keine Straße voraus innerhalb von 30 m, an die die Sackgasse angeschlossen werden kann" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Dieses Problem kann nicht automatisch behoben werden, nutze Anzeigen, um es zu finden" />
 		<text name="button_ad_statsToday"							 text="Heute" />
 		<text name="button_ad_statsWeek"							 text="Letzte 7 Tage" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Dieses Fahrzeug" />
 		<text name="gui_ad_od_noVehicle"							 text="Steig in ein Fahrzeug, um seine Overdrive-Einstellungen zu ändern" />
 		<text name="gui_ad_od_you"							 text="Du (nur für dich)" />
+		<text name="AD_nodeSelection_count" text="Wegpunkte ausgewählt" />
+		<text name="AD_nodeSelection_move" text="Verschieben" />
+		<text name="AD_nodeSelection_ground" text="Auf den Boden setzen" />
+		<text name="AD_nodeSelection_delete" text="Löschen" />
+		<text name="AD_nodeSelection_deselect" text="Auswahl aufheben" />
+		<text name="AD_nodeSelection_place" text="Klicken zum Absetzen" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />
 		<text name="AD_routeCheck_unreachable"						 text="Ziel &quot;%s&quot; ist nicht erreichbar" />
 		<text name="AD_routeCheck_isolated"							 text="Ziel &quot;%s&quot; ist nicht mit dem Netz verbunden" />
 		<text name="AD_routeCheck_noWayBack"							 text="Kein Rückweg vom Ziel &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Zwei Wegpunkte übereinander (%s m Abstand)" />
 		<text name="input_ADMoveNode"								 text="AD: Halten + mit linker Maustaste ziehen, um Wegpunkt zu verschieben" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Unterordner in %s erstellen" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Ordner %s umbenennen" />

@@ -953,7 +953,7 @@ function AutoDrive:onDrawEditorMode()
                 if (AutoDrive.mouseIsAtPos(point, 0.01) or point.isSelected) and mouseActiveForAutoDrive then
                     DrawingManager:addSphereTask(x, y, z, 3, unpack(AutoDrive.currentColors.ad_color_hoveredNode))
                 else
-                    if point.id == self.ad.selectedNodeId then
+                    if point.id == self.ad.selectedNodeId or ADNodeSelection:isSelected(point.id) then
                         DrawingManager:addSphereTask(x, y, z, 3, unpack(AutoDrive.currentColors.ad_color_selectedNode))
                     else
                         if point.isRightOfWayCenter then

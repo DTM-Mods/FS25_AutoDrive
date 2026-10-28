@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Herstellen" />
 		<text name="AD_routeCheck_fixed"							 text="Hersteld: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Het routenetwerk is gewijzigd, controleer eerst opnieuw" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Beide routepunten hebben bestemmingen, ze kunnen niet worden samengevoegd" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Geen routepunt binnen 30 m om mee te verbinden" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Dit probleem kan niet automatisch worden hersteld, gebruik Tonen om het te vinden" />
 		<text name="button_ad_statsToday"							 text="Vandaag" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Dit voertuig" />
 		<text name="gui_ad_od_noVehicle"							 text="Stap in een voertuig om zijn Overdrive-instellingen te wijzigen" />
 		<text name="gui_ad_od_you"							 text="Jij (alleen voor jou)" />
+		<text name="AD_nodeSelection_count" text="punten geselecteerd" />
+		<text name="AD_nodeSelection_move" text="Verplaatsen" />
+		<text name="AD_nodeSelection_ground" text="Op de grond zetten" />
+		<text name="AD_nodeSelection_delete" text="Verwijderen" />
+		<text name="AD_nodeSelection_deselect" text="Deselecteren" />
+		<text name="AD_nodeSelection_place" text="Klik om ze neer te zetten" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />
 		<text name="AD_routeCheck_unreachable"						 text="Bestemming &quot;%s&quot; is niet bereikbaar" />
 		<text name="AD_routeCheck_isolated"							 text="Bestemming &quot;%s&quot; is niet verbonden met het netwerk" />
 		<text name="AD_routeCheck_noWayBack"							 text="Geen weg terug vanaf bestemming &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Twee routepunten boven op elkaar (%s m uit elkaar)" />
 		<text name="input_ADMoveNode"								 text="AD: Vasthouden + slepen met linkermuisknop om routepunt te verplaatsen" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Submap maken in %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Map %s hernoemen" />

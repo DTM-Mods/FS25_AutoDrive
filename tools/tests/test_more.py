@@ -121,10 +121,12 @@ s.execute("""
     function network()
         ADGraphManager.wayPoints = {
             wp(1, 0, 0, {2}, {2}), wp(2, 10, 0, {1, 3}, {1, 3}), wp(3, 20, 0, {2, 4}, {2}),  -- 1 = 2 = 3 two-way, 3 -> 4
-            wp(4, 30, 0, {}, {3}),                -- dead end
+            wp(4, 30, 0, {}, {3}),                -- dead end heading +x; 2 and 3 behind it, 8 ahead, 9 to the side
             wp(5, 10.1, 0.1, {6}, {}),            -- on top of 2, leads to 6
-            wp(6, 10, 20, {}, {5}),               -- dead end, 2 is within 30 m
+            wp(6, 10, 20, {}, {5}),               -- dead end heading +z, nothing ahead within 30 m
             wp(7, 90, 90, {}, {}),                -- loose
+            wp(8, 50, 3, {1}, {}),                -- 20 m ahead of 4, leads on
+            wp(9, 30, 12, {1}, {}),               -- 12 m from 4 but to the side
         }
         ADGraphManager.mapMarkers = {{id = 1, name = "Farm", markerIndex = 1, group = "All"}}
     end
@@ -134,24 +136,30 @@ s.execute("""
     PROBLEMS = ADRouteCheck.analyse(ADGraphManager.wayPoints, ADGraphManager.mapMarkers)
     function problemOf(kind, id) for _, p in ipairs(PROBLEMS) do if p.kind == kind and p.wayPointId == id then return p end end end
 """)
-# loose waypoint: deleted
-s.execute("TO_CLIENTS = {}; OK = ADRouteCheck:fix(problemOf(ADRouteCheck.LOOSE, 7))")
-assert s.eval("OK") and s.eval("#ADGraphManager.wayPoints") == 6
-assert s.eval("#TO_CLIENTS") == 1 and s.eval("TO_CLIENTS[1].fixType") == 1
+# waypoints on top of each other (5 on 2) are not reported
+assert not any(p.kind not in (1, 2) for p in s.eval("PROBLEMS").values())
+# dead end 4 (at 30,0, heading +x): not back onto its own road (2, 3 behind it), not 9 at the side, but 8 ahead;
+# the two waypoints flash, a log line says what was done
+s.execute("TO_CLIENTS = {}; OK = ADRouteCheck:fix(problemOf(ADRouteCheck.DEAD_END, 4))")
+assert s.eval("OK") and list(s.eval("ADGraphManager.wayPoints[4].out").values()) == [8]
+assert s.eval("#ADUndoManager.highlights.points") == 2 and s.eval("ADUndoManager.highlights.points[2].x") == 50
+assert s.eval("ADUndoManager.highlights.endTime") == s.eval("g_time + ADRouteCheck.FIX_HIGHLIGHT_DURATION")
 assert s.eval("#ADUndoManager.undoStack") == 1
-# merge 5 into 2: 2 gets the connection to 6, 5 is gone
-s.execute("PROBLEMS = ADRouteCheck.analyse(ADGraphManager.wayPoints, ADGraphManager.mapMarkers)")
-s.execute("OK = ADRouteCheck:fix(problemOf(ADRouteCheck.DUPLICATE, 2))")
-assert s.eval("OK") and s.eval("#ADGraphManager.wayPoints") == 5
-assert s.eval("table.contains(ADGraphManager.wayPoints[2].out, 5)")  # old 6 is now 5
-assert s.eval("table.contains(ADGraphManager.wayPoints[5].incoming, 2)")
+# dead end 6 (heading +z from 5 at 10,0): 2 and 3 are behind it, nothing ahead
+s.execute("PROBLEMS = ADRouteCheck.analyse(ADGraphManager.wayPoints, ADGraphManager.mapMarkers); MESSAGES = {}")
+s.execute("OK = ADRouteCheck:fix(problemOf(ADRouteCheck.DEAD_END, 6))")
+assert not s.eval("OK") and "No road ahead" in s.eval("MESSAGES[1]")
+# loose waypoint: deleted
+s.execute("OK = ADRouteCheck:fix(problemOf(ADRouteCheck.LOOSE, 7))")
+assert s.eval("OK") and s.eval("#ADGraphManager.wayPoints") == 8
+assert s.eval("#TO_CLIENTS") == 2 and s.eval("TO_CLIENTS[2].fixType") == 1
 assert s.eval("#ADUndoManager.undoStack") == 2
-# dead end 4 (at 30,0): nearest waypoint within 30 m that does not lead to it: 2 is 20 m away, 3 leads to it
-s.execute("PROBLEMS = ADRouteCheck.analyse(ADGraphManager.wayPoints, ADGraphManager.mapMarkers)")
-s.execute("OK = ADRouteCheck:fix(problemOf(ADRouteCheck.DEAD_END, 4))")
-assert s.eval("OK") and s.eval("table.contains(ADGraphManager.wayPoints[4].out, 2)")
-# everything back with three undos
-s.execute("ADUndoManager:undo(nil); ADUndoManager:undo(nil); ADUndoManager:undo(nil)")
+# a dead end that ends right on top of another road is joined to it, even behind the heading
+s.execute("ADGraphManager.wayPoints[9] = wp(9, 29.9, 0.2, {8}, {})")
+assert s.eval("ADRouteCheck.findContinuation(ADGraphManager.wayPoints[4], ADGraphManager.wayPoints).id") == 9
+s.execute("ADGraphManager.wayPoints[9] = nil")
+# everything back with two undos
+s.execute("ADUndoManager:undo(nil); ADUndoManager:undo(nil)")
 assert s.globals().snapshot() == s.eval("BEFORE")
 # a client applies the same fixes and ends up with the same network
 client = t.make_runtime(False)
@@ -164,24 +172,20 @@ client.execute("""
 client.execute("""
     ADGraphManager.wayPoints = {
         wp(1, 0, 0, {2}, {2}), wp(2, 10, 0, {1, 3}, {1, 3}), wp(3, 20, 0, {2, 4}, {2}), wp(4, 30, 0, {}, {3}),
-        wp(5, 10.1, 0.1, {6}, {}), wp(6, 10, 20, {}, {5}), wp(7, 90, 90, {}, {}),
+        wp(5, 10.1, 0.1, {6}, {}), wp(6, 10, 20, {}, {5}), wp(7, 90, 90, {}, {}), wp(8, 50, 3, {1}, {}), wp(9, 30, 12, {1}, {}),
     }
     ADGraphManager.mapMarkers = {{id = 1, name = "Farm", markerIndex = 1, group = "All"}}
 """)
-s.execute("ADUndoManager:redo(nil); ADUndoManager:redo(nil); ADUndoManager:redo(nil)")
-fixes = [(s.eval("TO_CLIENTS[%d].fixType" % i), s.eval("TO_CLIENTS[%d].a" % i), s.eval("TO_CLIENTS[%d].b" % i)) for i in range(1, 4)]
+s.execute("ADUndoManager:redo(nil); ADUndoManager:redo(nil)")
+fixes = [(s.eval("TO_CLIENTS[%d].fixType" % i), s.eval("TO_CLIENTS[%d].a" % i), s.eval("TO_CLIENTS[%d].b" % i)) for i in range(1, 3)]
 for fix in fixes:
     client.execute("AutoDriveRouteFixEvent.new(%d, %d, %d):run(nil)" % fix)
 assert client.globals().snapshot() == s.globals().snapshot()
-# not fixable: two targets on top of each other, an outdated list
+# not fixable: an outdated list
 s.execute("""
     network()
-    ADGraphManager.mapMarkers = {{id = 2, name = "A", markerIndex = 1, group = "All"}, {id = 5, name = "B", markerIndex = 2, group = "All"}}
     PROBLEMS = ADRouteCheck.analyse(ADGraphManager.wayPoints, ADGraphManager.mapMarkers)
-    MESSAGES = {}
-    OK = ADRouteCheck:fix(problemOf(ADRouteCheck.DUPLICATE, 2))
 """)
-assert not s.eval("OK") and "can not be merged" in s.eval("MESSAGES[1]")
 s.execute("ADGraphManager.wayPoints[7].x = 50; MESSAGES = {}; OK = ADRouteCheck:fix(problemOf(ADRouteCheck.LOOSE, 7))")
 assert not s.eval("OK") and "changed" in s.eval("MESSAGES[1]")
 

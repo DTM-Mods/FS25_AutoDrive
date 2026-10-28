@@ -1,5 +1,5 @@
-"""Route check: every kind of problem is found in a small network, nothing in a clean one,
-and the check is fast enough for a big map."""
+"""Route check: every kind of problem is found in a small network, nothing in a clean one, waypoints on top of each
+other are no problem, and the check is fast enough for a big map."""
 import os
 import time
 import run_undo_test as t
@@ -23,7 +23,7 @@ s.execute("""
         wp(5, 20, 0, {6}),                -- one-way spur from 2 ...
         wp(6, 30, 0, {}),                 -- ... ending in a dead end
         wp(7, 50, 50, {}),                -- loose waypoint
-        wp(8, 10.1, 10.1, {3}),           -- on top of 3 (0.14 m), only leads into the ring
+        wp(8, 10.1, 10.1, {3}),           -- on top of 3 (0.14 m), only leads into the ring: not reported
         wp(9, 40, 10, {10}),              -- trap: 9 -> 10 -> 11 -> 10 ... no way out
         wp(10, 50, 10, {11}), wp(11, 60, 10, {10}),
         wp(12, -10, 10, {}),              -- target at a dead end: no way back
@@ -36,16 +36,14 @@ s.execute("""
 """)
 problems = s.eval("ADRouteCheck.analyse(W, M)")
 got = s.globals().kinds(problems)
-# kinds: LOOSE=1 DEAD_END=2 TRAP=3 UNREACHABLE=4 NO_WAY_BACK=5 DUPLICATE=6, the trap is entered at 10
-expected = sorted(["1@7", "2@6", "6@3", "3@10", "5@12", "4@13"])
+# kinds: LOOSE=1 DEAD_END=2 TRAP=3 UNREACHABLE=4 NO_WAY_BACK=5, the trap is entered at 10
+expected = sorted(["1@7", "2@6", "3@10", "5@12", "4@13"])
 assert got == " ".join(expected), got
 
 by_kind = {p.kind: p for p in problems.values()}
 assert by_kind[3].count == 2, by_kind[3].count
 assert by_kind[4].name == "Island" and by_kind[4].noWayBack
 assert by_kind[5].name == "Shed"
-assert by_kind[6].otherId == 8 and abs(by_kind[6].gap - 0.1414) < 0.001
-assert len(by_kind[6].points) == 2
 
 # texts
 s.globals().P = problems
@@ -57,7 +55,7 @@ s.execute("ADRouteCheck.sortByDistance(P, 0, 0)")
 d = [problems[i].distance for i in range(1, len(problems) + 1)]
 assert d == sorted(d)
 counts = s.eval("ADRouteCheck.countKinds(P)")
-assert [counts[i] for i in range(1, 7)] == [1, 1, 1, 1, 1, 1]
+assert [counts[i] for i in range(1, 6)] == [1, 1, 1, 1, 1]
 
 # clean network: two-way ring with targets, nothing found
 s.execute("""
@@ -92,4 +90,4 @@ s.execute("""
 elapsed = time.time() - start
 assert s.eval("#BIG") == 0 and s.eval("#BIG2") == 0
 assert elapsed < 10, elapsed
-print("OK: route check finds all 6 kinds of problems, clean networks pass, 2x40000 waypoints in %.1fs" % elapsed)
+print("OK: route check finds all 5 kinds of problems, waypoints on top of each other are fine, clean networks pass, 2x40000 waypoints in %.1fs" % elapsed)

@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Opravit" />
 		<text name="AD_routeCheck_fixed"							 text="Opraveno: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Síť tras se změnila, nejprve zkontrolujte znovu" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Oba body trasy mají cíle, nelze je sloučit" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Žádný bod trasy do 30 m, ke kterému by se dalo připojit" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Tento problém nelze opravit automaticky, najděte ho pomocí Zobrazit" />
 		<text name="button_ad_statsToday"							 text="Dnes" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Toto vozidlo" />
 		<text name="gui_ad_od_noVehicle"							 text="Nastupte do vozidla, abyste změnili jeho nastavení Overdrive" />
 		<text name="gui_ad_od_you"							 text="Vy (jen pro vás)" />
+		<text name="AD_nodeSelection_count" text="bodů vybráno" />
+		<text name="AD_nodeSelection_move" text="Přesunout" />
+		<text name="AD_nodeSelection_ground" text="Položit na zem" />
+		<text name="AD_nodeSelection_delete" text="Smazat" />
+		<text name="AD_nodeSelection_deselect" text="Zrušit výběr" />
+		<text name="AD_nodeSelection_place" text="Klikněte pro položení" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />
 		<text name="AD_routeCheck_unreachable"						 text="Cíl &quot;%s&quot; je nedosažitelný" />
 		<text name="AD_routeCheck_isolated"							 text="Cíl &quot;%s&quot; není připojen k síti" />
 		<text name="AD_routeCheck_noWayBack"							 text="Z cíle &quot;%s&quot; nevede cesta zpět" />
-		<text name="AD_routeCheck_duplicate"							 text="Dva body trasy na sobě (vzdálenost %s m)" />
 		<text name="input_ADMoveNode"								 text="AD: Držet + táhnout levým tlačítkem myši pro posun bodu trasy" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Vytvořit podadresář v %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Přejmenovat adresář %s" />

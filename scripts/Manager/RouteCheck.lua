@@ -9,20 +9,15 @@ ADRouteCheck.DEAD_END = 2 -- waypoint without outgoing connection (and without t
 ADRouteCheck.TRAP = 3 -- part of the network that can be entered but not left
 ADRouteCheck.UNREACHABLE = 4 -- target that can not be reached from the main network
 ADRouteCheck.NO_WAY_BACK = 5 -- target from which the main network can not be reached
-ADRouteCheck.DUPLICATE = 6 -- waypoints (almost) on top of each other
 
 ADRouteCheck.KIND_TEXTS = {
     [ADRouteCheck.LOOSE] = "AD_routeCheck_loose",
     [ADRouteCheck.DEAD_END] = "AD_routeCheck_deadEnd",
     [ADRouteCheck.TRAP] = "AD_routeCheck_trap",
     [ADRouteCheck.UNREACHABLE] = "AD_routeCheck_unreachable",
-    [ADRouteCheck.NO_WAY_BACK] = "AD_routeCheck_noWayBack",
-    [ADRouteCheck.DUPLICATE] = "AD_routeCheck_duplicate"
+    [ADRouteCheck.NO_WAY_BACK] = "AD_routeCheck_noWayBack"
 }
 
--- waypoints closer than this (horizontally) count as duplicates
-ADRouteCheck.DUPLICATE_DISTANCE = 0.3
-ADRouteCheck.DUPLICATE_HEIGHT = 1.5
 -- at most this many problems are listed, the nearest first
 ADRouteCheck.MAX_PROBLEMS = 500
 -- points highlighted for one problem, e.g. a trap
@@ -119,36 +114,6 @@ function ADRouteCheck.reachable(startIds, adjacency)
         end
     end
     return seen
-end
-
--- pairs of waypoints closer than DUPLICATE_DISTANCE, as {a, b, distance}
-function ADRouteCheck.findDuplicates(wayPoints)
-    local cellSize = ADRouteCheck.DUPLICATE_DISTANCE
-    local cells = {}
-    local pairsFound = {}
-    for id, wp in ipairs(wayPoints) do
-        local cx, cz = math.floor(wp.x / cellSize), math.floor(wp.z / cellSize)
-        for dx = -1, 1 do
-            for dz = -1, 1 do
-                local cell = cells[(cx + dx) .. "," .. (cz + dz)]
-                if cell ~= nil then
-                    for _, otherId in ipairs(cell) do
-                        local other = wayPoints[otherId]
-                        local distance = MathUtil.vector2Length(wp.x - other.x, wp.z - other.z)
-                        if distance < cellSize and math.abs(wp.y - other.y) < ADRouteCheck.DUPLICATE_HEIGHT then
-                            table.insert(pairsFound, {otherId, id, distance})
-                        end
-                    end
-                end
-            end
-        end
-        local key = cx .. "," .. cz
-        if cells[key] == nil then
-            cells[key] = {}
-        end
-        table.insert(cells[key], id)
-    end
-    return pairsFound
 end
 
 -- runs all checks, returns the list of problems:
@@ -291,11 +256,6 @@ function ADRouteCheck.analyse(wayPoints, mapMarkers)
         end
     end
 
-    for _, pair in ipairs(ADRouteCheck.findDuplicates(wayPoints)) do
-        local problem = addProblem(ADRouteCheck.DUPLICATE, pair[1], {otherId = pair[2], gap = pair[3]})
-        table.insert(problem.points, point(pair[2]))
-    end
-
     return problems
 end
 
@@ -339,8 +299,6 @@ function ADRouteCheck.getProblemText(problem)
         return string.format(text, problem.name)
     elseif problem.kind == ADRouteCheck.NO_WAY_BACK then
         return string.format(text, problem.name)
-    elseif problem.kind == ADRouteCheck.DUPLICATE then
-        return string.format(text, string.format("%.2f", problem.gap))
     end
     return text
 end
@@ -356,8 +314,7 @@ ADRouteCheck.KIND_ICONS = {
     [ADRouteCheck.DEAD_END] = "ad_gui.warn_icon",
     [ADRouteCheck.TRAP] = "ad_gui.error_icon",
     [ADRouteCheck.UNREACHABLE] = "ad_gui.error_icon",
-    [ADRouteCheck.NO_WAY_BACK] = "ad_gui.error_icon",
-    [ADRouteCheck.DUPLICATE] = "ad_gui.info_icon"
+    [ADRouteCheck.NO_WAY_BACK] = "ad_gui.error_icon"
 }
 
 function ADRouteCheck.getVehiclePosition(vehicle)
@@ -452,27 +409,84 @@ function ADRouteCheck:hide()
 end
 
 -------------------------------------------------------------------------------
--- fixes: delete a loose waypoint, merge two waypoints on top of each other,
--- connect a dead end to the nearest waypoint. One undo step each (AutoDriveRouteFixEvent)
+-- fixes: delete a loose waypoint, connect a dead end to the waypoint ahead where the road goes on.
+-- One undo step each (AutoDriveRouteFixEvent)
 -------------------------------------------------------------------------------
 
 ADRouteCheck.FIX_DELETE = 1
-ADRouteCheck.FIX_MERGE = 2
 ADRouteCheck.FIX_CONNECT = 3
--- a dead end is connected to a waypoint at most this far away
+-- a dead end is connected to a waypoint at most this far away, ahead: at most CONNECT_ANGLE degrees off the
+-- direction the road arrives in (or right on top of the dead end), not one of the last BEHIND_STEPS waypoints
+-- before it (the road curving round)
 ADRouteCheck.CONNECT_RANGE = 30
+ADRouteCheck.CONNECT_ANGLE = 60
+ADRouteCheck.ON_TOP = 0.5
+ADRouteCheck.BEHIND_STEPS = 3
+-- how long the waypoints of a fix flash in the editor (the list may still be open)
+ADRouteCheck.FIX_HIGHLIGHT_DURATION = 20000
 
 local function isAt(wp, point)
     return wp ~= nil and point ~= nil and math.abs(wp.x - point.x) < 0.01 and math.abs(wp.z - point.z) < 0.01
 end
 
-local function hasMarker(mapMarkers, wayPointId)
-    for _, marker in pairs(mapMarkers) do
-        if marker.id == wayPointId and not marker.isADDebug then
-            return true
+-- the waypoint a dead end is best continued to, and how far away: the nearest one that leads on somewhere, lies
+-- ahead and is not part of the road behind the dead end. (Taking just the nearest one connected the dead end back
+-- onto its own road: a U-turn drawn on top of the road, it looked as if nothing had happened.)
+function ADRouteCheck.findContinuation(wp, wayPoints)
+    -- connections into each waypoint, also reverse ones (only in the out list of the other waypoint)
+    local into = {}
+    for id, candidate in ipairs(wayPoints) do
+        for _, outId in ipairs(candidate.out) do
+            if into[outId] == nil then
+                into[outId] = {}
+            end
+            table.insert(into[outId], id)
         end
     end
-    return false
+    -- the direction the road arrives in
+    local headingX, headingZ = 0, 0
+    for _, fromId in ipairs(into[wp.id] or {}) do
+        local from = wayPoints[fromId]
+        local length = MathUtil.vector2Length(wp.x - from.x, wp.z - from.z)
+        if length > 0.01 then
+            headingX, headingZ = headingX + (wp.x - from.x) / length, headingZ + (wp.z - from.z) / length
+        end
+    end
+    local headingLength = MathUtil.vector2Length(headingX, headingZ)
+    if headingLength < 0.01 then
+        return nil
+    end
+    headingX, headingZ = headingX / headingLength, headingZ / headingLength
+    -- the road behind: waypoints that lead to the dead end within BEHIND_STEPS
+    local behind = {[wp.id] = true}
+    local front = {wp.id}
+    for _ = 1, ADRouteCheck.BEHIND_STEPS do
+        local nextFront = {}
+        for _, id in ipairs(front) do
+            for _, fromId in ipairs(into[id] or {}) do
+                if not behind[fromId] then
+                    behind[fromId] = true
+                    table.insert(nextFront, fromId)
+                end
+            end
+        end
+        if #nextFront == 0 then
+            break
+        end
+        front = nextFront
+    end
+    local minCos = math.cos(math.rad(ADRouteCheck.CONNECT_ANGLE))
+    local best, bestDistance = nil, ADRouteCheck.CONNECT_RANGE
+    for id, candidate in ipairs(wayPoints) do
+        if not behind[id] and #candidate.out > 0 then
+            local dx, dz = candidate.x - wp.x, candidate.z - wp.z
+            local distance = MathUtil.vector2Length(dx, dz)
+            if distance < bestDistance and (distance < ADRouteCheck.ON_TOP or (dx * headingX + dz * headingZ) / distance >= minCos) then
+                best, bestDistance = candidate, distance
+            end
+        end
+    end
+    return best, bestDistance
 end
 
 -- the fix for a problem as {type, a, b}, or nil and the text key of the reason
@@ -483,34 +497,12 @@ function ADRouteCheck.getFix(problem, wayPoints, mapMarkers)
     end
     if problem.kind == ADRouteCheck.LOOSE then
         return {type = ADRouteCheck.FIX_DELETE, a = wp.id}
-    elseif problem.kind == ADRouteCheck.DUPLICATE then
-        local other = wayPoints[problem.otherId]
-        if not isAt(other, problem.points[2]) then
-            return nil, "AD_routeCheck_fixOutdated"
-        end
-        local wpTarget, otherTarget = hasMarker(mapMarkers, wp.id), hasMarker(mapMarkers, other.id)
-        if wpTarget and otherTarget then
-            return nil, "AD_routeCheck_fixBothTargets"
-        end
-        -- the waypoint with a target stays
-        if otherTarget then
-            return {type = ADRouteCheck.FIX_MERGE, a = other.id, b = wp.id}
-        end
-        return {type = ADRouteCheck.FIX_MERGE, a = wp.id, b = other.id}
     elseif problem.kind == ADRouteCheck.DEAD_END then
-        local nearest, nearestDistance = nil, ADRouteCheck.CONNECT_RANGE
-        for id, candidate in ipairs(wayPoints) do
-            if id ~= wp.id and not table.contains(wp.incoming, id) and not table.contains(candidate.out, wp.id) then
-                local distance = MathUtil.vector2Length(candidate.x - wp.x, candidate.z - wp.z)
-                if distance < nearestDistance then
-                    nearest, nearestDistance = candidate, distance
-                end
-            end
-        end
-        if nearest == nil then
+        local continuation, distance = ADRouteCheck.findContinuation(wp, wayPoints)
+        if continuation == nil then
             return nil, "AD_routeCheck_fixNoNeighbour"
         end
-        return {type = ADRouteCheck.FIX_CONNECT, a = wp.id, b = nearest.id}
+        return {type = ADRouteCheck.FIX_CONNECT, a = wp.id, b = continuation.id, distance = distance}
     end
     return nil, "AD_routeCheck_fixNotPossible"
 end
@@ -526,49 +518,6 @@ function ADRouteCheck.applyFix(fixType, a, b)
         if from ~= nil and to ~= nil then
             gm:setConnectionBetween(from, to, 1, false)
         end
-    elseif fixType == ADRouteCheck.FIX_MERGE then
-        local keep, remove = gm:getWayPointById(a), gm:getWayPointById(b)
-        if keep == nil or remove == nil then
-            return
-        end
-        -- every waypoint linked with the removed one, also by reverse connections that are not in its incoming list
-        local neighbours = {}
-        for _, id in ipairs(remove.out) do
-            neighbours[id] = true
-        end
-        for _, id in ipairs(remove.incoming) do
-            neighbours[id] = true
-        end
-        for id, wp in ipairs(gm:getWayPoints()) do
-            if table.contains(wp.out, remove.id) then
-                neighbours[id] = true
-            end
-        end
-        local ids = {}
-        for id, _ in pairs(neighbours) do
-            if id ~= keep.id and id ~= remove.id then
-                table.insert(ids, id)
-            end
-        end
-        table.sort(ids)
-        -- the kept waypoint takes over the connections it does not have yet
-        for _, id in ipairs(ids) do
-            local neighbour = gm:getWayPointById(id)
-            if neighbour ~= nil and not (table.contains(keep.out, id) or table.contains(neighbour.out, keep.id)) then
-                local fromRemove = table.contains(remove.out, id)
-                local toRemove = table.contains(neighbour.out, remove.id)
-                if fromRemove and toRemove then
-                    gm:setConnectionBetween(keep, neighbour, 3, false)
-                elseif fromRemove then
-                    local reverse = not table.contains(neighbour.incoming, remove.id)
-                    gm:setConnectionBetween(keep, neighbour, reverse and 4 or 1, false)
-                elseif toRemove then
-                    local reverse = not table.contains(remove.incoming, id)
-                    gm:setConnectionBetween(neighbour, keep, reverse and 4 or 1, false)
-                end
-            end
-        end
-        gm:removeWayPoint(remove.id, false)
     end
 end
 
@@ -579,7 +528,22 @@ function ADRouteCheck:fix(problem)
         ADMessagesManager:addMessage(nil, ADMessagesManager.messageTypes.WARN, g_i18n:getText(reason), 5000)
         return false
     end
+    local wp = ADGraphManager:getWayPointById(fix.a)
+    local points = {{x = wp.x, y = wp.y, z = wp.z, kind = ADUndoManager.HIGHLIGHT_CHANGED}}
+    if fix.type == ADRouteCheck.FIX_DELETE then
+        points[1].kind = ADUndoManager.HIGHLIGHT_REMOVED
+        Logging.info("[AD] Route check fix: loose waypoint %d deleted", fix.a)
+    else
+        local target = ADGraphManager:getWayPointById(fix.b)
+        table.insert(points, {x = target.x, y = target.y, z = target.z, kind = ADUndoManager.HIGHLIGHT_ADDED})
+        Logging.info("[AD] Route check fix: dead end %d connected to waypoint %d, %.1f m ahead", fix.a, fix.b, fix.distance or 0)
+    end
     AutoDriveRouteFixEvent.sendEvent(fix.type, fix.a, fix.b)
+    -- show what changed: the waypoints flash in the editor
+    ADUndoManager:setHighlights(points)
+    if ADUndoManager.highlights ~= nil then
+        ADUndoManager.highlights.endTime = g_time + ADRouteCheck.FIX_HIGHLIGHT_DURATION
+    end
     ADMessagesManager:addMessage(nil, ADMessagesManager.messageTypes.INFO, string.format(g_i18n:getText("AD_routeCheck_fixed"), ADRouteCheck.getProblemText(problem)), 4000)
     return true
 end

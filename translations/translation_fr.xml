@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Corriger" />
 		<text name="AD_routeCheck_fixed"							 text="Corrigé : %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Le réseau de routes a changé, vérifiez d'abord à nouveau" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Les deux points de passage ont des destinations, ils ne peuvent pas être fusionnés" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Aucun point de passage à moins de 30 m auquel se connecter" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Ce problème ne peut pas être corrigé automatiquement, utilisez Afficher pour le trouver" />
 		<text name="button_ad_statsToday"							 text="Aujourd'hui" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Ce véhicule" />
 		<text name="gui_ad_od_noVehicle"							 text="Montez dans un véhicule pour changer ses réglages Overdrive" />
 		<text name="gui_ad_od_you"							 text="Vous (pour vous seulement)" />
+		<text name="AD_nodeSelection_count" text="points sélectionnés" />
+		<text name="AD_nodeSelection_move" text="Déplacer" />
+		<text name="AD_nodeSelection_ground" text="Poser au sol" />
+		<text name="AD_nodeSelection_delete" text="Supprimer" />
+		<text name="AD_nodeSelection_deselect" text="Désélectionner" />
+		<text name="AD_nodeSelection_place" text="Cliquez pour les poser" />
 		<text name="AD_routeCheck_loose"								 text="Point de passage isolé sans aucune connexion" />
 		<text name="AD_routeCheck_deadEnd"							 text="Impasse : aucun chemin à partir de ce point de passage" />
 		<text name="AD_routeCheck_trap"								 text="Piège à sens unique : %s points de passage où l'on peut entrer mais d'où l'on ne peut pas sortir" />
 		<text name="AD_routeCheck_unreachable"						 text="La destination &quot;%s&quot; est inaccessible" />
 		<text name="AD_routeCheck_isolated"							 text="La destination &quot;%s&quot; n'est pas reliée au réseau" />
 		<text name="AD_routeCheck_noWayBack"							 text="Aucun chemin de retour depuis la destination &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Deux points de passage superposés (à %s m l'un de l'autre)" />
 		<text name="input_ADMoveNode"								 text="AD: Maintenir + glisser avec le bouton gauche pour déplacer le point de passage" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Créer un sous-dossier dans %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Renommer le dossier %s" />

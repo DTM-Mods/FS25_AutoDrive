@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Düzelt" />
 		<text name="AD_routeCheck_fixed"							 text="Düzeltildi: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Rota ağı değişti, önce tekrar kontrol edin" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="İki ara noktanın da hedefi var, birleştirilemezler" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="30 m içinde bağlanacak ara nokta yok" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Bu sorun otomatik olarak düzeltilemez, bulmak için Göster'i kullanın" />
 		<text name="button_ad_statsToday"							 text="Bugün" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Bu araç" />
 		<text name="gui_ad_od_noVehicle"							 text="Overdrive ayarlarını değiştirmek için bir araca binin" />
 		<text name="gui_ad_od_you"							 text="Siz (yalnızca sizin için)" />
+		<text name="AD_nodeSelection_count" text="nokta seçildi" />
+		<text name="AD_nodeSelection_move" text="Taşı" />
+		<text name="AD_nodeSelection_ground" text="Yere koy" />
+		<text name="AD_nodeSelection_delete" text="Sil" />
+		<text name="AD_nodeSelection_deselect" text="Seçimi kaldır" />
+		<text name="AD_nodeSelection_place" text="Bırakmak için tıklayın" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />
 		<text name="AD_routeCheck_unreachable"						 text="&quot;%s&quot; hedefine ulaşılamıyor" />
 		<text name="AD_routeCheck_isolated"							 text="&quot;%s&quot; hedefi ağa bağlı değil" />
 		<text name="AD_routeCheck_noWayBack"							 text="&quot;%s&quot; hedefinden geri dönüş yolu yok" />
-		<text name="AD_routeCheck_duplicate"							 text="Üst üste iki ara nokta (%s m arayla)" />
 		<text name="input_ADMoveNode"								 text="AD: Ara noktayı taşımak için basılı tut + sol fare tuşuyla sürükle" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="%s içinde alt klasör oluştur" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="%s klasörünü yeniden adlandır" />

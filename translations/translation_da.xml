@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Ret" />
 		<text name="AD_routeCheck_fixed"							 text="Rettet: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="Rutenetværket er ændret, kontroller igen først" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Begge vejpunkter har mål, de kan ikke lægges sammen" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Intet vejpunkt inden for 30 m at forbinde til" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Dette problem kan ikke rettes automatisk, brug Vis for at finde det" />
 		<text name="button_ad_statsToday"							 text="I dag" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Dette køretøj" />
 		<text name="gui_ad_od_noVehicle"							 text="Sæt dig i et køretøj for at ændre dets Overdrive-indstillinger" />
 		<text name="gui_ad_od_you"							 text="Dig (kun for dig)" />
+		<text name="AD_nodeSelection_count" text="punkter valgt" />
+		<text name="AD_nodeSelection_move" text="Flyt" />
+		<text name="AD_nodeSelection_ground" text="Sæt på jorden" />
+		<text name="AD_nodeSelection_delete" text="Slet" />
+		<text name="AD_nodeSelection_deselect" text="Fravælg" />
+		<text name="AD_nodeSelection_place" text="Klik for at sætte dem" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />
 		<text name="AD_routeCheck_unreachable"						 text="Målet &quot;%s&quot; kan ikke nås" />
 		<text name="AD_routeCheck_isolated"							 text="Målet &quot;%s&quot; er ikke forbundet med netværket" />
 		<text name="AD_routeCheck_noWayBack"							 text="Ingen vej tilbage fra målet &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="To vejpunkter oven i hinanden (%s m fra hinanden)" />
 		<text name="input_ADMoveNode"								 text="AD: Hold + træk med venstre museknap for at flytte vejpunkt" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Opret undermappe i %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Omdøb mappe %s" />

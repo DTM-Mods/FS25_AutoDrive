@@ -382,6 +382,7 @@ function AutoDriveHud:drawHud(vehicle)
             end
             -- Overdrive: the selected waypoint next to the HUD
             ADWaypointPanel.safeDraw(vehicle, self)
+            ADNodeSelection.safeDraw(vehicle)
         end
 	end
 end
@@ -677,7 +678,7 @@ function AutoDriveHud:mouseEventFinishMovingNode(vehicle, isUp, button)
         then
         if vehicle.ad.nodeToMoveId ~= nil then
             -- middle or right mouse button to move points - end of move -> change waypoint coordinates now
-            ADGraphManager:changeWayPointPosition(vehicle.ad.nodeToMoveId)
+            ADNodeSelection:finishMove(vehicle.ad.nodeToMoveId)
             vehicle.ad.nodeToMoveId = nil
         end
     end
@@ -720,7 +721,7 @@ function AutoDriveHud:mouseEventFinishKeyDrag(vehicle, isUp, button)
     if button == 1 and isUp and vehicle.ad.keyDragNodeId ~= nil then
         vehicle.ad.keyDragNodeId = nil
         if vehicle.ad.nodeToMoveId ~= nil then
-            ADGraphManager:changeWayPointPosition(vehicle.ad.nodeToMoveId)
+            ADNodeSelection:finishMove(vehicle.ad.nodeToMoveId)
             vehicle.ad.nodeToMoveId = nil
             return true
         end
@@ -887,8 +888,12 @@ function AutoDriveHud:mouseEvent(vehicle, posX, posY, isDown, isUp, button)
             self:mouseEventFindHoveredNode(vehicle)
             self:mouseEventUpdateKeyDrag(vehicle)
             self:mouseEventMoveNode(vehicle)
+            -- Overdrive: selecting several waypoints (Ctrl + Shift + drag / Ctrl + click), moving them together
+            ADNodeSelection:updateGroupMove(vehicle)
 
-            if not self:mouseEventFinishKeyDrag(vehicle, isUp, button) then
+            if ADNodeSelection:mouseEvent(vehicle, posX, posY, isDown, isUp, button) then
+                -- used by the selection
+            elseif not self:mouseEventFinishKeyDrag(vehicle, isUp, button) then
                 if vehicle.ad.hoveredNodeId ~= nil then
                     -- mouse is hovering over a waypoint
                     self:mouseEventCreateSplineInterpolation(vehicle)

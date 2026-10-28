@@ -521,7 +521,6 @@
 		<text name="button_ad_fix"							 text="Corrigir" />
 		<text name="AD_routeCheck_fixed"							 text="Corrigido: %s" />
 		<text name="AD_routeCheck_fixOutdated"							 text="A rede de rotas foi alterada, verifique novamente primeiro" />
-		<text name="AD_routeCheck_fixBothTargets"							 text="Os dois waypoints têm destinos, não podem ser mesclados" />
 		<text name="AD_routeCheck_fixNoNeighbour"							 text="Nenhum waypoint a menos de 30 m para conectar" />
 		<text name="AD_routeCheck_fixNotPossible"							 text="Este problema não pode ser corrigido automaticamente, use Mostrar para encontrá-lo" />
 		<text name="button_ad_statsToday"							 text="Hoje" />
@@ -701,13 +700,18 @@
 		<text name="gui_ad_od_thisVehicle"							 text="Este veículo" />
 		<text name="gui_ad_od_noVehicle"							 text="Entre em um veículo para mudar as configurações Overdrive dele" />
 		<text name="gui_ad_od_you"							 text="Você (só para você)" />
+		<text name="AD_nodeSelection_count" text="pontos selecionados" />
+		<text name="AD_nodeSelection_move" text="Mover" />
+		<text name="AD_nodeSelection_ground" text="Colocar no chão" />
+		<text name="AD_nodeSelection_delete" text="Apagar" />
+		<text name="AD_nodeSelection_deselect" text="Desmarcar" />
+		<text name="AD_nodeSelection_place" text="Clique para soltá-los" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />
 		<text name="AD_routeCheck_unreachable"						 text="O destino &quot;%s&quot; não pode ser alcançado" />
 		<text name="AD_routeCheck_isolated"							 text="O destino &quot;%s&quot; não está conectado à rede" />
 		<text name="AD_routeCheck_noWayBack"							 text="Sem caminho de volta a partir do destino &quot;%s&quot;" />
-		<text name="AD_routeCheck_duplicate"							 text="Dois waypoints sobrepostos (a %s m de distância)" />
 		<text name="input_ADMoveNode"								 text="AD: Segurar + arrastar com o botão esquerdo para mover o waypoint" />
 		<text name="gui_ad_enterSubGroupNameTitle"					 text="Criar subpasta em %s" />
 		<text name="gui_ad_renameGroupNameTitle"						 text="Renomear pasta %s" />

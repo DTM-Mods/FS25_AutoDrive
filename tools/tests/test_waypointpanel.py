@@ -18,7 +18,7 @@ s.execute("""
     end
 """)
 for f in [("Utils", "TidyTools.lua"), ("Events", "Graph", "MoveWayPointEvent.lua"), ("Events", "Graph", "MoveWayPointsEvent.lua"),
-          ("Events", "Graph", "SetConnectionEvent.lua"), ("Events", "Graph", "RoadEvent.lua"), ("Events", "Graph", "DeleteWayPointsEvent.lua"), ("Gui", "WaypointPanel.lua")]:
+          ("Events", "Graph", "SetConnectionEvent.lua"), ("Events", "Graph", "RoadEvent.lua"), ("Events", "Graph", "DeleteWayPointsEvent.lua"), ("Gui", "WaypointPanel.lua"), ("Manager", "NodeSelection.lua")]:
     s.execute(t.read(os.path.join(t.MOD, "scripts", *f)))
 s.globals().setupNetwork(10, 2)
 s.execute("""
