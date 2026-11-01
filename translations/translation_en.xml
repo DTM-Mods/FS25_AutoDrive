@@ -112,6 +112,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Steering angle to enable turn lights automatically. (0 = turn light automatic deactivated)" />
 		<text name="gui_ad_pipe_offset"								text="Pipe Offset" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Pipe Offset Front/Back" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Moves the unloader's place beside the combine forward (+, towards the combine's front) or back (-). For filling a long trailer evenly or keeping clear of a wide header. Not used when chasing behind the combine (follow distance)" />
 		<text name="gui_ad_followDistance"								text="Distance combine" />
 		<text name="gui_ad_followDistance_tooltip"						text="Distance kept from combine when following it's rear end" />
 		<text name="gui_ad_lookahead_turning"							text="Look ahead distance (turn)" />
@@ -709,6 +711,19 @@
 		<text name="AD_nodeSelection_delete" text="Delete" />
 		<text name="AD_nodeSelection_deselect" text="Deselect" />
 		<text name="AD_nodeSelection_place" text="Click to put them down" />
+		<text name="AD_task_catch_paused" text="Waited, too many new paths in a row" />
+		<text name="AD_diag_catchPaused" text="could not get lined up with" />
+		<text name="AD_diag_newPaths" text="new paths in a row" />
+		<text name="AD_hint_catchPaused" text="it stands still for 30 seconds, then tries again. With a long truck or trailer, set these vehicle settings to No:" />
+		<text name="gui_ad_showRouteProblems" text="Route problems in the editor" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="While the editor is on, problems in the route network (dead ends, loose waypoints, traps, targets that can not be reached or left) are marked where they are with a beacon and their text, counted under the HUD and shown on the big map" />
+		<text name="AD_routeMarkers_summary" text="Route check: %s problems, the nearest %s m away" />
+		<text name="gui_ad_refuelDestination" text="Refuel at" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Where this vehicle refuels. Nearest: the closest refuel point along the routes, your own farm's if it is at most 1.5 times as far. If the chosen target can not be used, the vehicle refuels at the nearest one and the log says why" />
+		<text name="gui_ad_refuelNearest" text="Nearest" />
+		<text name="AD_diag_refuelChoiceGone" text="refuel target not found:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="no refuel point with fuel for it, or no access, at" />
+		<text name="AD_diag_refuelUsingNearest" text="refuelling at the nearest one instead" />
 		<text name="AD_routeCheck_loose"								 text="Loose waypoint without any connection" />
 		<text name="AD_routeCheck_deadEnd"							 text="Dead end: no way on from this waypoint" />
 		<text name="AD_routeCheck_trap"								 text="One-way trap: %s waypoints you can drive into but not out of" />

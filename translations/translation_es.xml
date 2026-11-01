@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Ángulo de giro para activar los intermitentes automáticamente. (0 = intermitentes desactivados)." />
 		<text name="gui_ad_pipe_offset"								text="Desplazamiento respecto al tubo de descarga" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Desplazamiento adicional aplicado a la posición detectada del tubo" />
+		<text name="gui_ad_pipeZOffset"								text="Desplazamiento del tubo delante/detrás" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Mueve el sitio del descargador junto a la cosechadora hacia delante (+, hacia el frente de la cosechadora) o hacia atrás (-). Para llenar un remolque largo de forma uniforme o apartarse de un cabezal ancho. No se usa detrás de la cosechadora (distancia de seguimiento)" />
 		<text name="gui_ad_followDistance"								text="Distancia de la cosechadora" />
 		<text name="gui_ad_followDistance_tooltip"						text="La distancia que se mantiene de la cosechadora cuando se sigue por detrás" />
 		<text name="gui_ad_lookahead_turning"							text="Distancia de detección delantera (giros)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Borrar" />
 		<text name="AD_nodeSelection_deselect" text="Deseleccionar" />
 		<text name="AD_nodeSelection_place" text="Haz clic para soltarlos" />
+		<text name="AD_task_catch_paused" text="Esperando, demasiadas rutas nuevas seguidas" />
+		<text name="AD_diag_catchPaused" text="no pudo alinearse con" />
+		<text name="AD_diag_newPaths" text="rutas nuevas seguidas" />
+		<text name="AD_hint_catchPaused" text="se detiene 30 segundos y vuelve a intentarlo. Con un camión o remolque largo, pon estos ajustes del vehículo en No:" />
+		<text name="gui_ad_showRouteProblems" text="Problemas de ruta en el editor" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Con el editor activo, los problemas de la red (callejones sin salida, puntos sueltos, trampas, destinos inalcanzables o sin salida) se marcan en su sitio con una baliza y su texto, se cuentan bajo el HUD y se muestran en el mapa grande" />
+		<text name="AD_routeMarkers_summary" text="Revisión de rutas: %s problemas, el más cercano a %s m" />
+		<text name="gui_ad_refuelDestination" text="Repostar en" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Dónde reposta este vehículo. Más cercano: el surtidor más cercano por las rutas, el de tu granja si está como mucho 1,5 veces más lejos. Si el destino elegido no se puede usar, reposta en el más cercano y el registro dice por qué" />
+		<text name="gui_ad_refuelNearest" text="Más cercano" />
+		<text name="AD_diag_refuelChoiceGone" text="destino de repostaje no encontrado:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="no hay surtidor con combustible para él, o sin acceso, en" />
+		<text name="AD_diag_refuelUsingNearest" text="repostando en el más cercano" />
 		<text name="AD_routeCheck_loose"								 text="Punto de ruta suelto sin ninguna conexión" />
 		<text name="AD_routeCheck_deadEnd"							 text="Callejón sin salida: no hay forma de seguir desde este punto de ruta" />
 		<text name="AD_routeCheck_trap"								 text="Trampa de sentido único: %s puntos de ruta en los que se puede entrar pero no salir" />

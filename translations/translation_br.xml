@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Ângulo de direção para ativar as luzes de direção automaticamente. (0 = acender luz automática desativada)" />
 		<text name="gui_ad_pipe_offset"								text="Deslocamento do tubo" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Deslocamento adicional aplicado à posição do tubo detectado" />
+		<text name="gui_ad_pipeZOffset"								text="Deslocamento do tubo frente/trás" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Move o lugar do descarregador ao lado da colheitadeira para a frente (+, para a frente da colheitadeira) ou para trás (-). Para encher uma carreta comprida por igual ou manter distância de uma plataforma larga. Não usado atrás da colheitadeira (distância de seguimento)" />
 		<text name="gui_ad_followDistance"								text="Distância colheitadeira" />
 		<text name="gui_ad_followDistance_tooltip"						text="Manter distância aoseguir a colheitadeira" />
 		<text name="gui_ad_lookahead_turning"							text="distância a frente (virar)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Apagar" />
 		<text name="AD_nodeSelection_deselect" text="Desmarcar" />
 		<text name="AD_nodeSelection_place" text="Clique para soltá-los" />
+		<text name="AD_task_catch_paused" text="Aguardando, muitos caminhos novos seguidos" />
+		<text name="AD_diag_catchPaused" text="não conseguiu se alinhar com" />
+		<text name="AD_diag_newPaths" text="caminhos novos seguidos" />
+		<text name="AD_hint_catchPaused" text="fica parado 30 segundos e tenta de novo. Com caminhão ou reboque longo, coloque estas configurações do veículo em Não:" />
+		<text name="gui_ad_showRouteProblems" text="Problemas de rota no editor" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Com o editor ligado, os problemas da rede (becos sem saída, pontos soltos, armadilhas, destinos inalcançáveis ou sem saída) são marcados no local com um farol e seu texto, contados sob o HUD e mostrados no mapa grande" />
+		<text name="AD_routeMarkers_summary" text="Verificação de rotas: %s problemas, o mais próximo a %s m" />
+		<text name="gui_ad_refuelDestination" text="Abastecer em" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Onde este veículo abastece. Mais próximo: o posto mais próximo pelas rotas, o da sua fazenda se estiver no máximo 1,5 vez mais longe. Se o destino escolhido não puder ser usado, abastece no mais próximo e o log diz por quê" />
+		<text name="gui_ad_refuelNearest" text="Mais próximo" />
+		<text name="AD_diag_refuelChoiceGone" text="destino de abastecimento não encontrado:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="sem posto com combustível para ele, ou sem acesso, em" />
+		<text name="AD_diag_refuelUsingNearest" text="abastecendo no mais próximo" />
 		<text name="AD_routeCheck_loose"								 text="Waypoint solto sem nenhuma conexão" />
 		<text name="AD_routeCheck_deadEnd"							 text="Beco sem saída: não há como seguir a partir deste waypoint" />
 		<text name="AD_routeCheck_trap"								 text="Armadilha de mão única: %s waypoints onde é possível entrar, mas não sair" />

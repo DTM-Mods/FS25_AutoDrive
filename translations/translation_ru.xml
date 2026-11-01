@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Угол поворота рулевого колеса для автовключения сигналов поворота (0 = автовключение отключено)." />
 		<text name="gui_ad_pipe_offset"								text="Смещение трубы" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Смещение трубы вперёд/назад" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Сдвигает место перегрузчика рядом с комбайном вперёд (+, к передней части комбайна) или назад (-). Чтобы равномерно заполнять длинный прицеп или держаться подальше от широкой жатки. Не используется позади комбайна (дистанция следования)" />
 		<text name="gui_ad_followDistance"								text="Расстояние до комбайна" />
 		<text name="gui_ad_followDistance_tooltip"						text="Расстояние до комбайна при следовании за ним сзади." />
 		<text name="gui_ad_lookahead_turning"							text="Просматривать при повороте на" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Удалить" />
 		<text name="AD_nodeSelection_deselect" text="Снять выбор" />
 		<text name="AD_nodeSelection_place" text="Щёлкните, чтобы поставить" />
+		<text name="AD_task_catch_paused" text="Ждёт, слишком много новых маршрутов подряд" />
+		<text name="AD_diag_catchPaused" text="не смог выровняться с" />
+		<text name="AD_diag_newPaths" text="новых маршрутов подряд" />
+		<text name="AD_hint_catchPaused" text="стоит 30 секунд, затем пробует снова. Для длинного грузовика или прицепа установите эти настройки техники в Нет:" />
+		<text name="gui_ad_showRouteProblems" text="Проблемы маршрутов в редакторе" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Когда редактор включён, проблемы сети маршрутов (тупики, одиночные точки, ловушки, недостижимые цели или цели без выезда) отмечаются на месте маяком с текстом, считаются под HUD и показываются на большой карте" />
+		<text name="AD_routeMarkers_summary" text="Проверка маршрутов: %s проблем, ближайшая в %s м" />
+		<text name="gui_ad_refuelDestination" text="Заправка в" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Где заправляется эта техника. Ближайшая: ближайшая заправка по маршрутам, своя заправка фермы, если она не дальше чем в 1,5 раза. Если выбранную цель нельзя использовать, техника заправится на ближайшей, а лог скажет почему" />
+		<text name="gui_ad_refuelNearest" text="Ближайшая" />
+		<text name="AD_diag_refuelChoiceGone" text="цель заправки не найдена:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="нет заправки с топливом для неё или нет доступа в" />
+		<text name="AD_diag_refuelUsingNearest" text="заправляется на ближайшей" />
 		<text name="AD_routeCheck_loose"								 text="Одиночная путевая точка без соединений" />
 		<text name="AD_routeCheck_deadEnd"							 text="Тупик: от этой путевой точки дальше пути нет" />
 		<text name="AD_routeCheck_trap"								 text="Односторонняя ловушка: путевых точек, куда можно въехать, но нельзя выехать: %s" />

@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Angle de braquage pour activer automatiquement les clignotants. (0 = clignotants désactivés)" />
 		<text name="gui_ad_pipe_offset"								text="Décalage de la goulotte" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Décalage goulotte avant/arrière" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Déplace la place du transbordeur à côté de la moissonneuse vers l'avant (+, vers l'avant de la machine) ou l'arrière (-). Pour remplir une longue remorque de façon régulière ou rester à l'écart d'une coupe large. Pas utilisé derrière la machine (distance de suivi)" />
 		<text name="gui_ad_followDistance"								text="Distance de moissonneuse" />
 		<text name="gui_ad_followDistance_tooltip"						text="Distance depuis l'arrière de la moissonneuse lorsqu'elle est suivie." />
 		<text name="gui_ad_lookahead_turning"							text="Distance de détection (virage)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Supprimer" />
 		<text name="AD_nodeSelection_deselect" text="Désélectionner" />
 		<text name="AD_nodeSelection_place" text="Cliquez pour les poser" />
+		<text name="AD_task_catch_paused" text="En attente, trop de nouveaux trajets d'affilée" />
+		<text name="AD_diag_catchPaused" text="n'a pas pu s'aligner sur" />
+		<text name="AD_diag_newPaths" text="nouveaux trajets d'affilée" />
+		<text name="AD_hint_catchPaused" text="il s'arrête 30 secondes puis réessaie. Avec un camion ou une remorque longue, mettez ces réglages du véhicule sur Non :" />
+		<text name="gui_ad_showRouteProblems" text="Problèmes de route dans l'éditeur" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Avec l'éditeur actif, les problèmes du réseau (impasses, points isolés, pièges, destinations inaccessibles ou sans retour) sont marqués sur place avec une balise et leur texte, comptés sous le HUD et affichés sur la grande carte" />
+		<text name="AD_routeMarkers_summary" text="Contrôle des routes : %s problèmes, le plus proche à %s m" />
+		<text name="gui_ad_refuelDestination" text="Faire le plein à" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Où ce véhicule fait le plein. Le plus proche : la station la plus proche par les routes, celle de votre ferme si elle est au plus 1,5 fois plus loin. Si la destination choisie n'est pas utilisable, le véhicule va à la plus proche et le journal dit pourquoi" />
+		<text name="gui_ad_refuelNearest" text="Le plus proche" />
+		<text name="AD_diag_refuelChoiceGone" text="destination de plein introuvable :" />
+		<text name="AD_diag_refuelChoiceUnusable" text="pas de station avec du carburant pour lui, ou pas d'accès, à" />
+		<text name="AD_diag_refuelUsingNearest" text="plein à la plus proche à la place" />
 		<text name="AD_routeCheck_loose"								 text="Point de passage isolé sans aucune connexion" />
 		<text name="AD_routeCheck_deadEnd"							 text="Impasse : aucun chemin à partir de ce point de passage" />
 		<text name="AD_routeCheck_trap"								 text="Piège à sens unique : %s points de passage où l'on peut entrer mais d'où l'on ne peut pas sortir" />

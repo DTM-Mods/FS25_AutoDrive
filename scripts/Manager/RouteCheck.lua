@@ -116,9 +116,91 @@ function ADRouteCheck.reachable(startIds, adjacency)
     return seen
 end
 
+-- a backup point: a short stub (at most BACKUP_STUB_STEPS waypoints, BACKUP_STUB_LENGTH m) off a waypoint where
+-- vehicles turn by backing up. Drivers go onto it before they back up, it is meant to end there.
+ADRouteCheck.BACKUP_STUB_STEPS = 3
+ADRouteCheck.BACKUP_STUB_LENGTH = 25
+-- a target this close to a field (checked around it) is a field entry: vehicles leave it across the field with the
+-- pathfinder, so it needs no way back on the network
+ADRouteCheck.FIELD_CHECK_DISTANCE = 10
+
+-- a reverse connection: a lists b as out, b does not list a as incoming (as the driving code sees it)
+local function isReverse(wayPoints, a, b)
+    local wpA, wpB = wayPoints[a], wayPoints[b]
+    if wpA == nil or wpB == nil or wpB.incoming == nil then
+        return false
+    end
+    return table.contains(wpA.out, b) and not table.contains(wpB.incoming, a)
+end
+
+-- is the waypoint the start or the end of a reverse connection?
+local function touchesReverse(wayPoints, incoming, id)
+    for _, outId in ipairs(wayPoints[id].out) do
+        if isReverse(wayPoints, id, outId) then
+            return true
+        end
+    end
+    for _, fromId in ipairs(incoming[id] or {}) do
+        if isReverse(wayPoints, fromId, id) then
+            return true
+        end
+    end
+    return false
+end
+
+function ADRouteCheck.isBackupStub(id, wayPoints, incoming)
+    local current, length = id, 0
+    for _ = 1, ADRouteCheck.BACKUP_STUB_STEPS do
+        local from = incoming[current]
+        if from == nil or #from ~= 1 then
+            return false
+        end
+        local previous = from[1]
+        length = length + MathUtil.vector2Length(wayPoints[previous].x - wayPoints[current].x, wayPoints[previous].z - wayPoints[current].z)
+        if length > ADRouteCheck.BACKUP_STUB_LENGTH then
+            return false
+        end
+        current = previous
+        if touchesReverse(wayPoints, incoming, current) then
+            return true
+        end
+        if #wayPoints[current].out > 1 then
+            -- the junction the stub starts at: backing up there, or right next to it?
+            for _, neighbour in ipairs(wayPoints[current].out) do
+                if neighbour ~= id and wayPoints[neighbour] ~= nil and touchesReverse(wayPoints, incoming, neighbour) then
+                    return true
+                end
+            end
+            for _, neighbour in ipairs(incoming[current] or {}) do
+                if touchesReverse(wayPoints, incoming, neighbour) then
+                    return true
+                end
+            end
+            return false
+        end
+    end
+    return false
+end
+
+-- on a field, or a field within FIELD_CHECK_DISTANCE (field entries are usually at its edge)
+function ADRouteCheck.isNearField(x, y, z)
+    if AutoDrive == nil or AutoDrive.checkIsOnField == nil then
+        return false
+    end
+    local d = ADRouteCheck.FIELD_CHECK_DISTANCE
+    for _, offset in ipairs({{0, 0}, {d, 0}, {-d, 0}, {0, d}, {0, -d}}) do
+        local ok, onField = pcall(AutoDrive.checkIsOnField, x + offset[1], y, z + offset[2])
+        if ok and onField then
+            return true
+        end
+    end
+    return false
+end
+
 -- runs all checks, returns the list of problems:
 -- {kind, wayPointId, x, y, z, count, name, distance, points = {{x, y, z}, ...}}
-function ADRouteCheck.analyse(wayPoints, mapMarkers)
+-- isNearField(x, y, z): optional, targets near a field need no way back (field entries)
+function ADRouteCheck.analyse(wayPoints, mapMarkers, isNearField)
     local problems = {}
     local function point(id)
         local wp = wayPoints[id]
@@ -171,7 +253,7 @@ function ADRouteCheck.analyse(wayPoints, mapMarkers)
         if not hasOut then
             if incoming[id] == nil then
                 addProblem(ADRouteCheck.LOOSE, id)
-            elseif markersOnWayPoint[id] == nil then
+            elseif markersOnWayPoint[id] == nil and not ADRouteCheck.isBackupStub(id, wayPoints, incoming) then
                 addProblem(ADRouteCheck.DEAD_END, id)
             end
         end
@@ -209,12 +291,23 @@ function ADRouteCheck.analyse(wayPoints, mapMarkers)
         local fromMain = ADRouteCheck.reachable(mainIds, out)
         local toMain = ADRouteCheck.reachable(mainIds, incoming)
 
+        -- field entries: targets near a field, left across the field
+        local fieldTarget = {}
+        if isNearField ~= nil then
+            for id, _ in pairs(markersOnWayPoint) do
+                if component[id] ~= main and fromMain[id] and not toMain[id] then
+                    local wp = wayPoints[id]
+                    fieldTarget[id] = isNearField(wp.x, wp.y, wp.z) == true
+                end
+            end
+        end
+
         for id, markers in pairs(markersOnWayPoint) do
             if component[id] ~= main then
                 for _, marker in ipairs(markers) do
                     if not fromMain[id] then
                         addProblem(ADRouteCheck.UNREACHABLE, id, {name = marker.name, noWayBack = not toMain[id]})
-                    elseif not toMain[id] then
+                    elseif not toMain[id] and not fieldTarget[id] then
                         addProblem(ADRouteCheck.NO_WAY_BACK, id, {name = marker.name})
                     end
                 end
@@ -243,6 +336,12 @@ function ADRouteCheck.analyse(wayPoints, mapMarkers)
                     members[c] = {}
                 end
                 table.insert(members[c], id)
+            end
+        end
+        -- a dead-end part that leads to a field entry is the way onto the field
+        for id, isField in pairs(fieldTarget) do
+            if isField then
+                members[component[id]] = nil
             end
         end
         for c, ids in pairs(members) do
@@ -326,7 +425,7 @@ end
 
 function ADRouteCheck:run(vehicle)
     local x, _, z = ADRouteCheck.getVehiclePosition(vehicle)
-    local problems = ADRouteCheck.analyse(ADGraphManager:getWayPoints(), ADGraphManager:getMapMarkers())
+    local problems = ADRouteCheck.analyse(ADGraphManager:getWayPoints(), ADGraphManager:getMapMarkers(), ADRouteCheck.isNearField)
     self.counts = ADRouteCheck.countKinds(problems)
     self.total = #problems
     self.problems = ADRouteCheck.sortByDistance(problems, x or 0, z or 0)

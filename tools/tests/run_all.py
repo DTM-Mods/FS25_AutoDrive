@@ -62,6 +62,9 @@ def main():
         run("test_strapped_load.py"),
         run("test_pallet_areas.py"),
         run("test_node_selection.py"),
+        run("test_route_markers.py"),
+        run("test_pipe_z_offset.py"),
+        run("test_refuel_choice.py"),
     ]
     if not all(results):
         sys.exit(1)

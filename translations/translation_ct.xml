@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="自動啟用轉向燈的轉向角度。 (0 = 轉向燈自動停用)" />
 		<text name="gui_ad_pipe_offset"								text="伸出螺旋鉆" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="卸料管前後偏移" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="將卸糧車在收割機旁的位置向前（+，朝收割機前方）或向後（-）移動。用於均勻裝滿長拖車，或避開寬割台。在收割機後方跟隨時不使用（跟隨距離）" />
 		<text name="gui_ad_followDistance"								text="收割機距離" />
 		<text name="gui_ad_followDistance_tooltip"						text="跟隨收割機後端時保持距離" />
 		<text name="gui_ad_lookahead_turning"							text="前視距離（轉彎）" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="刪除" />
 		<text name="AD_nodeSelection_deselect" text="取消選取" />
 		<text name="AD_nodeSelection_place" text="點擊放下" />
+		<text name="AD_task_catch_paused" text="等待中，連續重新規劃路徑過多" />
+		<text name="AD_diag_catchPaused" text="無法對準" />
+		<text name="AD_diag_newPaths" text="次連續新路徑" />
+		<text name="AD_hint_catchPaused" text="會停止 30 秒後再試。較長的卡車或拖車，請將以下車輛設定設為否：" />
+		<text name="gui_ad_showRouteProblems" text="編輯器中的路線問題" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="編輯器開啟時，路線網路中的問題（死路、孤立路點、陷阱、無法到達或無法離開的目標）會在原地用光柱和文字標出，在 HUD 下方計數，並顯示在大地圖上" />
+		<text name="AD_routeMarkers_summary" text="路線檢查：%s 個問題，最近的在 %s 公尺外" />
+		<text name="gui_ad_refuelDestination" text="加油地點" />
+		<text name="gui_ad_refuelDestination_tooltip" text="此車輛加油的地點。最近：沿路線最近的加油點；如果自己農場的加油點距離不超過 1.5 倍則優先使用。所選目標無法使用時，車輛去最近的加油點並在日誌中說明原因" />
+		<text name="gui_ad_refuelNearest" text="最近" />
+		<text name="AD_diag_refuelChoiceGone" text="找不到加油目標：" />
+		<text name="AD_diag_refuelChoiceUnusable" text="沒有適合它的有油加油點，或無權使用：" />
+		<text name="AD_diag_refuelUsingNearest" text="改為在最近的加油點加油" />
 		<text name="AD_routeCheck_loose"								 text="沒有任何連接的孤立航點" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：從此航點無法繼續前進" />
 		<text name="AD_routeCheck_trap"								 text="單向陷阱：%s 個航點只能駛入無法駛出" />

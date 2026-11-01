@@ -33,6 +33,8 @@ s.execute("""
         {id = 1, name = "Farm"}, {id = 3, name = "Silo"}, {id = 12, name = "Shed"}, {id = 13, name = "Island"},
         {id = 6, name = "debug", isADDebug = true},
     }
+    -- forward connections, as in a real network: every waypoint lists where it is reached from
+    for id, w in ipairs(W) do for _, o in ipairs(w.out) do table.insert(W[o].incoming, id) end end
 """)
 problems = s.eval("ADRouteCheck.analyse(W, M)")
 got = s.globals().kinds(problems)
@@ -44,6 +46,43 @@ by_kind = {p.kind: p for p in problems.values()}
 assert by_kind[3].count == 2, by_kind[3].count
 assert by_kind[4].name == "Island" and by_kind[4].noWayBack
 assert by_kind[5].name == "Shed"
+
+# backup points: a short stub off a waypoint where vehicles back up is no dead end; the end of a reverse leg neither;
+# a long dead-end road still is
+s.execute("""
+    function road(id, x, z, out, incoming) return {id = id, x = x, y = 0, z = z, out = out, incoming = incoming, flags = 0} end
+    B = {
+        [1] = road(1, 0, 0, {2}, {2}), [2] = road(2, 10, 0, {1, 3}, {1}),   -- 1 = 2 two-way, 2 -> 3
+        [3] = road(3, 20, 0, {4, 6}, {2}),                                -- junction: on to 4 (stub), and 6
+        [4] = road(4, 21, 0, {}, {3}),                                    -- 1 m stub: the backup point
+        [5] = road(5, 0, 50, {}, {}),                                     -- loose
+        [6] = road(6, 20, 8, {7}, {3}),
+        [7] = road(7, 20, 16, {2}, {6}),                                  -- 6 -> 7 forward, 7 -> 2 reversing (2 does not list 7)
+        [8] = road(8, 30, 0, {}, {}),                                     -- reached by reversing from 2 ...
+    }
+    table.insert(B[2].out, 8)                                        -- ... 2 -> 8 reverse
+    for id = 9, 15 do B[id] = road(id, 100 + id * 10, 0, id < 15 and {id + 1} or {}, {id - 1}) end
+    table.insert(B[1].out, 9); B[9].incoming = {1}                   -- 1 -> 9 ... 15: a 70 m road that just ends
+    BM = {{id = 1, name = "Farm"}}
+""")
+got = s.globals().kinds(s.eval("ADRouteCheck.analyse(B, BM)"))
+assert "2@4" not in got and "2@8" not in got, got
+assert "2@15" in got and "1@5" in got, got
+
+# field entries: a target at the end of a one-way spur has no way back; near a field that is how it is meant to be
+s.execute("""
+    F = {
+        road(1, 0, 0, {2}, {2}), road(2, 10, 0, {1, 3}, {1}),
+        road(3, 20, 0, {4}, {2, 4}), road(4, 30, 0, {3}, {3}),      -- 2 -> 3 <-> 4, target on 4
+    }
+    FM = {{id = 1, name = "Farm"}, {id = 2, name = "Shop"}, {id = 4, name = "Field 7"}}
+""")
+assert s.globals().kinds(s.eval("ADRouteCheck.analyse(F, FM)")) == "3@3 5@4"
+assert s.globals().kinds(s.eval("ADRouteCheck.analyse(F, FM, function() return false end)")) == "3@3 5@4"
+assert s.globals().kinds(s.eval("ADRouteCheck.analyse(F, FM, function(x, y, z) return x == 30 end)")) == ""
+# one that can not be reached at all is still reported, also near a field
+s.execute("F[2].out = {1}; F[3].incoming = {4}")
+assert "4@4" in s.globals().kinds(s.eval("ADRouteCheck.analyse(F, FM, function() return true end)"))
 
 # texts
 s.globals().P = problems
@@ -90,4 +129,4 @@ s.execute("""
 elapsed = time.time() - start
 assert s.eval("#BIG") == 0 and s.eval("#BIG2") == 0
 assert elapsed < 10, elapsed
-print("OK: route check finds all 5 kinds of problems, waypoints on top of each other are fine, clean networks pass, 2x40000 waypoints in %.1fs" % elapsed)
+print("OK: route check finds all 5 kinds of problems, waypoints on top of each other, backup points and field entries are fine, clean networks pass, 2x40000 waypoints in %.1fs" % elapsed)

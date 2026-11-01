@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Úhel řízení pro automatické zapnutí blinkrů. (0 = automatická deaktivace směrových světel)" />
 		<text name="gui_ad_pipe_offset"								text="Odstup od kombajnu" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Dodatečný posun aplikovaný na zjištěnou polohu roury" />
+		<text name="gui_ad_pipeZOffset"								text="Posun roury vpřed/vzad" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Posune místo překládacího vozu vedle kombajnu dopředu (+, k přední části kombajnu) nebo dozadu (-). Pro rovnoměrné plnění dlouhého přívěsu nebo odstup od širokého žacího ústrojí. Nepoužívá se za kombajnem (vzdálenost sledování)" />
 		<text name="gui_ad_followDistance"								text="Vzdálenost kombajnu" />
 		<text name="gui_ad_followDistance_tooltip"						text="Udržujte vzdálenost od konce kombajnu" />
 		<text name="gui_ad_lookahead_turning"							text="Kontola vpřed" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Smazat" />
 		<text name="AD_nodeSelection_deselect" text="Zrušit výběr" />
 		<text name="AD_nodeSelection_place" text="Klikněte pro položení" />
+		<text name="AD_task_catch_paused" text="Čeká, příliš mnoho nových cest za sebou" />
+		<text name="AD_diag_catchPaused" text="se nemohl srovnat s" />
+		<text name="AD_diag_newPaths" text="nových cest za sebou" />
+		<text name="AD_hint_catchPaused" text="30 sekund stojí, pak to zkusí znovu. U dlouhého nákladního auta nebo přívěsu nastavte tato nastavení vozidla na Ne:" />
+		<text name="gui_ad_showRouteProblems" text="Problémy tras v editoru" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Když je editor zapnutý, problémy v síti tras (slepé konce, volné body, pasti, nedosažitelné cíle nebo cíle bez cesty zpět) jsou označeny na místě majákem s textem, sečteny pod HUD a zobrazeny na velké mapě" />
+		<text name="AD_routeMarkers_summary" text="Kontrola tras: %s problémů, nejbližší %s m daleko" />
+		<text name="gui_ad_refuelDestination" text="Tankovat u" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Kde toto vozidlo tankuje. Nejbližší: nejbližší čerpací místo podle tras, vlastní farmy, pokud je nejvýše 1,5krát dál. Pokud zvolený cíl nelze použít, vozidlo natankuje u nejbližšího a log řekne proč" />
+		<text name="gui_ad_refuelNearest" text="Nejbližší" />
+		<text name="AD_diag_refuelChoiceGone" text="cíl tankování nenalezen:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="žádné čerpací místo s palivem pro něj nebo bez přístupu u" />
+		<text name="AD_diag_refuelUsingNearest" text="tankuje místo toho u nejbližšího" />
 		<text name="AD_routeCheck_loose"								 text="Osamocený bod trasy bez jakéhokoli spojení" />
 		<text name="AD_routeCheck_deadEnd"							 text="Slepá ulice: z tohoto bodu trasy nevede žádná cesta dál" />
 		<text name="AD_routeCheck_trap"								 text="Jednosměrná past: počet bodů trasy, do kterých lze vjet, ale ne vyjet: %s" />

@@ -31,12 +31,15 @@ if up.returncode == 0:
 for page in glob.glob(os.path.join(MOD, "gui", "*SettingsPage.xml")):
     if not page.endswith("overdriveSettingsPage.xml"):
         others = set(settings_of(os.path.basename(page)))
+        # pipeZOffset is also next to Pipe Offset on the vehicle tab
+        if page.endswith("vehicleSettingsPage.xml"):
+            others.discard("pipeZOffset")
         assert not (others & set(overdrive_tab)), (page, others & set(overdrive_tab))
 blocks = dict(re.findall(r"AutoDrive\.settings\.(\w+) = \{(.*?)\n\}", cur, re.S))
 vehicle_rows = [n for n in overdrive_tab if "isVehicleSpecific = true" in blocks[n]]
 user_rows = [n for n in overdrive_tab if "isUserSpecific = true" in blocks[n]]
 assert vehicle_rows + user_rows == overdrive_tab                     # vehicle section first, then "you"
-assert len(vehicle_rows) == 6 and len(user_rows) == 3
+assert len(vehicle_rows) == 7 and len(user_rows) == 4
 
 # --- wiring
 gui = read("scripts", "Gui.lua")
@@ -137,7 +140,7 @@ colors = s.eval("""(function()
     end
     return table.concat(out, ",")
 end)()""")
-assert colors == "|,|,0,1,0,1,0,|,0,1,0", colors                   # 5 vehicle rows shown (drive-through hidden), 3 user rows
+assert colors == "|,|,0,1,0,1,0,1,|,0,1,0,1", colors               # 6 vehicle rows shown (drive-through hidden), 4 user rows
 assert s.eval("PAGE.boxLayout.invalidated") == 3
 
 print("OK: Overdrive tab (all %d Overdrive settings, none left on other tabs, vehicle section only in a vehicle with "

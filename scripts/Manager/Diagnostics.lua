@@ -96,6 +96,14 @@ function ADDiag.pathFailed(vehicle, destinationId)
     end
 end
 
+-- catching up with the combine: new paths again and again without getting lined up (e.g. a long rig circling
+-- near the combine); it pauses, the message says why and which settings to check
+function ADDiag.catchPaused(vehicle, combine, lastReason, tries, seconds)
+    ADDiag.send(vehicle, ADMessagesManager.messageTypes.WARN,
+        "$l10n_AD_Driver_of; %s $l10n_AD_diag_catchPaused; %s (%s $l10n_AD_diag_newPaths;, $l10n_" .. lastReason .. ";): $l10n_AD_hint_catchPaused; '$l10n_gui_ad_restrictToField;', '$l10n_gui_ad_followOnlyOnField;'",
+        ADDiag.name(vehicle), ADDiag.name(combine), tostring(tries))
+end
+
 -- on the network, but no route from where it stands to the target
 function ADDiag.cannotReach(vehicle, wayPointId)
     ADDiag.send(vehicle, ADMessagesManager.messageTypes.ERROR,
@@ -174,6 +182,13 @@ function ADDiag.noRefuelStation(vehicle, ignoreFillLevel)
     ADDiag.send(vehicle, ADMessagesManager.messageTypes.ERROR,
         "$l10n_AD_Driver_of; %s $l10n_AD_No_Refuel_Station; (%s, %s $l10n_AD_diag_stations;): $l10n_AD_hint_refuel;",
         ADDiag.name(vehicle), fuels, tostring(stations))
+end
+
+-- the chosen refuel target can not be used: gone, or no refuel point with fuel for the vehicle / no access there
+function ADDiag.refuelChoiceUnusable(vehicle, name, gone)
+    local reason = gone and "$l10n_AD_diag_refuelChoiceGone;" or "$l10n_AD_diag_refuelChoiceUnusable;"
+    ADDiag.send(vehicle, ADMessagesManager.messageTypes.WARN, "$l10n_AD_Driver_of; %s: " .. reason .. " '%s' (%s) - $l10n_AD_diag_refuelUsingNearest;",
+        ADDiag.name(vehicle), tostring(name), (ADDiag.fuelText(vehicle, true)))
 end
 
 -- "Tatra 72 %, ASW 271 65 %": the damaged units

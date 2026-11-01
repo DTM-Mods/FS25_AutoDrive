@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Automatische knipperlicht bij stuurhoek. (0 = Automatische knipperlicht uitgeschakeld)" />
 		<text name="gui_ad_pipe_offset"								text="Afstand pijp" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Pijpafstand voor/achter" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Verplaatst de plek van de overlader naast de combine naar voren (+, richting de voorkant van de combine) of naar achteren (-). Om een lange aanhanger gelijkmatig te vullen of vrij te blijven van een breed maaibord. Niet gebruikt achter de combine (volgafstand)" />
 		<text name="gui_ad_followDistance"								text="Afstand oogstmachine" />
 		<text name="gui_ad_followDistance_tooltip"						text="Afstand tot de oogstmachine wanneer deze van achter gevold wordt" />
 		<text name="gui_ad_lookahead_turning"							text="Vooruitkijk afstand (Sturen)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Verwijderen" />
 		<text name="AD_nodeSelection_deselect" text="Deselecteren" />
 		<text name="AD_nodeSelection_place" text="Klik om ze neer te zetten" />
+		<text name="AD_task_catch_paused" text="Wacht, te veel nieuwe routes achter elkaar" />
+		<text name="AD_diag_catchPaused" text="kon zich niet uitlijnen met" />
+		<text name="AD_diag_newPaths" text="nieuwe routes achter elkaar" />
+		<text name="AD_hint_catchPaused" text="hij staat 30 seconden stil en probeert het dan opnieuw. Met een lange vrachtwagen of aanhanger deze voertuiginstellingen op Nee zetten:" />
+		<text name="gui_ad_showRouteProblems" text="Routeproblemen in de editor" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Met de editor aan worden problemen in het routenetwerk (doodlopende punten, losse punten, vallen, onbereikbare of onverlaatbare doelen) ter plekke gemarkeerd met een baken en hun tekst, onder de HUD geteld en op de grote kaart getoond" />
+		<text name="AD_routeMarkers_summary" text="Routecontrole: %s problemen, de dichtstbijzijnde op %s m" />
+		<text name="gui_ad_refuelDestination" text="Tanken bij" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Waar dit voertuig tankt. Dichtstbijzijnde: het dichtstbijzijnde tankpunt via de routes, dat van je eigen boerderij als het hooguit 1,5 keer zo ver is. Is het gekozen doel niet bruikbaar, dan tankt het voertuig bij het dichtstbijzijnde en zegt het log waarom" />
+		<text name="gui_ad_refuelNearest" text="Dichtstbijzijnde" />
+		<text name="AD_diag_refuelChoiceGone" text="tankdoel niet gevonden:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="geen tankpunt met brandstof ervoor, of geen toegang, bij" />
+		<text name="AD_diag_refuelUsingNearest" text="tankt in plaats daarvan bij het dichtstbijzijnde" />
 		<text name="AD_routeCheck_loose"								 text="Los routepunt zonder enige verbinding" />
 		<text name="AD_routeCheck_deadEnd"							 text="Doodlopend: vanaf dit routepunt kun je nergens verder" />
 		<text name="AD_routeCheck_trap"								 text="Eenrichtingsval: %s routepunten waar je in kunt rijden maar niet meer uit" />

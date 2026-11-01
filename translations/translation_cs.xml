@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="自动启用转向灯的转向角度。 (0 = 转向灯自动停用)" />
 		<text name="gui_ad_pipe_offset"								text="伸出螺旋钻" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="调整检测到的卸料管位置的额外偏移值" />
+		<text name="gui_ad_pipeZOffset"								text="卸料管前后偏移" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="将卸粮车在收割机旁的位置向前（+，朝收割机前方）或向后（-）移动。用于均匀装满长拖车，或避开宽割台。在收割机后方跟随时不使用（跟随距离）" />
 		<text name="gui_ad_followDistance"								text="收割机距离" />
 		<text name="gui_ad_followDistance_tooltip"						text="跟随收割机后端时保持距离" />
 		<text name="gui_ad_lookahead_turning"							text="前视距离（转弯）" />
@@ -700,12 +702,25 @@
 		<text name="gui_ad_od_thisVehicle"							 text="此车辆" />
 		<text name="gui_ad_od_noVehicle"							 text="进入车辆以更改其 Overdrive 设置" />
 		<text name="gui_ad_od_you"							 text="你（仅对你）" />
-		<text name="AD_nodeSelection_count" text="bodů vybráno" />
-		<text name="AD_nodeSelection_move" text="Přesunout" />
-		<text name="AD_nodeSelection_ground" text="Položit na zem" />
-		<text name="AD_nodeSelection_delete" text="Smazat" />
-		<text name="AD_nodeSelection_deselect" text="Zrušit výběr" />
-		<text name="AD_nodeSelection_place" text="Klikněte pro položení" />
+		<text name="AD_nodeSelection_count" text="个路点已选取" />
+		<text name="AD_nodeSelection_move" text="移动" />
+		<text name="AD_nodeSelection_ground" text="放到地面" />
+		<text name="AD_nodeSelection_delete" text="删除" />
+		<text name="AD_nodeSelection_deselect" text="取消选取" />
+		<text name="AD_nodeSelection_place" text="点击放下" />
+		<text name="AD_task_catch_paused" text="等待中，连续重新规划路径过多" />
+		<text name="AD_diag_catchPaused" text="无法对准" />
+		<text name="AD_diag_newPaths" text="次连续新路径" />
+		<text name="AD_hint_catchPaused" text="将停止 30 秒后重试。对于较长的卡车或拖车，请将以下车辆设置设为否：" />
+		<text name="gui_ad_showRouteProblems" text="编辑器中的路线问题" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="编辑器开启时，路线网络中的问题（死路、孤立航点、陷阱、无法到达或无法离开的目标）会在原地用光柱和文字标出，在 HUD 下方计数，并显示在大地图上" />
+		<text name="AD_routeMarkers_summary" text="路线检查：%s 个问题，最近的在 %s 米外" />
+		<text name="gui_ad_refuelDestination" text="加油地点" />
+		<text name="gui_ad_refuelDestination_tooltip" text="此车辆加油的地点。最近：沿路线最近的加油点；如果自己农场的加油点距离不超过 1.5 倍则优先使用。所选目标无法使用时，车辆去最近的加油点并在日志中说明原因" />
+		<text name="gui_ad_refuelNearest" text="最近" />
+		<text name="AD_diag_refuelChoiceGone" text="未找到加油目标：" />
+		<text name="AD_diag_refuelChoiceUnusable" text="没有适合它的有油加油点，或无权使用：" />
+		<text name="AD_diag_refuelUsingNearest" text="改为在最近的加油点加油" />
 		<text name="AD_routeCheck_loose"								 text="没有任何连接的孤立航点" />
 		<text name="AD_routeCheck_deadEnd"							 text="死路：从此航点无法继续前进" />
 		<text name="AD_routeCheck_trap"								 text="单向陷阱：%s 个航点只能驶入无法驶出" />

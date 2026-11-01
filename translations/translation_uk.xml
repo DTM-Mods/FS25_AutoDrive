@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Кут повороту керма для вмикання сигналу повороту (0 = автоматичне увімкнення вимкнено)." />
 		<text name="gui_ad_pipe_offset"								text="Зміщення труби" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Зміщення труби вперед/назад" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Зсуває місце перевантажувача поруч із комбайном вперед (+, до передньої частини комбайна) або назад (-). Щоб рівномірно заповнювати довгий причіп або триматися подалі від широкої жатки. Не використовується позаду комбайна (дистанція слідування)" />
 		<text name="gui_ad_followDistance"								text="Відстань до комбайну" />
 		<text name="gui_ad_followDistance_tooltip"						text="Відстань до комбайну під час руху за ним позаду." />
 		<text name="gui_ad_lookahead_turning"							text="Дивитися під час повороту на" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Видалити" />
 		<text name="AD_nodeSelection_deselect" text="Зняти вибір" />
 		<text name="AD_nodeSelection_place" text="Клацніть, щоб поставити" />
+		<text name="AD_task_catch_paused" text="Чекає, забагато нових маршрутів поспіль" />
+		<text name="AD_diag_catchPaused" text="не зміг вирівнятися з" />
+		<text name="AD_diag_newPaths" text="нових маршрутів поспіль" />
+		<text name="AD_hint_catchPaused" text="стоїть 30 секунд, потім пробує знову. Для довгої вантажівки чи причепа встановіть ці налаштування техніки в Ні:" />
+		<text name="gui_ad_showRouteProblems" text="Проблеми маршрутів у редакторі" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Коли редактор увімкнено, проблеми мережі маршрутів (тупики, поодинокі точки, пастки, недосяжні цілі або цілі без виїзду) позначаються на місці маяком з текстом, рахуються під HUD і показуються на великій карті" />
+		<text name="AD_routeMarkers_summary" text="Перевірка маршрутів: %s проблем, найближча за %s м" />
+		<text name="gui_ad_refuelDestination" text="Заправка в" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Де заправляється ця техніка. Найближча: найближча заправка за маршрутами, власна заправка ферми, якщо вона не далі ніж у 1,5 раза. Якщо вибрану ціль не можна використати, техніка заправиться на найближчій, а лог скаже чому" />
+		<text name="gui_ad_refuelNearest" text="Найближча" />
+		<text name="AD_diag_refuelChoiceGone" text="ціль заправки не знайдено:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="немає заправки з пальним для неї або немає доступу в" />
+		<text name="AD_diag_refuelUsingNearest" text="заправляється на найближчій" />
 		<text name="AD_routeCheck_loose"								 text="Окрема точка шляху без з'єднань" />
 		<text name="AD_routeCheck_deadEnd"							 text="Глухий кут: від цієї точки шляху далі немає шляху" />
 		<text name="AD_routeCheck_trap"								 text="Одностороння пастка: точок шляху, куди можна заїхати, але не можна виїхати: %s" />

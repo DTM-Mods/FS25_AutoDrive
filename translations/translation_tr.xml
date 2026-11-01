@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Sinyalleri otomatik olarak etkinleştirmek için direksiyon açısı. (0 = dönüş ışığı otomatik devre dışı bırakılır)" />
 		<text name="gui_ad_pipe_offset"								text="Boru Ofseti" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Boru ileri/geri kaydırma" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Biçerdöverin yanındaki aktarma aracının yerini ileri (+, biçerdöverin önüne doğru) veya geri (-) kaydırır. Uzun bir römorku eşit doldurmak veya geniş bir tablaya uzak durmak için. Biçerdöverin arkasında kullanılmaz (takip mesafesi)" />
 		<text name="gui_ad_followDistance"								text="Biçerdöver mesafesi" />
 		<text name="gui_ad_followDistance_tooltip"						text="Biçerdöverin arkasını takip ederken uzak durulan mesafe" />
 		<text name="gui_ad_lookahead_turning"							text="İleriye bakma mesafesi (dönüş)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Sil" />
 		<text name="AD_nodeSelection_deselect" text="Seçimi kaldır" />
 		<text name="AD_nodeSelection_place" text="Bırakmak için tıklayın" />
+		<text name="AD_task_catch_paused" text="Bekliyor, art arda çok fazla yeni yol" />
+		<text name="AD_diag_catchPaused" text="şununla hizalanamadı:" />
+		<text name="AD_diag_newPaths" text="art arda yeni yol" />
+		<text name="AD_hint_catchPaused" text="30 saniye bekler, sonra tekrar dener. Uzun kamyon veya römorkta bu araç ayarlarını Hayır yapın:" />
+		<text name="gui_ad_showRouteProblems" text="Editörde rota sorunları" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Editör açıkken rota ağındaki sorunlar (çıkmazlar, bağlantısız noktalar, tuzaklar, ulaşılamayan veya çıkılamayan hedefler) yerinde bir işaret ve metniyle gösterilir, HUD altında sayılır ve büyük haritada gösterilir" />
+		<text name="AD_routeMarkers_summary" text="Rota kontrolü: %s sorun, en yakını %s m uzakta" />
+		<text name="gui_ad_refuelDestination" text="Yakıt alma yeri" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Bu aracın yakıt aldığı yer. En yakın: rotalar boyunca en yakın yakıt noktası, en fazla 1,5 kat uzaksa kendi çiftliğinizinki. Seçilen hedef kullanılamazsa araç en yakında yakıt alır ve günlük nedenini söyler" />
+		<text name="gui_ad_refuelNearest" text="En yakın" />
+		<text name="AD_diag_refuelChoiceGone" text="yakıt hedefi bulunamadı:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="uygun yakıtlı yakıt noktası yok veya erişim yok:" />
+		<text name="AD_diag_refuelUsingNearest" text="bunun yerine en yakında yakıt alıyor" />
 		<text name="AD_routeCheck_loose"								 text="Hiçbir bağlantısı olmayan serbest ara nokta" />
 		<text name="AD_routeCheck_deadEnd"							 text="Çıkmaz: bu ara noktadan devam yolu yok" />
 		<text name="AD_routeCheck_trap"								 text="Tek yön tuzağı: girilebilen ama çıkılamayan %s ara nokta" />

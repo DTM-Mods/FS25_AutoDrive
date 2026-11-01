@@ -636,7 +636,7 @@ function CombineUnloaderMode:getDynamicSideChaseOffsetZ_fromDischargeNode(planni
     if planningPhase then
         offset = offset + (self.vehicle.size.length/2)
     end
-    return offset
+    return offset + self:getPipeZOffset()
 end
 
 function CombineUnloaderMode:getDynamicSideChaseOffsetZ_FS19()
@@ -677,10 +677,20 @@ end
 
 function CombineUnloaderMode:getSideChaseOffsetZ(dynamic)
     if dynamic then
-        return self:getDynamicSideChaseOffsetZ()
+        return self:getDynamicSideChaseOffsetZ() + self:getPipeZOffset()
     else
-        return (self.combine.size.length - self.vehicle.size.length + AutoDrive.getFrontToolLength(self.combine)) / 2
+        return (self.combine.size.length - self.vehicle.size.length + AutoDrive.getFrontToolLength(self.combine)) / 2 + self:getPipeZOffset()
     end
+end
+
+-- Overdrive: setting pipeZOffset, the unloader's place at the side moved forward (+) or back (-) along the combine.
+-- Not for auto-aiming choppers (their spout follows the trailer) or sugarcane harvesters (own Z logic).
+function CombineUnloaderMode:getPipeZOffset()
+    local combineAd = self.combine ~= nil and self.combine.ad or nil
+    if combineAd == nil or combineAd.isSugarcaneHarvester or combineAd.isAutoAimingChopper then
+        return 0
+    end
+    return AutoDrive.getSetting("pipeZOffset", self.vehicle) or 0
 end
 
 function CombineUnloaderMode:getRearChaseOffsetX(leftBlocked, rightBlocked)

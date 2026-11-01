@@ -15,6 +15,11 @@ CatchCombinePipeTask.MIN_COMBINE_DISTANCE = 25
 CatchCombinePipeTask.MAX_REVERSE_TIME = 5000
 CatchCombinePipeTask.MAX_STUCK_TIME = 60000
 CatchCombinePipeTask.MAX_COUNT_NEW_PATHFINDING = 20
+-- Overdrive: new paths in a row without getting lined up with the combine. The count above starts again with every
+-- path found, so on its own it never stops an unloader that drives circles near the combine: after MAX_REPLANS it
+-- stands still for REPLAN_PAUSE and says why (once), then tries again. Kept on the vehicle, as the task is made anew.
+CatchCombinePipeTask.MAX_REPLANS = 8
+CatchCombinePipeTask.REPLAN_PAUSE = 30000
 
 -- Why the task waits before planning (again), shown in the HUD instead of one text for all of them
 CatchCombinePipeTask.DELAY_STARTING = "AD_task_catch_planning"
@@ -23,6 +28,7 @@ CatchCombinePipeTask.DELAY_COMBINE_MOVED = "AD_task_catch_combine_moved"
 CatchCombinePipeTask.DELAY_NOT_LINED_UP = "AD_task_catch_not_lined_up"
 CatchCombinePipeTask.DELAY_CHASE_OFF_FIELD = "AD_task_catch_chase_off_field"
 CatchCombinePipeTask.DELAY_COMBINE_ALMOST_FULL = "AD_task_catch_combine_almost_full"
+CatchCombinePipeTask.DELAY_PAUSED = "AD_task_catch_paused"
 
 function CatchCombinePipeTask:new(vehicle, combine)
     local o = CatchCombinePipeTask:create()
@@ -38,6 +44,7 @@ function CatchCombinePipeTask:new(vehicle, combine)
     o.waitForCheckTimer.elapsedTime = 4000
     o.taskType = "CatchCombinePipeTask"
     o.newPathFindingCounter = 0
+    o.pauseTimer = 0
     o.trailers = nil
     CatchCombinePipeTask.setStateNames(o)
     return o
@@ -94,8 +101,7 @@ function CatchCombinePipeTask:update(dt)
                 self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:notifyAboutFailedPathfinder()
                 --AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.WARN, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path; %s", 5000, self.vehicle.ad.stateModule:getName(), self.combine.ad.stateModule:getName())
                 CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - STATE_PATHPLANNING restarting path finder - with delay")
-                self.delayReason = CatchCombinePipeTask.DELAY_NO_PATH
-                self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+                self:replan(CatchCombinePipeTask.DELAY_NO_PATH)
                 return
             else
                 self.vehicle.ad.drivePathModule:setWayPoints(self.wayPoints)
@@ -110,6 +116,13 @@ function CatchCombinePipeTask:update(dt)
         end
     elseif self.state == CatchCombinePipeTask.STATE_DELAY_PATHPLANNING then
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - STATE_DELAY_PATHPLANNING")
+        if self.pauseTimer > 0 then
+            -- too many new paths in a row: stand still for a while
+            self.pauseTimer = self.pauseTimer - dt
+            self.vehicle.ad.specialDrivingModule:stopVehicle()
+            self.vehicle.ad.specialDrivingModule:update(dt)
+            return
+        end
         if self.waitForCheckTimer:timer(true, 1000, dt) then
             if self.newPathFindingCounter > self.MAX_COUNT_NEW_PATHFINDING then
                 -- prevent deadlock
@@ -134,8 +147,7 @@ function CatchCombinePipeTask:update(dt)
         if combineTravelDistance > 85 then
             CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - combine travelled - recalculate path")
             self.waitForCheckTimer.elapsedTime = 4000
-            self.delayReason = CatchCombinePipeTask.DELAY_COMBINE_MOVED
-            self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+            self:replan(CatchCombinePipeTask.DELAY_COMBINE_MOVED)
             return
         else
             if self.vehicle.ad.drivePathModule:isTargetReached() then
@@ -147,12 +159,12 @@ function CatchCombinePipeTask:update(dt)
 
                 if angleToCombine < 35 and AutoDrive.getDistanceBetween(self.vehicle, self.combine) < 80 and isCorrectSide then
                     CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - STATE_DRIVING -> STATE_FINISHED")
+                    self.vehicle.ad.catchReplans = 0
                     self.state = CatchCombinePipeTask.STATE_FINISHED
                     return
                 else
                     CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - angle or distance to combine too high - recalculate path now")
-                    self.delayReason = CatchCombinePipeTask.DELAY_NOT_LINED_UP
-                    self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+                    self:replan(CatchCombinePipeTask.DELAY_NOT_LINED_UP)
                     return
                 end
             else
@@ -184,6 +196,23 @@ function CatchCombinePipeTask:update(dt)
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - STATE_FINISHED")
         self:finished()
         return
+    end
+end
+
+-- Overdrive: plan again (no path, combine moved on, not lined up); counted on the vehicle and logged, and after
+-- MAX_REPLANS in a row it pauses and tells the players why
+function CatchCombinePipeTask:replan(reason)
+    self.delayReason = reason
+    self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+    local count = (self.vehicle.ad.catchReplans or 0) + 1
+    self.vehicle.ad.catchReplans = count
+    local reasonText = g_i18n ~= nil and g_i18n:getText(reason) or reason
+    Logging.info("[AD] %s, catching up with %s: %s (new path %d of %d)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reasonText, count, self.MAX_REPLANS)
+    if count >= self.MAX_REPLANS then
+        self.vehicle.ad.catchReplans = 0
+        self.pauseTimer = self.REPLAN_PAUSE
+        self.delayReason = CatchCombinePipeTask.DELAY_PAUSED
+        ADDiag.catchPaused(self.vehicle, self.combine, reason, count, self.REPLAN_PAUSE / 1000)
     end
 end
 
@@ -284,6 +313,13 @@ function CatchCombinePipeTask:getI18nInfo()
         text = text .. " - " .. "$l10n_AD_task_pathfinding;" .. string.format(" %d / %d - %d / %d", actualState, maxStates, steps, max_pathfinder_steps)
     elseif self.state == CatchCombinePipeTask.STATE_DELAY_PATHPLANNING then
         text = text .. " - " .. "$l10n_" .. (self.delayReason or CatchCombinePipeTask.DELAY_STARTING) .. ";"
+        if self.delayReason == CatchCombinePipeTask.DELAY_PAUSED then
+            text = text .. string.format(" (%d s)", math.ceil(math.max(0, self.pauseTimer) / 1000))
+        elseif self.delayReason == CatchCombinePipeTask.DELAY_NO_PATH or self.delayReason == CatchCombinePipeTask.DELAY_COMBINE_MOVED
+            or self.delayReason == CatchCombinePipeTask.DELAY_NOT_LINED_UP then
+            -- new paths in a row, it pauses after this many
+            text = text .. string.format(" (%d/%d)", self.vehicle.ad.catchReplans or 0, self.MAX_REPLANS)
+        end
         if self.delayReason == CatchCombinePipeTask.DELAY_CHASE_OFF_FIELD or self.delayReason == CatchCombinePipeTask.DELAY_COMBINE_ALMOST_FULL then
             -- waiting like this, it gives up after this many tries (the count starts again with every finished path finding)
             text = text .. string.format(" (%d/%d)", self.newPathFindingCounter, self.MAX_COUNT_NEW_PATHFINDING)

@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Vinklen for at aktivere blinklys. (0 = automatisk blinklyst deaktiveret)" />
 		<text name="gui_ad_pipe_offset"								text="Rør forskydning" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Rørforskydning frem/tilbage" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Flytter aflæsserens plads ved siden af mejetærskeren frem (+, mod mejetærskerens front) eller tilbage (-). Til at fylde en lang vogn jævnt eller holde afstand til et bredt skærebord. Bruges ikke bag mejetærskeren (følgeafstand)" />
 		<text name="gui_ad_followDistance"								text="Distance til tærsker" />
 		<text name="gui_ad_followDistance_tooltip"						text="Distance holdes fra tærsker, når du følger den bageste ende" />
 		<text name="gui_ad_lookahead_turning"							text="Se fremad distance (turn)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Slet" />
 		<text name="AD_nodeSelection_deselect" text="Fravælg" />
 		<text name="AD_nodeSelection_place" text="Klik for at sætte dem" />
+		<text name="AD_task_catch_paused" text="Venter, for mange nye ruter i træk" />
+		<text name="AD_diag_catchPaused" text="kunne ikke komme på linje med" />
+		<text name="AD_diag_newPaths" text="nye ruter i træk" />
+		<text name="AD_hint_catchPaused" text="den holder stille i 30 sekunder og prøver så igen. Med en lang lastbil eller vogn: sæt disse køretøjsindstillinger til Nej:" />
+		<text name="gui_ad_showRouteProblems" text="Ruteproblemer i editoren" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Når editoren er tændt, markeres problemer i rutenettet (blindgyder, løse punkter, fælder, mål der ikke kan nås eller forlades) på stedet med et fyr og deres tekst, tælles under HUD og vises på det store kort" />
+		<text name="AD_routeMarkers_summary" text="Rutetjek: %s problemer, det nærmeste %s m væk" />
+		<text name="gui_ad_refuelDestination" text="Tank ved" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Hvor dette køretøj tanker. Nærmeste: det nærmeste tankpunkt langs ruterne, din egen gårds, hvis det højst er 1,5 gange så langt væk. Kan det valgte mål ikke bruges, tanker køretøjet ved det nærmeste, og loggen siger hvorfor" />
+		<text name="gui_ad_refuelNearest" text="Nærmeste" />
+		<text name="AD_diag_refuelChoiceGone" text="tankmål ikke fundet:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="intet tankpunkt med brændstof til det, eller ingen adgang, ved" />
+		<text name="AD_diag_refuelUsingNearest" text="tanker ved det nærmeste i stedet" />
 		<text name="AD_routeCheck_loose"								 text="Løst vejpunkt uden nogen forbindelse" />
 		<text name="AD_routeCheck_deadEnd"							 text="Blindgyde: ingen vej videre fra dette vejpunkt" />
 		<text name="AD_routeCheck_trap"								 text="Ensrettet fælde: %s vejpunkter, man kan køre ind i, men ikke ud af" />

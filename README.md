@@ -16,7 +16,7 @@ Versions are `<AutoDrive version>-od.<build>`, e.g. `3.0.1.4-od.1` is the first 
 
 ### Overdrive tab in the settings
 All settings Overdrive adds have their own tab in the AutoDrive settings window (speedometer icon), so the other tabs are the same as in AutoDrive:
-- **This vehicle:** Best price unloading, While tipping, Drive clear when blocked, Drive through obstructions (No AI Collisions), Start work at, Stop work at. Shown only while you sit in a vehicle; they are saved on that vehicle, and "Make default" works as on the vehicle tab.
+- **This vehicle:** Best price unloading, While tipping, Drive clear when blocked, Drive through obstructions (No AI Collisions), Start work at, Stop work at, Pipe Offset Front/Back, Refuel at. Shown only while you sit in a vehicle; they are saved on that vehicle, and "Make default" works as on the vehicle tab.
 - **You:** Waypoint panel, Ticker at the bottom, Fleet on the map. Only for you; the server keeps them per player.
 
 ### Undo and redo in the route editor
@@ -51,6 +51,8 @@ With the editor turned on, **Ctrl+Z** undoes and **Ctrl+Y** redoes your last cha
 ### Waypoint editing
 - **Move waypoints by dragging:** hold **Left Shift** and drag a waypoint with the left mouse button. The waypoint goes where the mouse points at the road or the ground, at its height, also on hills and slopes. A short click without moving still toggles the side road setting as before. The key can be changed ("AD: Hold + left mouse drag to move waypoint").
 - **Select several waypoints:** hold **Ctrl + Shift** and drag a box with the left mouse button: every waypoint in it is selected. **Ctrl + Shift + click** a waypoint to add it to or take it out of the selection (while something is selected, **Ctrl + click** does the same, like in Windows). When you let go of the keys, a menu opens at the mouse: **Move** (the waypoints follow the mouse, click to put them down), **Put on the ground**, **Side road** on / off, **Direction** (one-way and tidy up Even / Straight / Smooth when the selection is one unbranched line; two-way and flip for every connection between selected waypoints), **Delete** and **Deselect**. Each action is one undo step. A click outside the menu closes it and clears the selection. Shortcuts: **Alt + click** a selected waypoint deletes them all; dragging one of them (Left Shift + left drag, or right / middle drag) moves them all. With nothing selected, Ctrl + click and Ctrl + Shift + click on the ground do what they did before.
+- **Route problems where they are:** while the editor is on, AutoDrive checks the route network by itself a moment after every change and marks each problem on the spot: a tall beacon (orange: dead end or loose waypoint; red: trap, or a target that can not be reached or left) with its text above it, the number of problems and the distance to the nearest one under the HUD, an arrow towards it when it is out of sight, and squares on the big map. Setting "Route problems in the editor" on the Overdrive tab.
+- **Unloader that keeps missing the combine:** after 8 new paths in a row without getting lined up with the combine, it stands still for 30 seconds and says why, and which two settings to check for long trucks and trailers, instead of driving circles. Each new path is written to the log.
 - **Construction screen:** while landscaping (painting, shaping the ground), the left mouse button belongs to the brush: AutoDrive shows the routes but does not select, connect, create or drag waypoints with it there.
 - **Deleting a waypoint** removes all targets on it, not only the first one, and every connection pointing to it. Before, a second target or a reverse connection could be left pointing at the next waypoint.
 
@@ -182,6 +184,16 @@ New vehicle setting **Best price unloading**, for pickup and deliver and for unl
 A selling point counts only for the target nearest to where it is unloaded: a factory with a loading and an unloading section can have a target at each, and only the one at the unloading section gets its price (if that target does not take the product, see unload products, the next nearest does).
 
 The vehicle's own tanks (diesel, DEF, ...) are never counted as load. A stop is done when the selling point takes nothing more, so a vehicle never waits forever for a product the point does not buy. It needs "use folders", does nothing while target rotation for unloading is on, and the target must be in a folder, not in "All".
+
+### Refuel at
+New per-vehicle choice **Refuel at**, on the Overdrive tab and next to Auto Refuel on the vehicle tab: **Nearest** (default) or one of the targets at a refuel point for the vehicle's fuels. It is used for the refuel button, for auto refuel during AutoDrive's jobs and when Courseplay hands a vehicle over to refuel. It is stored as the target's name, so editing the network does not change it. If the chosen target is gone, has no refuel point with fuel for the vehicle, or the farm has no access, the vehicle refuels at the nearest one and the log (and a message) says why.
+
+Nearest is now measured along the routes instead of in a straight line (straight line if the network gives no route), and a refuel point of the vehicle's own farm wins if it is at most 1.5 times as far as the nearest one.
+
+Other mods: `AutoDrive.getRefuelDestination(vehicle)` gives the target name (`""` = Nearest), `AutoDrive.setRefuelDestination(vehicle, name)` sets it (synced in multiplayer), `AutoDrive.getRefuelDestinationChoices(vehicle)` lists the names that can be chosen.
+
+### Pipe offset front/back
+New vehicle setting for combine unloaders, **Pipe Offset Front/Back** (setting `pipeZOffset`, -5 m to +5 m in 0.25 m steps, default 0). Pipe Offset moves the unloader out from the combine or in; this one moves its place beside the combine forward (+, towards the combine's front) or back (-), to fill a long trailer evenly or to keep the cab clear of a wide header. It is used for the place it drives to and the place it keeps while unloading, not when it chases behind the combine (Follow distance does that) and not for auto-aiming choppers or sugarcane harvesters. On the vehicle tab next to Pipe Offset and on the Overdrive tab. Other mods can set it like any vehicle setting (`AutoDrive.setSettingState`, then `AutoDriveUpdateSettingsEvent.sendEvent(vehicle)`).
 
 ### Drive clear when blocked
 New vehicle setting for combine unloaders, **Drive clear when blocked** (off by default). When the unloader

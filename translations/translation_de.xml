@@ -111,6 +111,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Lenkwinkel, ab dem beim Abbiegen automatisch geblinkt wird. (0 = Blinker deaktiviert)" />
 		<text name="gui_ad_pipe_offset"								text="Abstand Rohr" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Zusätzlicher Abstand, der auf die ermittelte Rohrposition angewendet wird" />
+		<text name="gui_ad_pipeZOffset"								text="Abstand Rohr vorn/hinten" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Verschiebt den Platz des Abtankers neben dem Drescher nach vorn (+, zur Front des Dreschers) oder nach hinten (-). Zum gleichmäßigen Befüllen langer Anhänger oder für Abstand zu breiten Schneidwerken. Nicht beim Folgen hinter dem Drescher (Folgeabstand)" />
 		<text name="gui_ad_followDistance"								text="Abstand Häcksler" />
 		<text name="gui_ad_followDistance_tooltip"						text="Abstand vom Häcksler, wenn von hinten abgefahren/gefolgt wird." />
 		<text name="gui_ad_lookahead_turning"							text="Distanz Vorausschauen (Lenkung)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Löschen" />
 		<text name="AD_nodeSelection_deselect" text="Auswahl aufheben" />
 		<text name="AD_nodeSelection_place" text="Klicken zum Absetzen" />
+		<text name="AD_task_catch_paused" text="Wartet, zu viele neue Wege hintereinander" />
+		<text name="AD_diag_catchPaused" text="konnte sich nicht ausrichten an" />
+		<text name="AD_diag_newPaths" text="neue Wege hintereinander" />
+		<text name="AD_hint_catchPaused" text="es steht 30 Sekunden still und versucht es dann erneut. Bei langem LKW oder Anhänger diese Fahrzeugeinstellungen auf Nein stellen:" />
+		<text name="gui_ad_showRouteProblems" text="Routenprobleme im Editor" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Bei eingeschaltetem Editor werden Probleme im Routennetz (Sackgassen, lose Wegpunkte, Fallen, nicht erreichbare oder nicht verlassbare Ziele) vor Ort mit Leuchtsäule und Text markiert, unter dem HUD gezählt und auf der großen Karte gezeigt" />
+		<text name="AD_routeMarkers_summary" text="Routenprüfung: %s Probleme, das nächste %s m entfernt" />
+		<text name="gui_ad_refuelDestination" text="Tanken bei" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Wo dieses Fahrzeug tankt. Nächste: die nächste Tankstelle entlang der Routen, die eigene des Hofs, wenn sie höchstens 1,5-mal so weit ist. Kann das gewählte Ziel nicht genutzt werden, tankt das Fahrzeug an der nächsten und das Log sagt warum" />
+		<text name="gui_ad_refuelNearest" text="Nächste" />
+		<text name="AD_diag_refuelChoiceGone" text="Tankziel nicht gefunden:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="keine Tankstelle mit Kraftstoff dafür oder kein Zugang bei" />
+		<text name="AD_diag_refuelUsingNearest" text="tankt stattdessen an der nächsten" />
 		<text name="AD_routeCheck_loose"								 text="Loser Wegpunkt ohne jede Verbindung" />
 		<text name="AD_routeCheck_deadEnd"							 text="Sackgasse: von diesem Wegpunkt geht es nicht weiter" />
 		<text name="AD_routeCheck_trap"								 text="Einbahn-Falle: %s Wegpunkte, in die man hinein-, aber nicht wieder herausfahren kann" />

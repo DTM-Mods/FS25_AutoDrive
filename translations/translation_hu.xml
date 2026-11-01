@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Kormányállás az irányjelző fények automatikus engedélyezéséhez. (0 = az irányjelző fény automatikusan kikapcsol)" />
 		<text name="gui_ad_pipe_offset"								text="Cső eltolás" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Kirakodó jármű eltolása oldalirányba a cső végéhez képest" />
+		<text name="gui_ad_pipeZOffset"								text="Csőeltolás előre/hátra" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="A kombájn melletti átrakó helyét előre (+, a kombájn eleje felé) vagy hátra (-) tolja. Hosszú pótkocsi egyenletes töltéséhez vagy széles vágóasztal elkerüléséhez. A kombájn mögött nem használt (követési távolság)" />
 		<text name="gui_ad_followDistance"								text="Távolság a kombájntól" />
 		<text name="gui_ad_followDistance_tooltip"						text="Távolság ha a kombájnt hátul követi" />
 		<text name="gui_ad_lookahead_turning"							text="Kanyarodási távolság" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Törlés" />
 		<text name="AD_nodeSelection_deselect" text="Kijelölés megszüntetése" />
 		<text name="AD_nodeSelection_place" text="Kattints a lerakáshoz" />
+		<text name="AD_task_catch_paused" text="Vár, túl sok új útvonal egymás után" />
+		<text name="AD_diag_catchPaused" text="nem tudott beállni ehhez:" />
+		<text name="AD_diag_newPaths" text="új útvonal egymás után" />
+		<text name="AD_hint_catchPaused" text="30 másodpercig áll, aztán újra próbálja. Hosszú teherautónál vagy pótkocsinál állítsd Nem-re ezeket a jármű beállításokat:" />
+		<text name="gui_ad_showRouteProblems" text="Útvonalhibák a szerkesztőben" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Bekapcsolt szerkesztőnél az útvonalhálózat hibái (zsákutcák, magányos pontok, csapdák, elérhetetlen vagy elhagyhatatlan célok) a helyükön fényoszloppal és szöveggel jelölve, a HUD alatt számolva és a nagy térképen is látszanak" />
+		<text name="AD_routeMarkers_summary" text="Útvonal-ellenőrzés: %s hiba, a legközelebbi %s m-re" />
+		<text name="gui_ad_refuelDestination" text="Tankolás itt" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Hol tankol ez a jármű. Legközelebbi: az útvonalak mentén legközelebbi töltőpont, a saját farmé, ha legfeljebb 1,5-szer olyan messze van. Ha a választott cél nem használható, a jármű a legközelebbinél tankol, és a napló megmondja miért" />
+		<text name="gui_ad_refuelNearest" text="Legközelebbi" />
+		<text name="AD_diag_refuelChoiceGone" text="a tankolási cél nem található:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="nincs hozzá való üzemanyagos töltőpont vagy nincs hozzáférés itt:" />
+		<text name="AD_diag_refuelUsingNearest" text="helyette a legközelebbinél tankol" />
 		<text name="AD_routeCheck_loose"								 text="Különálló útpont, semmilyen kapcsolat nélkül" />
 		<text name="AD_routeCheck_deadEnd"							 text="Zsákutca: ebből az útpontból nincs továbbhaladás" />
 		<text name="AD_routeCheck_trap"								 text="Egyirányú csapda: %s útpont, ahová be lehet hajtani, de kijutni nem" />

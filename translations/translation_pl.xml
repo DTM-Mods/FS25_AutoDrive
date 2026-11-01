@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Kąt skrętu przy jakim kierunkowskazy się aktywują automatycznie. (0 = automatyczne kierunkowskazy wyłączone)" />
 		<text name="gui_ad_pipe_offset"								text="Przesunięcie rury" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Additional offset applied to the detected pipe position" />
+		<text name="gui_ad_pipeZOffset"								text="Przesunięcie rury przód/tył" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Przesuwa miejsce przeładowywacza obok kombajnu do przodu (+, w stronę przodu kombajnu) lub do tyłu (-). Do równego napełniania długiej przyczepy albo trzymania się z dala od szerokiego hedera. Nieużywane za kombajnem (odległość podążania)" />
 		<text name="gui_ad_followDistance"								text="Odległość od kombajnu" />
 		<text name="gui_ad_followDistance_tooltip"						text="Odległość utrzymywana od kombajnu w czasie podążania za nim" />
 		<text name="gui_ad_lookahead_turning"							text="Odległość patrzenia w przód (skręcanie)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Usuń" />
 		<text name="AD_nodeSelection_deselect" text="Odznacz" />
 		<text name="AD_nodeSelection_place" text="Kliknij, aby je położyć" />
+		<text name="AD_task_catch_paused" text="Czeka, zbyt wiele nowych tras z rzędu" />
+		<text name="AD_diag_catchPaused" text="nie mógł ustawić się przy" />
+		<text name="AD_diag_newPaths" text="nowych tras z rzędu" />
+		<text name="AD_hint_catchPaused" text="stoi 30 sekund, potem próbuje ponownie. Przy długiej ciężarówce lub przyczepie ustaw te opcje pojazdu na Nie:" />
+		<text name="gui_ad_showRouteProblems" text="Problemy tras w edytorze" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Gdy edytor jest włączony, problemy sieci tras (ślepe zaułki, luźne punkty, pułapki, cele nieosiągalne lub bez wyjazdu) są oznaczane na miejscu słupem światła z opisem, liczone pod HUD i pokazywane na dużej mapie" />
+		<text name="AD_routeMarkers_summary" text="Kontrola tras: %s problemów, najbliższy %s m" />
+		<text name="gui_ad_refuelDestination" text="Tankuj w" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Gdzie ten pojazd tankuje. Najbliższa: najbliższa stacja wzdłuż tras, stacja własnego gospodarstwa, jeśli jest najwyżej 1,5 raza dalej. Jeśli wybranego celu nie da się użyć, pojazd tankuje na najbliższej, a log mówi dlaczego" />
+		<text name="gui_ad_refuelNearest" text="Najbliższa" />
+		<text name="AD_diag_refuelChoiceGone" text="nie znaleziono celu tankowania:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="brak stacji z paliwem dla niego lub brak dostępu w" />
+		<text name="AD_diag_refuelUsingNearest" text="tankuje zamiast tego na najbliższej" />
 		<text name="AD_routeCheck_loose"								 text="Luźny punkt trasy bez żadnego połączenia" />
 		<text name="AD_routeCheck_deadEnd"							 text="Ślepa uliczka: z tego punktu trasy nie ma dalszej drogi" />
 		<text name="AD_routeCheck_trap"								 text="Pułapka jednokierunkowa: punkty trasy, do których można wjechać, ale nie można wyjechać: %s" />

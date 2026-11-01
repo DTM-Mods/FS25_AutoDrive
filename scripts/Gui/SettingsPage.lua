@@ -23,8 +23,24 @@ function ADSettingsPage:onFrameOpen()
     ADSettingsPage:superClass().onFrameOpen(self)
     if not self:hasChanges() then
         self:loadGUISettings()
+    else
+        -- Overdrive: a setting on two tabs (pipeZOffset) shows a change made on the other tab
+        self:showPendingSettings()
     end
     FocusManager:setFocus(self.boxLayout)
+end
+
+function ADSettingsPage:showPendingSettings()
+    local controlledVehicle = AutoDrive.getControlledVehicle()
+    for settingName, element in pairs(self.settingElements) do
+        local setting = AutoDrive.settings[settingName]
+        if setting ~= nil then
+            if setting.isVehicleSpecific and controlledVehicle ~= nil and controlledVehicle.ad ~= nil and controlledVehicle.ad.settings[settingName] ~= nil then
+                setting = controlledVehicle.ad.settings[settingName]
+            end
+            element:setState(setting.new or setting.current, false)
+        end
+    end
 end
 
 function ADSettingsPage:onGuiSetupFinished()

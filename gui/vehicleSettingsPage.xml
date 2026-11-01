@@ -21,6 +21,12 @@
 				</MultiTextOption>
 				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_pipe_offset"/>
 			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="pipeZOffset" id="pipeZOffset">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_pipeZOffset_tooltip"/>
+				</MultiTextOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_pipeZOffset"/>
+			</Bitmap>
 			<Bitmap profile="fs25_multiTextOptionContainer" id="followDistanceBox" onCreate="onCreateAutoDriveSettingRow">
 				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="followDistance" id="followDistance">
 					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_followDistance"/>
@@ -74,6 +80,12 @@
 					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_autoRefuel_tooltip"/>
 				</BinaryOption>
 				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_autoRefuel"/>
+			</Bitmap>
+			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
+				<MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onRefuelDestinationChange" onCreate="onCreateRefuelDestination" name="refuelDestination" id="refuelDestination">
+					<Text profile="fs25_multiTextOptionTooltip" name="ignore" text="$l10n_gui_ad_refuelDestination_tooltip"/>
+				</MultiTextOption>
+				<Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_gui_ad_refuelDestination"/>
 			</Bitmap>
 			<Bitmap profile="fs25_multiTextOptionContainer" onCreate="onCreateAutoDriveSettingRow">
 				<BinaryOption profile="fs25_settingsBinaryOption" onClick="onOptionChange" onCreate="onCreateAutoDriveSetting" name="autoRepair" id="autoRepair">

@@ -104,6 +104,8 @@
 		<text name="gui_ad_blinkValue_tooltip"							text="Angolo di sterzata per attivare automaticamente le frecce. (0 = indicatore di direzione automatico disattivato)" />
 		<text name="gui_ad_pipe_offset"								text="Distanza dal tubo" />
 		<text name="gui_ad_pipe_offset_tooltip"						text="Offset aggiuntivo applicato alla posizione del tubo rilevata" />
+		<text name="gui_ad_pipeZOffset"								text="Offset tubo avanti/indietro" />
+		<text name="gui_ad_pipeZOffset_tooltip"						text="Sposta il posto dello scaricatore accanto alla mietitrebbia in avanti (+, verso il davanti della mietitrebbia) o indietro (-). Per riempire in modo uniforme un rimorchio lungo o stare lontano da una testata larga. Non usato dietro la mietitrebbia (distanza di inseguimento)" />
 		<text name="gui_ad_followDistance"								text="Distanza mietitrebbia" />
 		<text name="gui_ad_followDistance_tooltip"						text="Distanza mantenuta dalla mietitrebbia quando la si segue" />
 		<text name="gui_ad_lookahead_turning"							text="Distanza d'avanti (sterzata)" />
@@ -706,6 +708,19 @@
 		<text name="AD_nodeSelection_delete" text="Elimina" />
 		<text name="AD_nodeSelection_deselect" text="Deseleziona" />
 		<text name="AD_nodeSelection_place" text="Clic per posarli" />
+		<text name="AD_task_catch_paused" text="In attesa, troppi nuovi percorsi di fila" />
+		<text name="AD_diag_catchPaused" text="non è riuscito ad allinearsi con" />
+		<text name="AD_diag_newPaths" text="nuovi percorsi di fila" />
+		<text name="AD_hint_catchPaused" text="si ferma 30 secondi, poi riprova. Con un camion o rimorchio lungo, imposta su No queste impostazioni del veicolo:" />
+		<text name="gui_ad_showRouteProblems" text="Problemi di percorso nell'editor" />
+		<text name="gui_ad_showRouteProblems_tooltip" text="Con l'editor attivo, i problemi della rete (vicoli ciechi, punti isolati, trappole, destinazioni irraggiungibili o senza uscita) sono segnati sul posto con un faro e il loro testo, contati sotto l'HUD e mostrati sulla mappa grande" />
+		<text name="AD_routeMarkers_summary" text="Controllo percorsi: %s problemi, il più vicino a %s m" />
+		<text name="gui_ad_refuelDestination" text="Rifornimento a" />
+		<text name="gui_ad_refuelDestination_tooltip" text="Dove fa rifornimento questo veicolo. Più vicino: il distributore più vicino lungo i percorsi, quello della tua fattoria se è al massimo 1,5 volte più lontano. Se la destinazione scelta non è utilizzabile, il veicolo va al più vicino e il log dice perché" />
+		<text name="gui_ad_refuelNearest" text="Più vicino" />
+		<text name="AD_diag_refuelChoiceGone" text="destinazione di rifornimento non trovata:" />
+		<text name="AD_diag_refuelChoiceUnusable" text="nessun distributore con carburante adatto, o nessun accesso, a" />
+		<text name="AD_diag_refuelUsingNearest" text="rifornimento al più vicino" />
 		<text name="AD_routeCheck_loose"								 text="Nodo isolato senza alcun collegamento" />
 		<text name="AD_routeCheck_deadEnd"							 text="Vicolo cieco: nessuna via per proseguire da questo nodo" />
 		<text name="AD_routeCheck_trap"								 text="Trappola a senso unico: %s nodi in cui si può entrare ma da cui non si può uscire" />

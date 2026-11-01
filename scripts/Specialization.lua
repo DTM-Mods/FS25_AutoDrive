@@ -182,6 +182,7 @@ function AutoDrive.initSpecialization()
     schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).AutoDrive#actualFarmId", "actualFarmId")
     ADStatistics.registerSavegameKeys(schemaSavegame)
     ADUnloadFilter.registerSavegameKeys(schemaSavegame)
+    ADRefuelChoice.registerSavegameKeys(schemaSavegame)
     if AutoDrive.automaticUnloadTarget then
         schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?).AutoDrive#automaticUnloadTarget", "automaticUnloadTarget")
     end
@@ -276,6 +277,7 @@ function AutoDrive:onPostLoad(savegame)
             AutoDrive.readVehicleSettingsFromXML(self, xmlFile, key)
             ADStatistics.loadFromXML(self, xmlFile, key)
             ADUnloadFilter.loadFromXML(self, xmlFile, key)
+            ADRefuelChoice.loadFromXML(self, xmlFile, key)
 
             if xmlFile:hasProperty(key) then
                 local groupString = xmlFile:getValue(key .. "#groups")
@@ -380,6 +382,8 @@ function AutoDrive:onWriteStream(streamId, connection)
     else
         streamWriteUInt8(streamId, 0)
     end
+    -- Overdrive: where it refuels
+    streamWriteString(streamId, ADRefuelChoice.get(self))
 end
 
 function AutoDrive:onReadStream(streamId, connection)
@@ -405,6 +409,8 @@ function AutoDrive:onReadStream(streamId, connection)
         -- in case we receive a helper index greater then actual number of helpers, we need to increase the number of helpers
         AutoDrive.checkAddHelper(self, helperIndex) -- use helper with index helperIndex
     end
+    -- Overdrive: where it refuels
+    ADRefuelChoice.set(self, streamReadString(streamId))
 end
 
 function AutoDrive:onUpdateTick(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
@@ -546,6 +552,7 @@ function AutoDrive:saveToXMLFile(xmlFile, key, usedModNames)
     AutoDrive.saveVehicleSettingsToXMLFile(self, xmlFile, adKey)
     ADStatistics.saveToXML(self, xmlFile, adKey)
     ADUnloadFilter.saveToXML(self, xmlFile, adKey)
+    ADRefuelChoice.saveToXML(self, xmlFile, adKey)
 
     if self.ad.groups ~= nil then
         local combinedString = ""
@@ -575,6 +582,8 @@ function AutoDrive:onDrawUIInfo()
     end
 
     if AutoDrive.getSetting("showHUD") then
+        -- Overdrive: the route problem count under the HUD, before it so the HUD's lists cover it
+        ADRouteMarkers.safeDrawSummary(self)
         AutoDrive.Hud:drawHud(self)
     end
     if AutoDrive.getSetting("showNextPath") == true then
@@ -593,6 +602,8 @@ function AutoDrive:onDrawUIInfo()
         ADUndoManager:drawHighlights(self)
     end
     ADRouteCheck:draw(self)
+    -- Overdrive: route problems marked where they are while the editor is on
+    ADRouteMarkers.safeDraw(self)
     ADWaypointActions.drawEditor(self)
     ADRoutePreview:draw(self)
 
