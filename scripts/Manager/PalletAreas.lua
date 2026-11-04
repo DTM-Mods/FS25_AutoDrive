@@ -5,7 +5,7 @@
 -- Everything it does goes to the log ("[AD] Pallet areas ...").
 ADPalletAreas = {}
 
-ADPalletAreas.HEIGHT_FACTOR = 3
+ADPalletAreas.HEIGHT_FACTOR = 1
 ADPalletAreas.CHECK_INTERVAL = 10000
 
 ADPalletAreas.done = {}            -- trigger node -> true
