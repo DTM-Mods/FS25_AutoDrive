@@ -82,6 +82,22 @@ function ADHarvestManager:unregisterAsUnloader(vehicle)
 end
 
 function ADHarvestManager:fireUnloader(unloader, harvester)
+    -- PropaineX edit (3.4.0.4): the harvester stopped working (off to refuel or repair, helper off, pipe folded):
+    -- the unloader (and one queued behind it) stays on. 50 % or more in the trailer: drive off to unload; less: wait
+    -- for the next call. AutoDrive used to stop it there with AutoDrive switched off.
+    local mode = unloader.ad.modes ~= nil and unloader.ad.modes[AutoDrive.MODE_UNLOAD] or nil
+    if unloader.ad.stateModule:isActive() and mode ~= nil and unloader.ad.stateModule:getCurrentMode() == mode then
+        local follower = mode:getFollowingUnloader()
+        mode:unregisterFollowingUnloader() -- so it isn't promoted to this harvester's unloader
+        self:unregisterAsUnloader(unloader)
+        if follower ~= nil and follower.ad.stateModule:isActive() and follower.ad.modes ~= nil
+            and follower.ad.stateModule:getCurrentMode() == follower.ad.modes[AutoDrive.MODE_UNLOAD] then
+            self:unregisterAsUnloader(follower)
+            follower.ad.modes[AutoDrive.MODE_UNLOAD]:onHarvesterLeft()
+        end
+        mode:onHarvesterLeft()
+        return
+    end
     if unloader.ad.stateModule:isActive() then
         local follower = unloader.ad.modes[AutoDrive.MODE_UNLOAD]:getFollowingUnloader()
         if follower ~= nil then
@@ -291,6 +307,14 @@ function ADHarvestManager.isHarvesterActive(harvester)
             return  AutoDrive.isPipeOut(harvester)
         end
         -- ADHarvestManager.debugMsg(harvester, "ADHarvestManager.isHarvesterActive reachedPreCallLevel %s isAlmostFull %s allowedToChase %s", reachedPreCallLevel, isAlmostFull, allowedToChase)
+
+        -- PropaineX edit (3.3.0.4): Active unloading on: always send an unloader to chase it, from the start (no
+        -- pre-call level, no "almost full" cut-off, no holding back for a rear chase with the pipe over crop)
+        if AutoDrive.getSetting("activeUnloading", harvester:getRootVehicle()) == true then
+            -- only on a field (not a Courseplay harvester driving on the road to or from it)
+            local hx, hy, hz = getWorldTranslation(harvester.components[1].node)
+            return AutoDrive.checkIsOnField(hx, hy, hz)
+        end
 
         return reachedPreCallLevel and (not isAlmostFull) and allowedToChase
     end

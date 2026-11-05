@@ -14,7 +14,10 @@ ADUnloaderClear.UNSAFE_TIME = 3000      -- ms in the way before it moves (the ha
 ADUnloaderClear.UNSAFE_MARGIN = 10      -- m: closer than this counts as in the way
 ADUnloaderClear.SAFE_MARGIN = 15        -- m: a new spot is at least this clear
 ADUnloaderClear.HARVESTER_RANGE = 200   -- m: harvesters further away are not looked at
-ADUnloaderClear.AHEAD_LENGTH = 80       -- m: the strip in front of the harvester
+ADUnloaderClear.AHEAD_LENGTH = 50       -- m: the strip in front of the harvester (3.4.1.4: was 80)
+ADUnloaderClear.AHEAD_MARGIN = 5        -- m: the strip is this much wider than the header on each side (3.4.1.4: was 10)
+ADUnloaderClear.TURN_REACH = 200        -- m: how far sideways the turn zone reaches toward the turn side (the field clips it)
+ADUnloaderClear.FIELD_SCAN = 400        -- m: how far ahead it looks for the end of the field
 ADUnloaderClear.MIN_WORK_WIDTH = 6      -- m
 ADUnloaderClear.HEADLAND_MIN = 20       -- m: the turning band along the field edge, at least this or 2 working widths
 ADUnloaderClear.SEARCH_RINGS = {15, 25, 40, 60, 80}  -- m from the unloader where new spots are tried
@@ -146,39 +149,88 @@ end
 function ADUnloaderClear.getDanger(vehicle, harvesters, fruits)
     local boxes = ADUnloaderEscape.getUnitBoxes(vehicle)
     for _, entry in ipairs(harvesters) do
-        local ahead = ADUnloaderClear.getAheadBox(entry, ADUnloaderClear.UNSAFE_MARGIN)
+        local ahead = ADUnloaderClear.getAheadBox(entry, ADUnloaderClear.AHEAD_MARGIN)
         for _, box in ipairs(boxes) do
             if AutoDrive.boxesIntersect(ahead, box) then
                 return "ahead"
             end
         end
     end
-    for _, box in ipairs(boxes) do
-        if ADUnloaderClear.hasCrop(ADUnloaderEscape.growBox(box, ADUnloaderClear.UNSAFE_MARGIN), fruits) then
-            return "crop"
-        end
-    end
-    local headland = ADUnloaderClear.getHeadland(harvesters)
-    for _, box in ipairs(boxes) do
-        for i = 1, 4 do
-            if ADUnloaderClear.isNearFieldEdge(box[i].x, box[i].z, headland) then
-                return "headland"
+    -- PropaineX edit (3.4.1.4): next to standing crop is fine now (no crop rule); the headland only counts where
+    -- the harvester is going to turn
+    for _, zone in ipairs(ADUnloaderClear.getTurnZones(harvesters, fruits)) do
+        for _, box in ipairs(boxes) do
+            if AutoDrive.boxesIntersect(zone, box) then
+                return "turn"
             end
         end
     end
     return nil
 end
 
+-- PropaineX edit (3.4.1.4): where a harvester will turn: the headland band at the end of the field it is heading to,
+-- from its own lane (header + AHEAD_MARGIN) toward the side with standing crop (it turns into the next pass). Crop on
+-- neither or both sides: both directions. nil when the field end isn't found ahead.
+function ADUnloaderClear.getTurnZone(entry, headland, fruits)
+    local root = entry.root
+    local x, y, z = getWorldTranslation(root.components[1].node)
+    local dirX, _, dirZ = AutoDrive.localDirectionToWorld(root, 0, 0, 1)
+    local dist = nil
+    for d = 5, ADUnloaderClear.FIELD_SCAN, 5 do
+        if not isOnField(x + dirX * d, z + dirZ * d) then
+            dist = d
+            break
+        end
+    end
+    if dist == nil then
+        return nil
+    end
+    -- sideways axis, the same one makeBox uses for its width
+    local px, pz = -dirZ, dirX
+    local side = entry.width / 2 + 8
+    local function cropOn(sign)
+        local cx, cz = x + px * sign * side + dirX * 10, z + pz * sign * side + dirZ * 10
+        return ADUnloaderClear.hasCrop(ADUnloaderEscape.makeBox(cx, y, cz, dirX, dirZ, 5, 15), fruits)
+    end
+    local plus, minus = cropOn(1), cropOn(-1)
+    local inner = entry.width / 2 + ADUnloaderClear.AHEAD_MARGIN
+    local u0, u1 = -ADUnloaderClear.TURN_REACH, ADUnloaderClear.TURN_REACH
+    if plus and not minus then
+        u0 = -inner
+    elseif minus and not plus then
+        u1 = inner
+    end
+    local v0, v1 = dist - 5 - headland, dist + 5 -- the edge lies between dist - 5 (on the field) and dist
+    local cu, cv = (u0 + u1) / 2, (v0 + v1) / 2
+    return ADUnloaderEscape.makeBox(x + px * cu + dirX * cv, y, z + pz * cu + dirZ * cv, dirX, dirZ, (u1 - u0) / 2, (v1 - v0) / 2)
+end
+
+function ADUnloaderClear.getTurnZones(harvesters, fruits)
+    local zones = {}
+    local headland = ADUnloaderClear.getHeadland(harvesters)
+    for _, entry in ipairs(harvesters) do
+        local zone = ADUnloaderClear.getTurnZone(entry, headland, fruits)
+        if zone ~= nil then
+            table.insert(zones, zone)
+        end
+    end
+    return zones
+end
+
 -- a spot for the whole rig at x, z (pointing dirX, dirZ) that is clear by SAFE_MARGIN
-function ADUnloaderClear.isSafeSpot(vehicle, x, z, dirX, dirZ, harvesters, fruits, headland, halfLength)
+function ADUnloaderClear.isSafeSpot(vehicle, x, z, dirX, dirZ, harvesters, zones, halfLength)
     local foot = ADUnloaderEscape.makeBox(x, terrainY(x, z), z, dirX, dirZ, 2, halfLength)
     for i = 1, 4 do
         if not isOnField(foot[i].x, foot[i].z) then
             return false
         end
     end
-    if ADUnloaderClear.isNearFieldEdge(x, z, headland + halfLength + ADUnloaderClear.SAFE_MARGIN - ADUnloaderClear.UNSAFE_MARGIN) then
-        return false
+    -- PropaineX edit (3.4.1.4): clear of where the harvesters turn (was: of the whole headland)
+    local grown = ADUnloaderEscape.growBox(foot, ADUnloaderClear.SAFE_MARGIN - ADUnloaderClear.UNSAFE_MARGIN)
+    for _, zone in ipairs(zones) do
+        if AutoDrive.boxesIntersect(zone, grown) then
+            return false
+        end
     end
     for _, entry in ipairs(harvesters) do
         if AutoDrive.boxesIntersect(ADUnloaderClear.getAheadBox(entry, ADUnloaderClear.SAFE_MARGIN), foot) then
@@ -188,14 +240,14 @@ function ADUnloaderClear.isSafeSpot(vehicle, x, z, dirX, dirZ, harvesters, fruit
     if AutoDrive.checkForVehiclesInBox(ADUnloaderEscape.growBox(foot, 3), {vehicle}) then
         return false
     end
-    return not ADUnloaderClear.hasCrop(ADUnloaderEscape.growBox(foot, ADUnloaderClear.SAFE_MARGIN), fruits)
+    return true -- PropaineX edit (3.4.1.4): next to standing crop is fine
 end
 
 -- the nearest clear spot, tried first in the directions away from the harvesters; else just outside the field.
 -- returns x, z, dirX, dirZ or nil
 function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
     local x, _, z = getWorldTranslation(vehicle.components[1].node)
-    local headland = ADUnloaderClear.getHeadland(harvesters)
+    local zones = ADUnloaderClear.getTurnZones(harvesters, fruits)
     local halfLength = math.max(AutoDrive.getTractorTrainLength(vehicle, true, false) or 0, 6) / 2
     -- away from the harvesters, and the direction they work in (to park along)
     local awayX, awayZ, workX, workZ = 0, 0, 0, 0
@@ -226,7 +278,7 @@ function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
     for _, ring in ipairs(ADUnloaderClear.SEARCH_RINGS) do
         for _, dir in ipairs(directions) do
             local px, pz = x + dir.x * ring, z + dir.z * ring
-            if ADUnloaderClear.isSafeSpot(vehicle, px, pz, workX, workZ, harvesters, fruits, headland, halfLength) then
+            if ADUnloaderClear.isSafeSpot(vehicle, px, pz, workX, workZ, harvesters, zones, halfLength) then
                 return px, pz, workX, workZ
             end
         end

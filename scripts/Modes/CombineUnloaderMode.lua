@@ -343,6 +343,42 @@ function CombineUnloaderMode:setToWaitForCall(keepCombine)
     CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:setToWaitForCall end self.state %s self.combine %s", tostring(self:getStateName()), tostring(self.combine))
 end
 
+-- PropaineX edit (3.4.0.4): our harvester stopped working (ADHarvestManager:fireUnloader). 50 % or more in the
+-- trailer: drive off to unload (leaving the field first, as for a full trailer); less: wait for the next call here
+CombineUnloaderMode.LEAVE_UNLOAD_LEVEL = 0.5
+function CombineUnloaderMode:onHarvesterLeft()
+    self.vehicle.ad.taskModule:abortAllTasks()
+    self.followingUnloader = nil
+    self.targetUnloader = nil
+    self.combine = nil
+    local trailers, _ = AutoDrive.getAllUnits(self.vehicle)
+    local fillLevel, _, _, fillFreeCapacity = AutoDrive.getAllFillLevels(trailers)
+    local capacity = fillLevel + fillFreeCapacity
+    local ratio = capacity > 0 and fillLevel / capacity or 0
+    CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:onHarvesterLeft trailer %.0f %%", ratio * 100)
+    if ratio >= CombineUnloaderMode.LEAVE_UNLOAD_LEVEL then
+        local x, y, z = getWorldTranslation(self.vehicle.components[1].node)
+        local distanceToStart = 0
+        local firstMarker = self.vehicle.ad.stateModule:getFirstMarker()
+        if firstMarker ~= nil and firstMarker ~= 0 and firstMarker.id ~= nil then
+            local point = ADGraphManager:getWayPointById(firstMarker.id)
+            if point ~= nil then
+                distanceToStart = MathUtil.vector2Length(x - point.x, z - point.z)
+            end
+        end
+        if AutoDrive.checkIsOnField(x, y, z) and distanceToStart > 30 then
+            self.vehicle.ad.taskModule:addTask(ExitFieldTask:new(self.vehicle))
+            self.state = self.STATE_EXIT_FIELD
+        else
+            self.vehicle.ad.taskModule:addTask(UnloadAtDestinationTask:new(self.vehicle, self.vehicle.ad.stateModule:getSecondMarker().id))
+            self.state = self.STATE_DRIVE_TO_UNLOAD
+        end
+    else
+        self.state = self.STATE_WAIT_TO_BE_CALLED
+        self.vehicle.ad.taskModule:addTask(WaitForCallTask:new(self.vehicle))
+    end
+end
+
 function CombineUnloaderMode:assignToHarvester(harvester)
     if self.state == self.STATE_WAIT_TO_BE_CALLED then
 

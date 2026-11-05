@@ -3,6 +3,46 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.4.1.4 (2026-11-05): "in the harvester's way" made tighter and smarter
+*Untested.*
+
+A waiting unloader now only counts as in a harvester's way when it's:
+- in the strip in front of the harvester: **50 m** ahead (was 80 m), the header width plus **5 m** on each side (was
+  10 m), or
+- in the headland **where the harvester is going to turn**: at the end of the field it's heading to, from its own lane
+  toward the side with standing crop (it turns into the next pass). With crop on neither side, or both, both
+  directions count.
+
+No longer in the way:
+- parked next to standing crop (the "within 10 m of crop" rule is gone),
+- parked in the headland on the side the harvester turns away from.
+
+When it does move, its new spot no longer has to keep away from crop or from the whole headland, only from the strip
+(by 15 m) and from where the harvester turns.
+
+## 3.4.0.4 (2026-11-05): unloader stays on when its harvester leaves
+*Untested.*
+
+- When a harvester stops working (it drives off to refuel or get repaired, its helper is switched off, or you fold
+  the pipe), its unloader no longer stops where it is with AutoDrive switched off. Instead:
+  - trailer 50% full or more: it drives off to unload, as with a full trailer (leaving the field first);
+  - under 50%: it stays on, waits for the next call, and keeps out of the harvester's way as usual. When the
+    harvester comes back and starts working, an unloader is sent again.
+- A second unloader queued behind it does the same, based on its own trailer.
+- With Active unloading on, an unloader is now only sent while the harvester is on a field. A Courseplay harvester
+  driving on the road to or from a field doesn't get chased down the road.
+
+## 3.3.0.4 (2026-11-05): Active unloading: chase from the start
+*Untested.*
+
+- With Active unloading on, a combine no longer waits until it reaches the "Call unloader at" (pre-call) level before
+  it gets an unloader. As soon as it is working, the closest free unloader is sent to chase it, even at 0% full.
+- It also keeps calling one when it is over 90% full, so a nearly full combine is chased too.
+- Nothing holds it back because the pipe would be over standing crop any more (AI crop damage is off on our server).
+  Before, an unloader that would chase from behind wasn't sent above 70% full, and one already coming in from behind
+  waited above 85%.
+- Active unloading off: unchanged, it still waits for the pre-call level.
+
 ## 3.2.1.4 (2026-11-05): no backing away from a nearly full combine (Active unloading)
 *Untested.*
 

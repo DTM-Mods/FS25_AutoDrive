@@ -249,7 +249,8 @@ function CatchCombinePipeTask:startNewPathFinding()
 
     self.newPathFindingCounter = self.newPathFindingCounter + 1 -- used to prevent deadlock
 
-    if self.combine.ad.isChopper or (pipeChaseSide ~= AutoDrive.CHASEPOS_REAR or (targetFieldId == combineFieldId and cFillRatio <= 0.85)) then
+    if self.combine.ad.isChopper or (pipeChaseSide ~= AutoDrive.CHASEPOS_REAR or (targetFieldId == combineFieldId and (cFillRatio <= 0.85 or activeUnloadingOn))) then
+    -- PropaineX edit (3.3.0.4): with Active unloading on, the rear chase doesn't wait above 85 % (pipe over crop is fine)
     -- if self.combine:getIsBufferCombine() or (pipeChaseSide ~= AutoDrive.CHASEPOS_REAR and targetFieldId == combineFieldId and cFillRatio <= 0.85) then
         -- is chopper or chase not rear and harvester on correct field and filled < 85% - i.e. combine pipe not in fruit
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:startNewPathFinding() - chase pos looks good - calculate path to it...")
