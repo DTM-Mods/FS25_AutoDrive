@@ -224,6 +224,17 @@ New vehicle settings **Start work at** and **Stop work at** (in-game hours, `--:
 - At the stop hour, pickup and deliver finishes the round it is on (loading and unloading) and then drives to its park position, if one is set. Other modes stop right away.
 - Skipping time (sleeping) counts: the later of the two hours that were skipped decides.
 
+### Longer run-up to the pipe
+When a combine unloader drives up to a combine's pipe, the straight stretch it gets after its last turn is 50% longer than in AutoDrive (`runUpFactor = 1.5` in `PathFinderModule:startPathPlanningToPipe`), so the trailer has time to line up behind the tractor instead of coming in at an angle. Combines: half the combine's length plus 0.765 x the tractor-and-trailer length, now x 1.5, at least 10.5 m (was 7 m); for a 12 m combine and an 18 m rig that is 29.7 m instead of 19.8 m. Choppers with a fixed pipe: 1.5 combine lengths instead of 1. Auto-aiming choppers and chasing straight behind a combine have no run-up and are unchanged. On tight headlands the unloader may swing out a little further before it comes in.
+
+### Keep out of the harvester's way
+While a combine unloader waits on the field to be called, it checks every second whether it stands where a working harvester (combine or chopper, within 200 m) is going to drive:
+- in the strip in front of the harvester: 80 m ahead, its working width plus 10 m on each side,
+- within 10 m of standing crop, where the next passes go, or
+- in the headland band along the field edge where the harvester turns: 20 m, or two working widths if that is more.
+
+After 3 seconds in the way it drives with the pathfinder to the nearest spot on harvested ground that is at least 15 m clear of all of that (tried from 15 to 80 m away, directions away from the harvesters first, no other vehicles there), parked along the working direction; if there is none, 15 m outside the field edge. Then it waits for a call again. While it moves it shows *Moving out of the harvester's way* and is not on the harvest manager's list of free unloaders, so no harvester calls it halfway. After a move it checks again after 15 seconds; after three failed moves in a row it waits 60 seconds. It is not checked while the unloader drives to a combine, unloads or drives off to unload, nor for a second unloader queued behind the active one (Drive clear when blocked covers that). Code: `scripts/Manager/UnloaderClear.lua` (`ADUnloaderClear`, called from `CombineUnloaderMode:monitorTasks`), `scripts/Tasks/MoveClearOfHarvesterTask.lua`.
+
 ### Key bindings
 | Action | Default key |
 |---|---|
