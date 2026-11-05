@@ -3,6 +3,18 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.5.0.4 (2026-11-05): unloaders drive like semis when chasing
+*Untested.*
+
+Semi trucks chasing a harvester's pipe used to aim the cab straight at the spot under the pipe and steer as hard as
+needed. With the spot right beside the cab or just behind it (inside the truck's turning circle) they drove in circles
+or folded the trailer up (jackknifed) and got stuck. Now, while chasing with a trailer attached:
+- It never steers tighter than a semi can turn (12 m radius). A spot it can't reach is no longer chased at full
+  lock: it stays nearly straight, lets the harvester come by, and lines up from behind.
+- Jackknife guard: if the cab gets more than 45 degrees off the trailer, it straightens the wheels and drives on at
+  8 km/h or less until the trailer is back within 15 degrees.
+- Driving on roads and AutoDrive routes, and rigs without a trailer: unchanged.
+
 ## 3.4.1.4 (2026-11-05): "in the harvester's way" made tighter and smarter
 *Untested.*
 
