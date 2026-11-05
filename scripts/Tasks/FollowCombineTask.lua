@@ -474,7 +474,8 @@ function FollowCombineTask:followChasePoint(dt)
             acc = 1
             totalSpeedLimit = math.max(combineSpeed + 20, 10)
         end
-        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed, false, acc, totalSpeedLimit)
+        -- PropaineX edit: stronger catch-up to stay under the pipe (chaseCatchUp)
+        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed, false, acc, totalSpeedLimit, true)
     end
 end
 

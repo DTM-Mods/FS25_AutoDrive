@@ -235,6 +235,9 @@ While a combine unloader waits on the field to be called, it checks every second
 
 After 3 seconds in the way it drives with the pathfinder to the nearest spot on harvested ground that is at least 15 m clear of all of that (tried from 15 to 80 m away, directions away from the harvesters first, no other vehicles there), parked along the working direction; if there is none, 15 m outside the field edge. Then it waits for a call again. While it moves it shows *Moving out of the harvester's way* and is not on the harvest manager's list of free unloaders, so no harvester calls it halfway. After a move it checks again after 15 seconds; after three failed moves in a row it waits 60 seconds. It is not checked while the unloader drives to a combine, unloads or drives off to unload, nor for a second unloader queued behind the active one (Drive clear when blocked covers that). Code: `scripts/Manager/UnloaderClear.lua` (`ADUnloaderClear`, called from `CombineUnloaderMode:monitorTasks`), `scripts/Tasks/MoveClearOfHarvesterTask.lua`.
 
+### Staying under the pipe
+When a combine unloader chases a combine that unloads on the move, it pushes harder to get back under the pipe: it aims for the combine's speed + 1 km/h + 3 km/h for every metre it is short of its place (within 20 m; AutoDrive used 1.4 km/h per metre under 7 m and 2 km/h per metre under 20 m, so it crept up slowly and the combine kept getting away). 3 m short is now combine + 10 km/h instead of + 4 km/h. Once past its place it drops below the combine's speed and slides back instead of overshooting. Field speed stays its top speed. Only the pipe chase uses this (`chaseCatchUp` argument of `ADSpecialDrivingModule:driveToPoint`, passed by `FollowCombineTask:followChasePoint`; numbers `CATCH_UP_GAIN` and `CATCH_UP_LEAD`); bale unloading, reversing from a bad location and the escape to the field edge drive as before.
+
 ### Key bindings
 | Action | Default key |
 |---|---|

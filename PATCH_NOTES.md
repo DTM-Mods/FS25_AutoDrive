@@ -3,6 +3,18 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.1.1.4 (2026-11-05): unloader stays under the pipe
+*Untested.*
+
+- When the unloader chases a combine that unloads on the move, it now pushes harder to get back under the pipe.
+  It aims for the combine's speed plus 1 km/h, plus 3 km/h for every metre it is short of its place (it used to be
+  only 1.4 to 2 km/h per metre, so it crept up slowly and the combine kept getting away from it).
+  For example, 3 m short: combine + 10 km/h (was combine + 4 km/h).
+- If it gets ahead of its place, it now drops below the combine's speed and slides back, instead of overshooting.
+- Your Field speed setting is still its top speed.
+- Only the pipe chase works this way. Bale unloading, reversing out of a bad spot and driving clear to the field edge
+  are unchanged.
+
 ## 3.1.0.4 (2026-11-05): unloader keeps out of the harvester's way
 *Untested.*
 
