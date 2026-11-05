@@ -400,6 +400,7 @@
 		<text name="AD_task_drive_to_park"								text="Fahre zum Parkplatz" />
 		<text name="AD_task_catch_planning"					text="Plane den Weg zum Drescher" />
 		<text name="AD_task_catch_no_path"					text="Kein Weg zum Drescher gefunden, versuche es erneut" />
+		<text name="AD_task_catch_no_way_around_crop"		text="Kein Weg um die Frucht herum zum Drescher, warte" />
 		<text name="AD_task_catch_combine_moved"				text="Drescher ist weitergefahren, plane neu" />
 		<text name="AD_task_catch_not_lined_up"				text="Nicht am Drescher ausgerichtet, versuche es erneut" />
 		<text name="AD_task_catch_chase_off_field"			text="Platz hinter dem Drescher liegt nicht auf seinem Feld, warte" />

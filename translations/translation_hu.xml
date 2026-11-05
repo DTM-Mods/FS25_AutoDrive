@@ -393,6 +393,7 @@
 		<text name="AD_task_drive_to_park"								text="Parkolás a területen" />
 		<text name="AD_task_catch_planning"					text="Planning the way to the combine" />
 		<text name="AD_task_catch_no_path"					text="No way to the combine found, trying again" />
+		<text name="AD_task_catch_no_way_around_crop"		text="No way around the crop to the combine, waiting" />
 		<text name="AD_task_catch_combine_moved"				text="Combine moved on, planning again" />
 		<text name="AD_task_catch_not_lined_up"				text="Not lined up with the combine, trying again" />
 		<text name="AD_task_catch_chase_off_field"			text="Spot behind the combine is off its field, waiting" />

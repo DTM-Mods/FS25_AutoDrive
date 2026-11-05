@@ -20,6 +20,9 @@ CatchCombinePipeTask.MAX_COUNT_NEW_PATHFINDING = 20
 -- stands still for REPLAN_PAUSE and says why (once), then tries again. Kept on the vehicle, as the task is made anew.
 CatchCombinePipeTask.MAX_REPLANS = 8
 CatchCombinePipeTask.REPLAN_PAUSE = 30000
+-- Overdrive: no way around the crop to the combine (avoid fruit on, the path finder does not drive through it): stand
+-- still this long, then plan again - the combine may move or the harvested area grow
+CatchCombinePipeTask.CROP_WAIT = 5000
 
 -- Why the task waits before planning (again), shown in the HUD instead of one text for all of them
 CatchCombinePipeTask.DELAY_STARTING = "AD_task_catch_planning"
@@ -29,6 +32,7 @@ CatchCombinePipeTask.DELAY_NOT_LINED_UP = "AD_task_catch_not_lined_up"
 CatchCombinePipeTask.DELAY_CHASE_OFF_FIELD = "AD_task_catch_chase_off_field"
 CatchCombinePipeTask.DELAY_COMBINE_ALMOST_FULL = "AD_task_catch_combine_almost_full"
 CatchCombinePipeTask.DELAY_PAUSED = "AD_task_catch_paused"
+CatchCombinePipeTask.DELAY_NO_WAY_AROUND_CROP = "AD_task_catch_no_way_around_crop"
 
 function CatchCombinePipeTask:new(vehicle, combine)
     local o = CatchCombinePipeTask:create()
@@ -101,9 +105,14 @@ function CatchCombinePipeTask:update(dt)
                 self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:notifyAboutFailedPathfinder()
                 --AutoDriveMessageEvent.sendMessageOrNotification(self.vehicle, ADMessagesManager.messageTypes.WARN, "$l10n_AD_Driver_of; %s $l10n_AD_cannot_find_path; %s", 5000, self.vehicle.ad.stateModule:getName(), self.combine.ad.stateModule:getName())
                 CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:update - STATE_PATHPLANNING restarting path finder - with delay")
-                self:replan(CatchCombinePipeTask.DELAY_NO_PATH)
+                if self.vehicle.ad.pathFinderModule:isNoWayAroundCrop() then
+                    self:waitForCrop()
+                else
+                    self:replan(CatchCombinePipeTask.DELAY_NO_PATH)
+                end
                 return
             else
+                self.vehicle.ad.noWayAroundCropLogged = nil
                 self.vehicle.ad.drivePathModule:setWayPoints(self.wayPoints)
                 self.state = CatchCombinePipeTask.STATE_DRIVING
                 return
@@ -216,6 +225,20 @@ function CatchCombinePipeTask:replan(reason)
     end
 end
 
+-- Overdrive: no way around the crop (avoid fruit on): stand still for CROP_WAIT, then plan again. Not counted as a new
+-- path (it stands still, there is nothing to cap); logged once until a path is found.
+function CatchCombinePipeTask:waitForCrop()
+    self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+    self.delayReason = CatchCombinePipeTask.DELAY_NO_WAY_AROUND_CROP
+    self.pauseTimer = self.CROP_WAIT
+    CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:waitForCrop - no way around the crop, waiting %d ms", self.CROP_WAIT)
+    if not self.vehicle.ad.noWayAroundCropLogged then
+        self.vehicle.ad.noWayAroundCropLogged = true
+        local reasonText = g_i18n ~= nil and g_i18n:getText(self.delayReason) or self.delayReason
+        Logging.info("[AD] %s, catching up with %s: %s (avoid fruit is on, not driving through the crop)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reasonText)
+    end
+end
+
 function CatchCombinePipeTask:abort()
 end
 
@@ -317,7 +340,7 @@ function CatchCombinePipeTask:getI18nInfo()
         text = text .. " - " .. "$l10n_AD_task_pathfinding;" .. string.format(" %d / %d - %d / %d", actualState, maxStates, steps, max_pathfinder_steps)
     elseif self.state == CatchCombinePipeTask.STATE_DELAY_PATHPLANNING then
         text = text .. " - " .. "$l10n_" .. (self.delayReason or CatchCombinePipeTask.DELAY_STARTING) .. ";"
-        if self.delayReason == CatchCombinePipeTask.DELAY_PAUSED then
+        if self.delayReason == CatchCombinePipeTask.DELAY_PAUSED or self.delayReason == CatchCombinePipeTask.DELAY_NO_WAY_AROUND_CROP then
             text = text .. string.format(" (%d s)", math.ceil(math.max(0, self.pauseTimer) / 1000))
         elseif self.delayReason == CatchCombinePipeTask.DELAY_NO_PATH or self.delayReason == CatchCombinePipeTask.DELAY_COMBINE_MOVED
             or self.delayReason == CatchCombinePipeTask.DELAY_NOT_LINED_UP then

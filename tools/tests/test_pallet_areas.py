@@ -1,5 +1,6 @@
-"""Taller pallet areas: on the server every pallet trigger of an unloading station is made three times as tall, once,
-also for stations placed later; other triggers are left alone; failures leave everything as it is; it is logged."""
+"""Taller pallet areas: switched off (HEIGHT_FACTOR 1: no trigger is touched, nothing logged). With a factor set, on the
+server every pallet trigger of an unloading station is made that many times as tall, once, also for stations placed
+later; other triggers are left alone; failures leave everything as it is; it is logged."""
 import os
 from lupa.lua55 import LuaRuntime
 
@@ -38,6 +39,14 @@ s.execute("""
 """)
 s.execute(read("scripts", "Manager", "PalletAreas.lua"))
 
+# off: factor 1 leaves every trigger as it is, not even taken out of physics, and says nothing
+assert s.eval("ADPalletAreas.HEIGHT_FACTOR") == 1
+s.execute("ADPalletAreas:update(16); ADPalletAreas:update(20000)")
+assert s.eval("next(SCALE)") is None and s.eval("#PHYS") == 0 and s.eval("#LOG") == 0 and s.eval("next(ADPalletAreas.done)") is None
+
+# the scaling itself, with a factor of 3
+s.execute("ADPalletAreas.HEIGHT_FACTOR = 3; ADPalletAreas.timer = 0")
+
 # first check: the two pallet triggers 3x as tall, taken out of and back into physics; the bulk trigger untouched
 s.execute("ADPalletAreas:update(16)")
 assert s.eval("SCALE[2][2]") == 3 and s.eval("SCALE[3][2]") == 3 and s.eval("SCALE[2][1]") == 1
@@ -75,5 +84,5 @@ server = server[:server.index("\tend\n")]
 assert "ADPalletAreas:update(dt)" in server
 assert read("register.lua").count("scripts/Manager/PalletAreas.lua") == 1
 
-print("OK: taller pallet areas (only pallet triggers, 3x height, out of and back into physics, once each, stations "
+print("OK: taller pallet areas off (factor 1: triggers untouched, nothing logged); with a factor (only pallet triggers, 3x height, out of and back into physics, once each, stations "
       "placed later, every 10 s, failure leaves them as they are, report when none found, server update, logged)")

@@ -65,6 +65,7 @@ def main():
         run("test_route_markers.py"),
         run("test_pipe_z_offset.py"),
         run("test_refuel_choice.py"),
+        run("test_pipe_no_crop.py"),
     ]
     if not all(results):
         sys.exit(1)

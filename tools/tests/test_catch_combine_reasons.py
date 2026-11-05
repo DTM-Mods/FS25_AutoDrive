@@ -40,7 +40,8 @@ s.execute("""
             setToWaitForCall = function() end}},
         pathFinderModule = {reset = function() end, startPathPlanningToPipe = function() end, hasFinished = function() return true end,
             getPath = function() return PATH end, update = function() end, addDelayTimer = function() end,
-            getCurrentState = function() return 1, 2, 3, 4 end},
+            getCurrentState = function() return 1, 2, 3, 4 end,
+            isNoWayAroundCrop = function() return false end},
         specialDrivingModule = {stopVehicle = function() end, update = function() end},
         drivePathModule = {setWayPoints = function() end, isTargetReached = function() return TARGET_REACHED end, update = function() end},
         taskModule = {setCurrentTaskFinished = function() end}}}
@@ -121,7 +122,7 @@ for f in os.listdir(os.path.join(t.MOD, "translations")):
 en = t.read(os.path.join(t.MOD, "translations", "translation_en.xml"))
 keys = set(re.findall(r'<text name="([^"]+)"', en))
 reasons = re.findall(r'CatchCombinePipeTask\.DELAY_\w+ = "(\w+)"', t.read(os.path.join(t.MOD, "scripts", "Tasks", "CatchCombinePipeTask.lua")))
-assert len(reasons) == 7 and all(r in keys for r in reasons), reasons
+assert len(reasons) == 8 and all(r in keys for r in reasons), reasons
 assert "AD_task_unload_area_in_fruit" not in keys
 print("OK: catching up with the combine says why it waits (starting, no path, combine moved, not lined up, "
       "spot behind off the field, combine almost full, paused) and, waiting behind the combine, how many of the 20 tries are used; "
