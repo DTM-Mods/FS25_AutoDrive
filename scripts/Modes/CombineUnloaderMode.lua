@@ -15,6 +15,8 @@ CombineUnloaderMode.STATE_EXIT_FIELD = {}
 CombineUnloaderMode.STATE_REVERSE_FROM_BAD_LOCATION = {}
 -- Overdrive: drive clear when blocked (ADUnloaderEscape)
 CombineUnloaderMode.STATE_ESCAPE = {}
+-- PropaineX edit: moving out of the harvesters' way while waiting (ADUnloaderClear)
+CombineUnloaderMode.STATE_MOVE_CLEAR = {}
 
 CombineUnloaderMode.MAX_COMBINE_FILLLEVEL_CHASING = 101
 CombineUnloaderMode.STATIC_X_OFFSET_FROM_HEADER = 0
@@ -84,6 +86,10 @@ function CombineUnloaderMode:monitorTasks(dt)
     local isStuck = self.failedPathFinder >= 5 or ((self.vehicle.ad.specialDrivingModule:shouldStopMotor() or self.vehicle.ad.specialDrivingModule.stoppedTimer:done()) and self.vehicle.ad.specialDrivingModule.isBlocked)
     -- Overdrive: blocked by or blocking a vehicle: drive through to the field edge instead of reversing (vehicle setting)
     if ADUnloaderEscape.monitor(self, dt, isStuck) then
+        return
+    end
+    -- PropaineX edit: waiting where a harvester will drive: move to a clear spot
+    if ADUnloaderClear.monitor(self, dt) then
         return
     end
     if isStuck then
@@ -249,6 +255,10 @@ function CombineUnloaderMode:getNextTask()
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_DRIVE_TO_PIPE | STATE_REVERSE_FROM_BAD_LOCATION")
         --Drive to pipe can be finished when combine is emptied or when vehicle has reached 'old' pipe position and should switch to active mode
         nextTask = self:getTaskAfterUnload(filledToUnload)
+    elseif self.state == self.STATE_MOVE_CLEAR then
+        -- PropaineX edit: moved out of the harvesters' way (ADUnloaderClear): wait for a call again
+        CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_MOVE_CLEAR")
+        self:setToWaitForCall()
     elseif self.state == self.STATE_LEAVE_CROP then
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_LEAVE_CROP")
         self:setToWaitForCall()
