@@ -3,6 +3,34 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.2.1.4 (2026-11-05): no backing away from a nearly full combine (Active unloading)
+*Untested.*
+
+- 3.2.0.4 only stopped the "combine over 90% full and I'm within 25 m, back away" rule for an unloader called to a
+  standing combine. A combine still driving and over 90% full still made it back away. With Active unloading on, that
+  rule is now off completely.
+- With Active unloading on, an unloader chasing a combine no longer gives up and goes back to waiting when the combine
+  gets past 91% full. It keeps chasing, so it's under the pipe when the combine stops.
+- With Active unloading on, a combine that is still driving but over 94.5% full now gets an unloader that chases it.
+  Before, the unloader drove to the spot where the pipe was, as if the combine were standing.
+- When a combine with Active unloading on stops and the unloader is at the pipe (within 3 m), the unloader holds still
+  there, ready, and moves the moment the combine does.
+- Active unloading off: unchanged.
+
+## 3.2.0.4 (2026-11-05): Active unloading means always chasing
+*Untested.*
+
+- With Active unloading on, an unloader that reaches a standing combine no longer does a "standing unload". It goes
+  straight into chase mode and holds still under the pipe while the combine stands. The moment the combine rolls, it
+  rolls with it. There is no switch-over any more, so it can't miss the combine driving off (in 3.1.3.4 it sat there,
+  gave up once the combine was 30 m away, looped round and came back).
+- While it waits under a standing combine like this, it doesn't count as stuck, and it no longer backs away because
+  the combine is over 90% full and close by.
+- If the combine starts driving while the unloader is still on its way, it still switches to chasing after half a
+  second (as in 3.1.3.4).
+- Active unloading off, forage harvesters, a combine that is turning, and a Courseplay combine in a pocket: unchanged,
+  standing unload as before.
+
 ## 3.1.3.4 (2026-11-05): chase a standing combine the moment it moves
 *Untested.*
 

@@ -237,7 +237,10 @@ function CatchCombinePipeTask:startNewPathFinding()
     local cfillLevel, cfillCapacity, _, cfillFreeCapacity = AutoDrive.getObjectFillLevels(self.combine)
     local cFillRatio = cfillCapacity > 0 and cfillLevel / cfillCapacity or 0
 
-    if cFillRatio > 0.91 or cfillFreeCapacity < 0.1 then
+    -- PropaineX edit (3.2.1.4): with Active unloading on, a harvester that is almost full is still chased (it is about
+    -- to stop; we want to be under the pipe then), not given up on
+    local activeUnloadingOn = self.combine.ad.isHarvester and AutoDrive.getSetting("activeUnloading", self.combine:getRootVehicle()) == true
+    if (cFillRatio > 0.91 or cfillFreeCapacity < 0.1) and not activeUnloadingOn then
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:startNewPathFinding() - Combine is almost full - dont chase for active unloading anymore")
         self:finished(ADTaskModule.DONT_PROPAGATE)
         self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:setToWaitForCall()

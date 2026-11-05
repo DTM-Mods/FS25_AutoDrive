@@ -241,6 +241,9 @@ When a combine unloader chases a combine that unloads on the move, it pushes har
 ### Unloading a standing combine
 When an unloader is sent to a combine that stands still (`EmptyHarvesterTask`) and the combine starts to drive, the unloader switches to chasing it after half a second (`FOLLOW_AFTER`), whatever it is doing: planning its way there, driving up, waiting for the pipe or unloading. AutoDrive only checked this while unloading, stood still for 4 seconds first, and gave up (back to waiting for a call) when the unloader was next to crop. It only counts once the combine has been seen standing, because a moving combine that is nearly full is also sent an unloader this way. If a combine set to **Active unloading** is emptied while standing and the unloader still has room, it stays with the combine and follows it instead of going back to waiting for the next call (not for choppers, not while the combine turns or stands in a Courseplay pocket).
 
+### Active unloading: always chasing
+With **Active unloading** on, a combine unloader is always in chase mode (`FollowCombineTask`), never a standing unload. When it reaches a standing combine it goes straight into chase mode (`EmptyHarvesterTask:startUnloading`, flag `standingCall`) and holds still under the pipe while the combine stands (also whenever it is within 3 m of its chase point). The moment the combine rolls, it rolls with it, with no hand-over to miss. The three "combine nearly full" give-ups are off with Active unloading: FollowCombineTask's "over 90 % and within 25 m, reverse", CatchCombinePipeTask's "over 91 %, wait for a call", and CombineUnloaderMode sending a moving combine over 94.5 % a standing-style unloader. The rear chase still waits above 85 % (the pipe would be over crop). Active unloading off, choppers, a turning combine and a Courseplay combine in a pocket: unchanged.
+
 ### Key bindings
 | Action | Default key |
 |---|---|

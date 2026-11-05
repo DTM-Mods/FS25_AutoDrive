@@ -22,8 +22,23 @@ function EmptyHarvesterTask:switchToFollow()
     mode.state = CombineUnloaderMode.STATE_ACTIVE_UNLOAD_COMBINE
     mode.breadCrumbs = Queue:new()
     mode.lastBreadCrumb = nil
-    self.vehicle.ad.taskModule:addTask(FollowCombineTask:new(self.vehicle, self.combine))
+    local followTask = FollowCombineTask:new(self.vehicle, self.combine)
+    -- PropaineX edit (3.2.0.4): this unloader was called to a standing combine (see FollowCombineTask, standingCall)
+    followTask.standingCall = true
+    self.vehicle.ad.taskModule:addTask(followTask)
     self.vehicle.ad.taskModule:setCurrentTaskFinished(ADTaskModule.DONT_PROPAGATE)
+end
+
+-- PropaineX edit (3.2.0.4): arrived under the pipe of a standing combine. With Active unloading it goes straight
+-- into chase mode (holding still while the combine stands), so there is no hand-over when the combine drives off.
+-- Otherwise the old standing unload.
+function EmptyHarvesterTask:startUnloading()
+    if self:shouldStayWithCombine() then
+        EmptyHarvesterTask.debugMsg(self.vehicle, "EmptyHarvesterTask: arrived, active unloading -> chase mode")
+        self:switchToFollow()
+    else
+        self.state = EmptyHarvesterTask.STATE_UNLOADING
+    end
 end
 
 -- PropaineX edit: a combine (not a chopper) set to Active unloading, not turning or in a Courseplay pocket
@@ -140,10 +155,10 @@ function EmptyHarvesterTask:update(dt)
                 self.waitTimer:timer(self.combine:getDischargeState() ~= Dischargeable.DISCHARGE_STATE_OFF, EmptyHarvesterTask.WAITING_FOR_PIPE, dt)
                 if self.waitTimer:done() then
                     self.waitTimer:timer(false)
-                    self.state = EmptyHarvesterTask.STATE_UNLOADING
+                    self:startUnloading()
                 end
             else
-                self.state = EmptyHarvesterTask.STATE_UNLOADING
+                self:startUnloading()
             end
             return
         else

@@ -113,6 +113,23 @@ function FollowCombineTask:update(dt)
             return
         end
 
+        -- PropaineX edit (3.2.0.4): called to a standing combine: while it stands, chase it at its speed (zero), i.e.
+        -- hold still under the pipe; no stuck/angle timers meanwhile. The moment it rolls, the normal chase below runs.
+        -- (3.2.1.4: for every Active unloading combine that stands, once we are at the pipe: within 3 m of the chase
+        -- point, or arrived there by a standing call)
+        local nearPipe = self.standingCall
+        if not nearPipe and self.chasePos ~= nil then
+            local vx, _, vz = getWorldTranslation(self.vehicle.components[1].node)
+            nearPipe = MathUtil.vector2Length(vx - self.chasePos.x, vz - self.chasePos.z) < 3
+        end
+        if self.activeUnloading and self.combine.ad.isHarvester and nearPipe and self.combine.lastSpeedReal <= 0.0004 then
+            self.stuckTimer:timer(false)
+            self.angleWrongTimer:timer(false)
+            self.vehicle.ad.specialDrivingModule:stopVehicle()
+            self.vehicle.ad.specialDrivingModule:update(dt)
+            return
+        end
+
         local wrongChopperHeading = self.combine.ad.isChopper and (self.angleToCombineHeading > 90 and self.distanceToCombine < 30)
 
         if (self.angleWrongTimer.elapsedTime > 15000) or wrongChopperHeading then
@@ -136,7 +153,8 @@ function FollowCombineTask:update(dt)
             return
         end
 
-        if self.combine.ad.isHarvester and ((self.combineFillPercent > 90 and AutoDrive.getDistanceBetween(self.vehicle, self.combine) < self.MIN_COMBINE_DISTANCE) -- if to close -> reverse
+        -- PropaineX edit (3.2.1.4): not the "over 90 % and closer than 25 m -> reverse" part with Active unloading on
+        if self.combine.ad.isHarvester and ((not self.activeUnloading and self.combineFillPercent > 90 and AutoDrive.getDistanceBetween(self.vehicle, self.combine) < self.MIN_COMBINE_DISTANCE) -- if to close -> reverse
             or AutoDrive:getIsCPTurning(self.combine))
             then
             -- Stop chasing and wait for a normal unload call while standing

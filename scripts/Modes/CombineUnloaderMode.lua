@@ -358,7 +358,10 @@ function CombineUnloaderMode:assignToHarvester(harvester)
             local cFillRatio = cfillCapacity > 0 and cfillLevel / cfillCapacity or 0
 
             if (self.combine.ad.isHarvester) 
-                and (self.combine.ad.noMovementTimer.elapsedTime > 500 or cleftCapacity < 0.1 or cFillRatio > 0.945)
+                -- PropaineX edit (3.2.1.4): with Active unloading on, a moving combine that is almost full is chased
+                -- (CatchCombinePipeTask), not driven to as if it stood
+                and (self.combine.ad.noMovementTimer.elapsedTime > 500
+                    or ((cleftCapacity < 0.1 or cFillRatio > 0.945) and AutoDrive.getSetting("activeUnloading", self.combine:getRootVehicle()) ~= true))
             then
                 -- default unloading - no movement
                 self.state = self.STATE_DRIVE_TO_PIPE
