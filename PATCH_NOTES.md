@@ -3,6 +3,32 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.1.3.4 (2026-11-05): chase a standing combine the moment it moves
+*Untested.*
+
+- When the unloader is sent to a combine that is standing still and the combine starts to drive, the unloader now
+  switches to chasing it after half a second, whatever it is doing: still planning its way there, driving up,
+  waiting for the pipe, or already unloading. It used to notice only once it had stopped under the pipe, so if the
+  combine pulled away while it was coming in, it first drove to the empty spot where the pipe had been.
+- It only does this once it has seen the combine standing. A combine that is still moving but nearly full is also
+  sent an unloader the "standing" way (it is about to stop); that one is not chased straight away.
+
+## 3.1.2.4 (2026-11-05): unloader stays with the combine
+*Untested.*
+
+- Under the pipe the unloader now drives at exactly the combine's speed, no faster. "Under the pipe" means within
+  1 m of its place. Further back it still catches up: the combine's speed plus 1 km/h, plus 3 km/h for every metre
+  beyond that 1 m.
+- When it has driven up to a combine that is standing still, and the combine drives off, the unloader now starts
+  following it after half a second. It used to stand still for 4 seconds first, so the combine was already several
+  metres away.
+- In that moment it now always follows. It used to give up and go back to waiting if its tractor or trailer was near
+  standing crop.
+- If a combine set to Active unloading is emptied while standing still, and the unloader still has room, it now
+  stays with the combine and follows it, so it is already under the pipe when the combine fills again. It used to
+  leave and wait for the next call. A full unloader still drives off to unload as before, and nothing changes for
+  forage harvesters or for combines with Active unloading off.
+
 ## 3.1.1.4 (2026-11-05): unloader stays under the pipe
 *Untested.*
 

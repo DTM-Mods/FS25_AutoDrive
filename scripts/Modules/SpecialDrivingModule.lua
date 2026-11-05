@@ -212,10 +212,12 @@ function ADSpecialDrivingModule:driveReverse(dt, maxSpeed, maxAcceleration, guid
 end
 
 -- PropaineX edit: catch-up when chasing a combine's pipe (chaseCatchUp, only FollowCombineTask:followChasePoint):
--- CATCH_UP_GAIN km/h per metre short of the chase spot on top of the combine's speed (was 1.4 / 2), always
--- CATCH_UP_LEAD km/h ahead of it, and slower than the combine once past the spot. Other callers unchanged.
+-- under the pipe (closer than UNDER_PIPE_DISTANCE to the chase spot) exactly the combine's speed, no faster;
+-- short of it the combine's speed + CATCH_UP_LEAD + CATCH_UP_GAIN km/h per metre beyond that (was 1.4 / 2 per metre),
+-- and slower than the combine once past the spot. Other callers unchanged.
 ADSpecialDrivingModule.CATCH_UP_GAIN = 3
 ADSpecialDrivingModule.CATCH_UP_LEAD = 1
+ADSpecialDrivingModule.UNDER_PIPE_DISTANCE = 1
 
 function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDynamicCollision, maxAcc, maxSpeed, chaseCatchUp)
     local speed = math.min(self.vehicle.ad.stateModule:getFieldSpeedLimit(), maxSpeed)
@@ -226,11 +228,15 @@ function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDyn
 
     if chaseCatchUp then
         local _, _, aheadZ = AutoDrive.worldToLocal(self.vehicle, point.x, point.y, point.z)
-        if aheadZ < 0 then
+        local under = ADSpecialDrivingModule.UNDER_PIPE_DISTANCE
+        if self.distanceToChasePos < under then
+            -- under the pipe: match the combine's speed, no faster
+            speed = maxFollowSpeed
+        elseif aheadZ < 0 then
             -- past the spot: drop back
-            speed = math.max(maxFollowSpeed - self.distanceToChasePos * ADSpecialDrivingModule.CATCH_UP_GAIN, 0)
+            speed = math.max(maxFollowSpeed - (self.distanceToChasePos - under) * ADSpecialDrivingModule.CATCH_UP_GAIN, 0)
         elseif self.distanceToChasePos < 20 then
-            speed = maxFollowSpeed + ADSpecialDrivingModule.CATCH_UP_LEAD + self.distanceToChasePos * ADSpecialDrivingModule.CATCH_UP_GAIN
+            speed = maxFollowSpeed + ADSpecialDrivingModule.CATCH_UP_LEAD + (self.distanceToChasePos - under) * ADSpecialDrivingModule.CATCH_UP_GAIN
         end
         speed = math.min(speed, self.vehicle.ad.stateModule:getFieldSpeedLimit())
     elseif self.distanceToChasePos < 0.5 then
