@@ -3,6 +3,9 @@
 -- of an unloading station is made HEIGHT_FACTOR times as tall, once (also for stations placed later: checked every
 -- CHECK_INTERVAL). Changing the scale of a physics shape needs it taken out of and put back into physics.
 -- Everything it does goes to the log ("[AD] Pallet areas ...").
+-- OFF for now (HEIGHT_FACTOR 1, triggers are not touched at all): setScale stretches from the trigger node's origin, so
+-- a trigger box that sits away from its origin was moved as well as stretched, and rope pallets stopped selling at
+-- shops (hardware store, farmers market). Needs to stretch the box upwards around its own position before it is on again.
 ADPalletAreas = {}
 
 ADPalletAreas.HEIGHT_FACTOR = 1
@@ -12,7 +15,7 @@ ADPalletAreas.done = {}            -- trigger node -> true
 ADPalletAreas.timer = 0
 
 function ADPalletAreas:update(dt)
-    if self.failed then
+    if self.failed or self.HEIGHT_FACTOR == 1 then
         return
     end
     self.timer = self.timer - dt

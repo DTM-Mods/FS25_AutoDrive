@@ -80,11 +80,20 @@ function EmptyHarvesterTask:update(dt)
                     return
                 else
                     self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:notifyAboutFailedPathfinder()
+                    -- Overdrive: no way around the crop (avoid fruit on): it stands still and plans again after the delay
+                    self.noWayAroundCrop = self.vehicle.ad.pathFinderModule:isNoWayAroundCrop()
+                    if self.noWayAroundCrop and not self.vehicle.ad.noWayAroundCropLogged then
+                        self.vehicle.ad.noWayAroundCropLogged = true
+                        local reasonText = g_i18n ~= nil and g_i18n:getText("AD_task_catch_no_way_around_crop") or "AD_task_catch_no_way_around_crop"
+                        Logging.info("[AD] %s, unloading %s: %s (avoid fruit is on, not driving through the crop)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reasonText)
+                    end
                     self.vehicle.ad.pathFinderModule:reset()
                     self.vehicle.ad.pathFinderModule:startPathPlanningToPipe(self.combine, false)
                     self.vehicle.ad.pathFinderModule:addDelayTimer(10000)
                 end
             else
+                self.noWayAroundCrop = false
+                self.vehicle.ad.noWayAroundCropLogged = nil
                 self.state = EmptyHarvesterTask.STATE_DRIVING
                 return
             end
@@ -271,7 +280,11 @@ end
 
 function EmptyHarvesterTask:getI18nInfo()
     local text = "$l10n_AD_task_unloading_combine;"
-    if self.state == EmptyHarvesterTask.STATE_PATHPLANNING then
+    local delayTime = self.vehicle.ad.pathFinderModule.delayTime or 0
+    if self.state == EmptyHarvesterTask.STATE_PATHPLANNING and self.noWayAroundCrop and delayTime > 0 then
+        -- Overdrive: waiting before planning again, no way around the crop
+        text = text .. " - " .. "$l10n_AD_task_catch_no_way_around_crop;" .. string.format(" (%d s)", math.ceil(delayTime / 1000))
+    elseif self.state == EmptyHarvesterTask.STATE_PATHPLANNING then
         local actualState, maxStates, steps, max_pathfinder_steps = self.vehicle.ad.pathFinderModule:getCurrentState()
         text = text .. " - " .. "$l10n_AD_task_pathfinding;" .. string.format(" %d / %d - %d / %d", actualState, maxStates, steps, max_pathfinder_steps)
     elseif self.state == EmptyHarvesterTask.STATE_DRIVING then

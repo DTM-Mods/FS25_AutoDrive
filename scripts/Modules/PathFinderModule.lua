@@ -30,6 +30,8 @@ Second fallback will deactivate all field border restrictions, means setting avo
 fallback 3:
 Third fallback will take effect only if setting avoidFruit is enabled.
 It will disable fruit avoid automatically if no path was found.
+Overdrive: not for an unloader driving up to a combine's pipe (not chasing): that one first searches with a bigger
+step budget, may use fallback 1 and 2, but never drives through the crop; without a path it waits and plans again.
 
 Inside informations:
 This is a calculation with the worst assumption of all cells to be checked:
@@ -83,6 +85,9 @@ PathFinderModule.PP_MAX_EAGER_LOOKAHEAD_STEPS = 10
 PathFinderModule.MIN_FRUIT_VALUE = 50
 PathFinderModule.SLOPE_DETECTION_THRESHOLD = math.rad(20)
 PathFinderModule.NEW_PF_STEP_FACTOR = 20
+-- Overdrive: an unloader driving up to a combine's pipe (not chasing it) first gets a bigger search before any fallback,
+-- MAX_PATHFINDER_STEPS_TOTAL times this (or pathFinderTime, if more), and with avoid fruit on never fallback 3
+PathFinderModule.PIPE_STEPS_FACTOR = 3
 --[[
 from Giants Engine:
 AITurnStrategy.SLOPE_DETECTION_THRESHOLD  = 0.5235987755983
@@ -115,6 +120,8 @@ function PathFinderModule:reset()
     self.fallBackMode1 = false
     self.fallBackMode2 = false
     self.fallBackMode3 = false
+    self.pipeStepsRaised = false
+    self.noWayAroundCrop = false
     self.isFinished = true
     self.smoothDone = true
     self.fruitAreas = {}
@@ -398,6 +405,8 @@ function PathFinderModule:startPathPlanningTo(targetPoint, targetVector)
     self.fallBackMode1 = false  -- disable restrict to field
     self.fallBackMode2 = false  -- disable restrict to field border
     self.fallBackMode3 = false  -- disable avoid fruit
+    self.pipeStepsRaised = false
+    self.noWayAroundCrop = false
     self.max_pathfinder_steps = PathFinderModule.MAX_PATHFINDER_STEPS_TOTAL * self.pathFinderTime
 
     self.fruitToCheck = nil
@@ -599,6 +608,16 @@ function PathFinderModule:isTargetBlocked() --> always false TODO: how to use th
     return self.targetBlocked
 end
 
+-- Overdrive: no path to the combine's pipe without driving through the crop (avoid fruit on): the task waits and plans again
+function PathFinderModule:isNoWayAroundCrop()
+    return self.noWayAroundCrop
+end
+
+-- Overdrive: driving up to a combine's pipe, not chasing it: bigger search first, and fallback 3 never with avoid fruit on
+function PathFinderModule:isPipeApproach()
+    return self.goingToPipe and (not self.chasingVehicle) and (not self.isSecondChasingVehicle)
+end
+
 -- return the actual and max number of iterations the pathfinder will perform by itself, could be used to show info in HUD
 function PathFinderModule:getCurrentState()
     local maxStates = 1
@@ -606,7 +625,9 @@ function PathFinderModule:getCurrentState()
     if self.restrictToField then
         maxStates = maxStates + 2
     end
-    if self.avoidFruitSetting then
+    if self:isPipeApproach() then
+        maxStates = maxStates + 1     -- the bigger search; never fallback 3 with avoid fruit on
+    elseif self.avoidFruitSetting then
         maxStates = maxStates + 1
     end
     if self.destinationId ~= nil then
@@ -619,7 +640,7 @@ function PathFinderModule:getCurrentState()
     if self.fallBackMode2 then
         actualState = actualState + 1
     end
-    if self.fallBackMode3 then
+    if self.fallBackMode3 or self.pipeStepsRaised then
         actualState = actualState + 1
     end
     if self.destinationId ~= nil and self.retryCounter > 0 then
@@ -725,11 +746,30 @@ function PathFinderModule:update(dt)
         local fallBackModeAllowed2 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.restrictToField) and (not self.fallBackMode2)    -- disable restrict to field border
         local fallBackModeAllowed3 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.avoidFruitSetting) and (not self.fallBackMode3)    -- disable avoid fruit
         local increaseStepsAllowed = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.max_pathfinder_steps < PathFinderModule.MAX_PATHFINDER_STEPS_TOTAL * self.pathFinderTime)    -- increase number of steps if possible
+        -- Overdrive: up to a combine's pipe: a bigger search before any fallback, and never through the crop with avoid fruit on
+        local pipeApproach = self:isPipeApproach()
+        local pipeStepsAllowed = pipeApproach and (not self.pipeStepsRaised)
+        if pipeApproach and self.avoidFruitSetting then
+            fallBackModeAllowed3 = false
+        end
 
         -- Only allow auto restart when planning path to network and we can adjust target wayPoint
         local retryAllowed = self.destinationId ~= nil and self.retryCounter < self.PATHFINDER_MAX_RETRIES
 
-        if fallBackModeAllowed1 then
+        if pipeStepsAllowed then
+            local pipeSteps = PathFinderModule.MAX_PATHFINDER_STEPS_TOTAL * math.max(PathFinderModule.PIPE_STEPS_FACTOR, self.pathFinderTime)
+            AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "PathFinderModule:update - error - going to pipe -> bigger search %d -> %d steps #self.grid %d", self.max_pathfinder_steps, pipeSteps, table.count(self.grid))
+            PathFinderModule.debugVehicleMsg(self.vehicle,
+                string.format("PFM update - error - going to pipe -> bigger search %d -> %d steps #self.grid %d",
+                    self.max_pathfinder_steps,
+                    pipeSteps,
+                    table.count(self.grid)
+                )
+            )
+            self.pipeStepsRaised = true
+            self.max_pathfinder_steps = math.max(self.max_pathfinder_steps, pipeSteps)
+            self:autoRestart()
+        elseif fallBackModeAllowed1 then
             AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "PathFinderModule:update - error - retryAllowed: no -> fallBackModeAllowed1: yes -> going fallback now -> disable restrict to field #self.grid %d", table.count(self.grid))
             PathFinderModule.debugVehicleMsg(self.vehicle,
                 string.format("PFM update - error - retryAllowed: no -> fallBackModeAllowed1: yes -> going fallback now -> disable restrict to field #self.grid %d",
@@ -792,6 +832,16 @@ function PathFinderModule:update(dt)
         else
             if AutoDrive.isEditorModeEnabled() and AutoDrive.getDebugChannelIsSet(AutoDrive.DC_PATHINFO) then
                 return
+            end
+            if pipeApproach and self.avoidFruitSetting then
+                -- no way around the crop: no path at all rather than one through the crop; the task waits and plans again
+                self.noWayAroundCrop = true
+                AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "PathFinderModule:update - going to pipe, avoid fruit on -> no way around the crop after %d steps, not driving through it -> aborting now", self.max_pathfinder_steps)
+                PathFinderModule.debugVehicleMsg(self.vehicle,
+                    string.format("PFM update - going to pipe, avoid fruit on -> no way around the crop after %d steps, not driving through it -> aborting now",
+                        self.max_pathfinder_steps
+                    )
+                )
             end
             AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "PathFinderModule:update - error - retryAllowed: no -> fallBackModeAllowed: no -> aborting now")
             PathFinderModule.debugVehicleMsg(self.vehicle,

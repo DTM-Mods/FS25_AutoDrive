@@ -104,7 +104,9 @@ end
 function CombineUnloaderMode:notifyAboutFailedPathfinder()
     CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:notifyAboutFailedPathfinder self.failedPathFinder %s ADGraphManager:getDistanceFromNetwork(self.vehicle) > 20 %s", tostring(self.failedPathFinder), tostring(ADGraphManager:getDistanceFromNetwork(self.vehicle) > 20))
     --print("CombineUnloaderMode:notifyAboutFailedPathfinder() - blocked: " .. tostring(self.vehicle.ad.pathFinderModule.completelyBlocked) .. " distance: " .. ADGraphManager:getDistanceFromNetwork(self.vehicle))
-    if self.vehicle.ad.pathFinderModule.completelyBlocked and ADGraphManager:getDistanceFromNetwork(self.vehicle) > 20 then
+    -- Overdrive: not when it only found no way around the crop: it waits for the combine there, reversing is driving too
+    if self.vehicle.ad.pathFinderModule.completelyBlocked and not self.vehicle.ad.pathFinderModule.noWayAroundCrop
+        and ADGraphManager:getDistanceFromNetwork(self.vehicle) > 20 then
         self.failedPathFinder = self.failedPathFinder + 1
     --print("Increased Failed pathfinder count to: " .. self.failedPathFinder)
     end
