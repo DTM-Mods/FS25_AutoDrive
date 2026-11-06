@@ -603,10 +603,24 @@ function AutoDrive.readLocalSettingsFromXML()
             local blue = getXMLFloat(xmlFile, key .. "#blue")
             local alpha = getXMLFloat(xmlFile, key .. "#alpha")
 
-            AutoDrive:setColorAssignment(color, red, green, blue, alpha)
+            if not AutoDrive.isPreviousHudColor(color, red, green, blue, alpha) then
+                AutoDrive:setColorAssignment(color, red, green, blue, alpha)
+            end
             i = i + 1
         end
     end
+end
+
+--- Overdrive: a HUD colour saved at its default from before the new look was never changed by the player
+function AutoDrive.isPreviousHudColor(colorKey, r, g, b, a)
+    local previous = AutoDrive.previousHudColors[colorKey]
+    if previous == nil or r == nil or g == nil or b == nil then
+        return false
+    end
+    local function same(x, y)
+        return math.abs(x - y) < 0.001
+    end
+    return same(r, previous[1]) and same(g, previous[2]) and same(b, previous[3]) and same(a or previous[4], previous[4])
 end
 
 function AutoDrive.writeLocalSettingsToXML()

@@ -595,6 +595,10 @@
 		<text name="AD_wpPanel_vehicles"							 text="车辆" />
 		<text name="AD_wpPanel_driveHere"							 text="开到这里" />
 		<text name="AD_wpPanel_sendVehicle"							 text="派出车辆" />
+		<text name="AD_wpPanel_park"							 text="停在这里" />
+		<text name="AD_wpPanel_parkName"							 text="停车 %s" />
+		<text name="AD_wpPanel_parkSet"							 text="%s 完成工作后停在 %s" />
+		<text name="AD_wpPanel_parkCleared"							 text="%s：不再有停车位" />
 		<text name="AD_wpPanel_road"							 text="道路：%s 个航点" />
 		<text name="AD_wpPanel_direction"							 text="方向" />
 		<text name="AD_wpPanel_oneWay"							 text="单向" />

@@ -23,7 +23,10 @@ end
 
 function ADHudCounterButton:updateState(vehicle)
     local newState, newCounter = self:getNewState(vehicle)
-    self.ov:setSliceId(self.images[newState])
+    if newState ~= self.shownState then
+        self.ov:setSliceId(self.images[newState])
+        self.shownState = newState
+    end
     self.state = newState
     self.counter = newCounter
 end
@@ -50,6 +53,13 @@ end
 
 function ADHudCounterButton:onDraw(vehicle, uiScale)
     self:updateState(vehicle)
+    -- Overdrive: on a chip (ADHudStyle), green while the loops are counted
+    local x, y, w, h = self.position.x, self.position.y, self.size.width, self.size.height
+    if not self.isInset then
+        ADHudStyle.insetOverlay(self.ov, x, y, w, h)
+        self.isInset = true
+    end
+    ADHudStyle.chip(x, y, w, h, uiScale, ADHudStyle.isHovered(x, y, w, h), self.state == ADHudCounterButton.STATE_ACTIVE)
     self.ov:render()
 
     if AutoDrive.pullDownListExpanded == 0 then

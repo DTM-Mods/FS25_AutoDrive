@@ -151,12 +151,10 @@ function ADRouteMarkers:drawSummary(vehicle)
     local text = string.format(g_i18n:getText("AD_routeMarkers_summary"), #self.problems, math.floor(nearest.viewDistance + 0.5))
     local size = self.SUMMARY_TEXT_SIZE
     local posX, posY = hud.posX, hud.posY - 0.022
-    if self.overlay == nil then
-        self.overlay = createImageOverlay("dataS/menu/base/graph_pixel.dds")
-    end
-    local padX, padY = 0.004, 0.004
-    setOverlayColor(self.overlay, 0, 0, 0, 0.8)
-    renderOverlay(self.overlay, posX - padX, posY - padY, getTextWidth(size, text) + 2 * padX, size + padY)
+    -- on a rounded dark box (ADHudStyle) as wide as the text
+    local padX, padY = 0.005, 0.004
+    setTextBold(true)
+    ADHudStyle.roundRect(posX - padX, posY - padY, getTextWidth(size, text) + 2 * padX, size + 1.5 * padY, ADHudStyle.px(ADHudStyle.CHIP_RADIUS), ADHudStyle.C.bg)
     local color = self.COLORS[nearest.kind] == self.WARNING and self.WARNING or self.SUMMARY_ERROR
     local r, g, b = unpack(color)
     setTextAlignment(RenderText.ALIGN_LEFT)

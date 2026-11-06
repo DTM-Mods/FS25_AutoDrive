@@ -1,5 +1,5 @@
 -- Waypoint panel: while a waypoint is selected in the editor (left click), a panel next to the AutoDrive HUD
--- shows it and changes it: target (create / rename / remove, drive or send a vehicle there), side road, the
+-- shows it and changes it: target (create / rename / remove, drive or send a vehicle there, park the vehicle there), side road, the
 -- connections to its neighbours (switch or remove), the waypoint actions and the speed zone, and for the road
 -- it is on (up to the next junctions): speed zone, side road, direction and the tidy-up tools.
 -- Every click is one undo step and goes through the same events as the editor keys. User setting waypointPanel.
@@ -27,14 +27,17 @@ ADWaypointPanel.REVERSE = 4
 ADWaypointPanel.REVERSE_IN = 5
 ADWaypointPanel.NEXT_DIRECTION = {[1] = 2, [2] = 3, [3] = 4, [4] = 1, [5] = 1}
 
-ADWaypointPanel.COLOR_BACKGROUND = {0, 0, 0, 0.82}
-ADWaypointPanel.COLOR_BUTTON = {0.18, 0.18, 0.18, 0.95}
-ADWaypointPanel.COLOR_HOVER = {0.35, 0.35, 0.35, 0.95}
-ADWaypointPanel.COLOR_ACTIVE = {1, 0.6, 0.1, 0.95}
-ADWaypointPanel.COLOR_TARGET = {1, 0.7, 0.2, 1}
-ADWaypointPanel.COLOR_DIM = {0.75, 0.75, 0.75, 1}
-ADWaypointPanel.COLOR_DANGER = {0.55, 0.1, 0.1, 0.95}
-ADWaypointPanel.COLOR_DANGER_HOVER = {0.8, 0.15, 0.15, 0.95}
+-- Overdrive look (ADHudStyle): panel and button colours as they look on screen (sRGB), text colours linear
+ADWaypointPanel.COLOR_BACKGROUND = ADHudStyle.C.bg
+ADWaypointPanel.COLOR_BUTTON = ADHudStyle.C.chip
+ADWaypointPanel.COLOR_HOVER = ADHudStyle.C.hover
+ADWaypointPanel.COLOR_ACTIVE = ADHudStyle.C.accent
+ADWaypointPanel.COLOR_ACTIVE_HOVER = ADHudStyle.C.accentHover
+ADWaypointPanel.COLOR_TARGET = ADHudStyle.linear(ADHudStyle.C.warn)
+ADWaypointPanel.COLOR_DIM = ADHudStyle.linear(ADHudStyle.C.muted)
+ADWaypointPanel.COLOR_TEXT = ADHudStyle.linear(ADHudStyle.C.text)
+ADWaypointPanel.COLOR_DANGER = ADHudStyle.C.danger
+ADWaypointPanel.COLOR_DANGER_HOVER = ADHudStyle.C.dangerHover
 
 ADWaypointPanel.buttons = {}
 ADWaypointPanel.cache = {}
@@ -361,6 +364,77 @@ function ADWaypointPanel.driveHere(vehicle, markerIndex)
     end
 end
 
+-- Overdrive: park here. Like AutoDrive's own park button: for the selected implement, else the vehicle; it parks at
+-- this target when its job is done. Set through AutoDrive's park events, so it is synced and saved as before.
+ADWaypointPanel.PARK_WAIT = 10000   -- ms to wait for a target created to park at (it comes back from the server)
+
+function ADWaypointPanel.getParkVehicle(vehicle)
+    return AutoDrive.getSelectedWorkTool(vehicle) or vehicle
+end
+
+function ADWaypointPanel.isParkedHere(vehicle, markerIndex)
+    local tool = ADWaypointPanel.getParkVehicle(vehicle)
+    return markerIndex ~= nil and tool ~= nil and tool.advd ~= nil and tool.advd.parkDestination == markerIndex
+end
+
+local function vehicleName(vehicle)
+    if vehicle ~= nil and vehicle.getName ~= nil then
+        return vehicle:getName()
+    end
+    return ""
+end
+
+--- markerIndex nil: no parking place any more
+function ADWaypointPanel.setPark(vehicle, markerIndex)
+    local tool = ADWaypointPanel.getParkVehicle(vehicle)
+    if tool == nil or tool.advd == nil or vehicle.advd == nil then
+        return
+    end
+    vehicle.advd:setParkDestination(tool, markerIndex or -1)
+    local marker = markerIndex ~= nil and ADGraphManager:getMapMarkerById(markerIndex) or nil
+    if marker ~= nil then
+        ADMessagesManager:addMessage(vehicle, ADMessagesManager.messageTypes.INFO,
+            string.format(g_i18n:getText("AD_wpPanel_parkSet"), vehicleName(tool), marker.name), 5000)
+    else
+        ADMessagesManager:addMessage(vehicle, ADMessagesManager.messageTypes.INFO,
+            string.format(g_i18n:getText("AD_wpPanel_parkCleared"), vehicleName(tool)), 5000)
+    end
+end
+
+--- a waypoint without a target: a target named after the vehicle ("Park <name>", numbered when taken) is created on
+--- it, the parking place is set as soon as the target is there (updatePendingPark)
+function ADWaypointPanel.createParkTarget(vehicle, wp)
+    local base = string.format(g_i18n:getText("AD_wpPanel_parkName"), vehicleName(ADWaypointPanel.getParkVehicle(vehicle)))
+    local taken = {}
+    for _, marker in pairs(ADGraphManager:getMapMarkers()) do
+        taken[marker.name] = true
+    end
+    local name, number = base, 1
+    while taken[name] do
+        number = number + 1
+        name = base .. " " .. number
+    end
+    ADWaypointPanel.pendingPark = {vehicle = vehicle, wayPointId = wp.id, name = name, time = g_time}
+    ADGraphManager:createMapMarker(wp.id, name)
+end
+
+function ADWaypointPanel.updatePendingPark()
+    local pending = ADWaypointPanel.pendingPark
+    if pending == nil then
+        return
+    end
+    for index, marker in pairs(ADGraphManager:getMapMarkers()) do
+        if marker.id == pending.wayPointId and marker.name == pending.name then
+            ADWaypointPanel.pendingPark = nil
+            ADWaypointPanel.setPark(pending.vehicle, index)
+            return
+        end
+    end
+    if g_time - pending.time > ADWaypointPanel.PARK_WAIT then
+        ADWaypointPanel.pendingPark = nil
+    end
+end
+
 function ADWaypointPanel.cycleConnection(wp, connection)
     local neighbour = ADGraphManager:getWayPointById(connection.id)
     if neighbour ~= nil then
@@ -411,10 +485,15 @@ function ADWaypointPanel.getRows(vehicle, wp)
         table.insert(rows, {label = text("AD_wpPanel_vehicles"), buttons = {
             choice(text("AD_wpPanel_driveHere"), false, function() ADWaypointPanel.driveHere(vehicle, markerIndex) end),
             choice(text("AD_wpPanel_sendVehicle"), false, function() AutoDrive.onOpenSendTo(nil, markerIndex) end)}})
+        local parked = ADWaypointPanel.isParkedHere(vehicle, markerIndex)
+        table.insert(rows, {label = text("AD_wpPanel_park"), buttons = {
+            choice(text("gui_ad_no"), not parked, function() if parked then ADWaypointPanel.setPark(vehicle, nil) end end),
+            choice(text("gui_ad_yes"), parked, function() if not parked then ADWaypointPanel.setPark(vehicle, markerIndex) end end)}})
     else
         table.insert(rows, {label = text("AD_wpPanel_noTarget"), wide = true, color = ADWaypointPanel.COLOR_DIM})
         table.insert(rows, {name = "Target", label = "", fullWidth = true, buttons = {
-            choice(text("AD_wpPanel_create"), false, function() ADWaypointPanel.createTarget(wp) end)}})
+            choice(text("AD_wpPanel_create"), false, function() ADWaypointPanel.createTarget(wp) end),
+            choice(text("AD_wpPanel_park"), false, function() ADWaypointPanel.createParkTarget(vehicle, wp) end)}})
     end
 
     local distance = 0
@@ -583,6 +662,7 @@ end
 function ADWaypointPanel:draw(vehicle, hud)
     self.buttons = {}
     self.rect = nil
+    ADWaypointPanel.updatePendingPark()
     local wp = ADWaypointPanel.getWayPoint(vehicle)
     if wp == nil or hud == nil or hud.posX == nil then
         return
@@ -594,7 +674,8 @@ function ADWaypointPanel:draw(vehicle, hud)
     local fontSize = AutoDrive.FONT_SCALE * uiScale
     local mouseX, mouseY = g_lastMousePosX, g_lastMousePosY
 
-    drawFilledRect(l.x, l.y, l.width, l.height, unpack(ADWaypointPanel.COLOR_BACKGROUND))
+    ADHudStyle.panel(l.x, l.y, l.width, l.height, uiScale, ADWaypointPanel.COLOR_BACKGROUND)
+    local chipRadius = ADHudStyle.px(ADHudStyle.CHIP_RADIUS, uiScale)
     local innerX, innerWidth = l.x + l.gapX, l.width - 2 * l.gapX
     setTextAlignment(RenderText.ALIGN_LEFT)
     self.hoveredConnection = nil
@@ -605,7 +686,7 @@ function ADWaypointPanel:draw(vehicle, hud)
         local rowY = l.y + l.height - l.gapY - i * l.rowHeight
         local textY = rowY + (l.rowHeight - fontSize) / 2 + fontSize * 0.15
         setTextBold(row.bold == true)
-        setTextColor(unpack(row.color or {1, 1, 1, 1}))
+        setTextColor(unpack(row.color or ADWaypointPanel.COLOR_TEXT))
         local width = (row.wide or row.buttons == nil) and innerWidth or labelWidth - l.gapX
         if isCloseRow then
             -- the title: the whole line up to the close button
@@ -638,24 +719,17 @@ function ADWaypointPanel:draw(vehicle, hud)
                 local hovered = inside(rect, mouseX, mouseY)
                 local color = button.color or ADWaypointPanel.COLOR_BUTTON
                 if button.active then
-                    color = ADWaypointPanel.COLOR_ACTIVE
+                    color = hovered and ADWaypointPanel.COLOR_ACTIVE_HOVER or ADWaypointPanel.COLOR_ACTIVE
                 elseif hovered then
                     color = button.hoverColor or ADWaypointPanel.COLOR_HOVER
                 end
-                drawFilledRect(rect.x, rect.y, rect.width, rect.height, unpack(color))
-                if hovered and button.active then
-                    drawFilledRect(rect.x, rect.y, rect.width, rect.height, 1, 1, 1, 0.2)
-                end
+                ADHudStyle.roundRect(rect.x, rect.y, rect.width, rect.height, chipRadius, color)
                 if hovered and row.highlight ~= nil then
                     self.hoveredConnection = row.highlight
                 end
                 setTextAlignment(RenderText.ALIGN_CENTER)
-                setTextBold(false)
-                if button.active then
-                    setTextColor(0, 0, 0, 1)
-                else
-                    setTextColor(1, 1, 1, 1)
-                end
+                setTextBold(button.active == true)
+                setTextColor(unpack(ADWaypointPanel.COLOR_TEXT))
                 renderText(rect.x + rect.width / 2, textY, fontSize, fitText(fontSize, button.text, rect.width - l.gapX))
                 setTextAlignment(RenderText.ALIGN_LEFT)
                 rect.onClick = button.onClick

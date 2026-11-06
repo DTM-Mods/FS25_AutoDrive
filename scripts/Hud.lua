@@ -10,8 +10,10 @@ AutoDrive.mouseWheelActive = false
 
 AutoDriveHud.debug = false
 
-AutoDriveHud.defaultHeaderHeight = 0.016
-AutoDriveHud.extendedHeaderHeight = 0.200
+-- Overdrive: a title bar like CourseCorrect's: the title large, the details on a line below, the header buttons big
+AutoDriveHud.defaultHeaderHeight = 0.046
+AutoDriveHud.extendedHeaderHeight = 0.250
+AutoDriveHud.headerButtonSize = 0.024
 
 function AutoDriveHud:new()
 	local o = {}
@@ -166,25 +168,37 @@ function AutoDriveHud:createHudAt(hudX, hudY)
 	self.row4 = self.posY + (self.pullDownRowOffset + 3) * self.borderY + (self.pullDownRowOffset + 2) * self.buttonHeight
 	self.rowHeader = self.posY + (self.pullDownRowOffset + 4) * self.borderY + (self.pullDownRowOffset + 3) * self.buttonHeight
 
-	table.insert(self.hudElements, ADHudIcon:new(self.posX, self.posY - 0 * self.gapHeight, self.width, self.height + 5 * self.gapHeight, "ad_gui.Background", 0, "background"))
-	table.insert(self.hudElements, ADHudIcon:new(self.posX, self.rowHeader, self.width, self.headerHeight, "ad_gui.Header", 1, "header"))
+	-- Overdrive: the panel from a gap below the buttons up to the top of the header (self.height has the header's
+	-- height added in pixels, so it does not cover the header); other mods (ADAddOn) sit on the header's top edge
+	table.insert(self.hudElements, ADHudIcon:new(self.posX, self.posY - self.gapHeight, self.width, self.rowHeader + self.headerHeight - self.posY + self.gapHeight, "ad_gui.Background", 0, "background"))
+	-- (kept: the panel grows upwards with the header's extra lines)
+	self.headerElement = ADHudIcon:new(self.posX, self.rowHeader, self.width, self.headerHeight, "ad_gui.Header", 1, "header")
+	table.insert(self.hudElements, self.headerElement)
 
-	local closeHeight = AutoDriveHud.defaultHeaderHeight * uiScale --0.0177 * uiScale;
+	-- Overdrive: the header buttons big, on the title line in the top right corner; they move up with the title when
+	-- the details take more lines (ADHudIcon:onDrawHeader)
+	local closeHeight = AutoDriveHud.headerButtonSize * uiScale
 	local closeWidth = closeHeight * (g_screenHeight / g_screenWidth)
 	self.headerIconWidth = closeWidth
-	local posX = self.posX + self.width - (closeWidth * 1.1)
-	local posY = self.rowHeader
+	self.headerButtons = {}
+	local function addHeaderButton(button)
+		button.headerBaseY = button.position.y
+		table.insert(self.headerButtons, button)
+		table.insert(self.hudElements, button)
+	end
+	local posX = self.posX + self.width - closeWidth - ADHudIcon.getHeaderPadX(uiScale) + closeWidth * 0.2
+	local posY = ADHudIcon.getTitleCenterY(self.rowHeader + self.headerHeight, uiScale) - closeHeight / 2
 	-- close crossing
-	table.insert(self.hudElements, ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_toggleHud", nil, nil, nil, nil, nil, nil, nil, "", 1, true))
+	addHeaderButton(ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_toggleHud", nil, nil, nil, nil, nil, nil, nil, "", 1, true):setFlat())
 
 	posX = posX - closeWidth - self.gapWidth
-	table.insert(self.hudElements, ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_toggleHudExtension", nil, nil, nil, nil, nil, nil, nil, "", 1, true))
+	addHeaderButton(ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_toggleHudExtension", nil, nil, nil, nil, nil, nil, nil, "", 1, true):setFlat())
 
 	-- editor: undo / redo, right click on undo shows what it would change
 	posX = posX - closeWidth - 3 * self.gapWidth
-	table.insert(self.hudElements, ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_redo", nil, nil, nil, nil, nil, nil, nil, "input_ADRedo", 1, false))
+	addHeaderButton(ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_redo", nil, nil, nil, nil, nil, nil, nil, "input_ADRedo", 1, false):setFlat())
 	posX = posX - closeWidth - self.gapWidth
-	table.insert(self.hudElements, ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_undo", nil, nil, nil, nil, nil, nil, nil, "input_ADUndo", 1, false))
+	addHeaderButton(ADHudButton:new(posX, posY, closeWidth, closeHeight, "input_undo", nil, nil, nil, nil, nil, nil, nil, "input_ADUndo", 1, false):setFlat())
 
 	
 	table.insert(self.hudElements, ADHudButton:new(self.posX + self.gapWidth, self.row4, self.iconWidth, self.iconHeight, "input_toggleAutomaticPickupTarget", nil, nil, nil, nil, nil, nil, nil, "input_ADToggleAutomaticPickupTarget", 1, true))

@@ -595,6 +595,10 @@
 		<text name="AD_wpPanel_vehicles"							 text="Veicoli" />
 		<text name="AD_wpPanel_driveHere"							 text="Guida qui" />
 		<text name="AD_wpPanel_sendVehicle"							 text="Invia veicolo" />
+		<text name="AD_wpPanel_park"							 text="Parcheggia qui" />
+		<text name="AD_wpPanel_parkName"							 text="Parcheggio %s" />
+		<text name="AD_wpPanel_parkSet"							 text="%s parcheggia a %s a lavoro finito" />
+		<text name="AD_wpPanel_parkCleared"							 text="%s: nessun parcheggio" />
 		<text name="AD_wpPanel_road"							 text="Strada: %s nodi" />
 		<text name="AD_wpPanel_direction"							 text="Direzione" />
 		<text name="AD_wpPanel_oneWay"							 text="Senso unico" />

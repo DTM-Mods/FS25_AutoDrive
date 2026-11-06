@@ -48,13 +48,54 @@ end
 function ADHudButton:onDraw(vehicle, uiScale)
     self:updateState(vehicle)
     if self.isVisible then
+        -- Overdrive: on a chip (ADHudStyle), the small buttons in the header only a round spot under the mouse
+        local x, y, w, h = self.position.x, self.position.y, self.size.width, self.size.height
+        local hovered = ADHudStyle.isHovered(x, y, w, h)
+        if self.flat then
+            if hovered then
+                ADHudStyle.roundRect(x, y, w, h, h / 2, ADHudStyle.C.hover)
+            end
+        else
+            if not self.isInset then
+                ADHudStyle.insetOverlay(self.ov, x, y, w, h)
+                self.isInset = true
+            end
+            ADHudStyle.chip(x, y, w, h, uiScale, hovered, self:isOn())
+        end
         self.ov:render()
     end
 end
 
+-- Overdrive: a button in the header, drawn without a chip
+function ADHudButton:setFlat()
+    self.flat = true
+    return self
+end
+
+-- Overdrive: a header button moved up or down (with the title when the header text takes more lines)
+function ADHudButton:setY(y)
+    if self.position.y ~= y then
+        self.position.y = y
+        self.ov:setPosition(self.position.x, y)
+    end
+end
+
+-- Overdrive: buttons that switch something on show it with a green chip
+function ADHudButton:isOn()
+    local action, state = self.primaryAction, self.state
+    if action == "input_start_stop" or action == "input_debug" or action == "input_showNeighbor" then
+        return state == 2
+    end
+    return action == "input_record" and state ~= nil and state > 1
+end
+
 function ADHudButton:updateState(vehicle)
     local newState = self:getNewState(vehicle)
-    self.ov:setSliceId(self.images[newState])
+    -- switching the image looks the slice up again, only done when the state changed
+    if newState ~= self.shownState then
+        self.ov:setSliceId(self.images[newState])
+        self.shownState = newState
+    end
     self.state = newState
 end
 

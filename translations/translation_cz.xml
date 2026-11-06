@@ -595,6 +595,10 @@
 		<text name="AD_wpPanel_vehicles"							 text="Vozidla" />
 		<text name="AD_wpPanel_driveHere"							 text="Jet sem" />
 		<text name="AD_wpPanel_sendVehicle"							 text="Poslat vozidlo" />
+		<text name="AD_wpPanel_park"							 text="Parkovat zde" />
+		<text name="AD_wpPanel_parkName"							 text="Parkoviště %s" />
+		<text name="AD_wpPanel_parkSet"							 text="%s po dokončení práce zaparkuje u %s" />
+		<text name="AD_wpPanel_parkCleared"							 text="%s: už nemá parkoviště" />
 		<text name="AD_wpPanel_road"							 text="Silnice: %s bodů" />
 		<text name="AD_wpPanel_direction"							 text="Směr" />
 		<text name="AD_wpPanel_oneWay"							 text="Jednosměrná" />

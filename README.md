@@ -14,6 +14,9 @@ Versions are `<AutoDrive version>-od.<build>`, e.g. `3.0.1.4-od.1` is the first 
 
 ## What Overdrive adds
 
+### A new look
+The HUD looks like CourseCorrect's panel: a dark rounded panel with a soft shadow and a green line along the top, the title in bold with the mode, time and task in grey, every button on a rounded chip that lights up under the mouse and turns green when it is on (start / stop, editor, recording, yes / no settings, loop counter), and the target lists as rounded fields; an opened list is a panel of its own with the row under the mouse highlighted. The waypoint panel, the selection menu and the route-check count match. Everything works as before. The HUD colours in the settings still apply (background, the line along the top = header colour, texts); colours never changed by a player move to the new ones. It also draws a little faster: button images, the header text and the list names are only worked out again when they change.
+
 ### Overdrive tab in the settings
 All settings Overdrive adds have their own tab in the AutoDrive settings window (speedometer icon), so the other tabs are the same as in AutoDrive:
 - **This vehicle:** Best price unloading, While tipping, Drive clear when blocked, Drive through obstructions (No AI Collisions), Start work at, Stop work at, Pipe Offset Front/Back, Refuel at. Shown only while you sit in a vehicle; they are saved on that vehicle, and "Make default" works as on the vehicle tab.
@@ -92,6 +95,7 @@ In the editor, **left-click a waypoint** to select it: a panel opens next to the
 - **Height:** **-0.5** / **+0.5** move the waypoint down or up by half a metre a click (only the height changes; Ctrl+Z puts it back, quick clicks undo together)
 - **Delete waypoint** (red, under the height and distance): deletes the waypoint like the editor's delete, with the targets on it and all connections to it; one Ctrl+Z brings it all back
 - **Vehicles** (on a target): **Drive here** sends the vehicle you are in to this target (drive to, and it starts); **Send vehicle** lists the AutoDrive vehicles of your farm, nearest first (busy ones are marked), and sends the one you pick
+- **Park here**: **Yes** makes this target the vehicle's parking place (where it goes when its job is done, like AutoDrive's park button: for the selected implement if one is selected); **No** removes it. On a waypoint without a target, **Park here** creates a target named "Park" plus the vehicle's name and makes it the parking place
 - **Side road:** no / yes for this waypoint
 - **Connections:** every neighbouring waypoint with the kind of connection (out, in, both ways, reverse out, reverse in). Click it to switch to the next kind, **X** removes the connection; pointing at a row draws a line to that waypoint
 - **Actions:** wait (each click: next time), horn, lights, unlock load

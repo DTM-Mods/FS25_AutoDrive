@@ -595,6 +595,10 @@
 		<text name="AD_wpPanel_vehicles"							 text="Техника" />
 		<text name="AD_wpPanel_driveHere"							 text="Ехать сюда" />
 		<text name="AD_wpPanel_sendVehicle"							 text="Отправить технику" />
+		<text name="AD_wpPanel_park"							 text="Парковать здесь" />
+		<text name="AD_wpPanel_parkName"							 text="Парковка %s" />
+		<text name="AD_wpPanel_parkSet"							 text="%s после работы паркуется у %s" />
+		<text name="AD_wpPanel_parkCleared"							 text="%s: места парковки больше нет" />
 		<text name="AD_wpPanel_road"							 text="Дорога: %s точек" />
 		<text name="AD_wpPanel_direction"							 text="Направление" />
 		<text name="AD_wpPanel_oneWay"							 text="Одностороннее" />

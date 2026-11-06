@@ -146,7 +146,10 @@ function ADPullDownList:onDraw(vehicle, uiScale)
     setTextAlignment(RenderText.ALIGN_LEFT)
 
     if self.state == ADPullDownList.STATE_COLLAPSED then
-        self.ovBG:render()
+        -- Overdrive: a rounded field (ADHudStyle), lighter under the mouse
+        local hovered = AutoDrive.pullDownListExpanded == 0 and ADHudStyle.isHovered(self.position.x, self.position.y, self.size.width, self.size.height)
+        ADHudStyle.roundRect(self.position.x, self.position.y, self.size.width, self.size.height, ADHudStyle.px(ADHudStyle.CHIP_RADIUS, uiScale),
+            hovered and ADHudStyle.C.hover or ADHudStyle.C.surface)
         self.ovExpand:render()
 
         if (AutoDrive.pullDownListExpanded ~= 0) and ((AutoDrive.pullDownListExpanded > self.type and AutoDrive.pullDownListDirection == ADPullDownList.EXPANDED_UP) or (AutoDrive.pullDownListExpanded < self.type and AutoDrive.pullDownListDirection == ADPullDownList.EXPANDED_DOWN)) then
@@ -186,10 +189,8 @@ function ADPullDownList:onDraw(vehicle, uiScale)
 
         renderText(posX, posY, adFontSize, text)
     else
-        drawFilledRect(self.position.x, self.expandedBottom, self.size.width, self.expandedSize.height, 0, 0, 0, 0.9)
-        self.ovTop:render()
-        self.ovStretch:render()
-        self.ovBottom:render()
+        -- Overdrive: a rounded panel with a shadow (ADHudStyle), the row under the mouse highlighted
+        ADHudStyle.panel(self.position.x, self.expandedBottom, self.size.width, self.expandedSize.height, uiScale, ADHudStyle.C.surface)
 
         local useFolders = AutoDrive.getSetting("useFolders")
 
@@ -249,6 +250,10 @@ function ADPullDownList:onDraw(vehicle, uiScale)
                 text = self:shortenTextToWidth(text, textTargetWidth, adFontSize)
 
                 local textPosition = self:getTextPositionByDisplayIndex(i + 1, uiScale)     -- start 1 line later
+
+                if self.hovered == self.selected + (i - 1) then
+                    self:drawRowHighlight(i + 1, uiScale)
+                end
 
                 if listEntry.isFolder then
 --[[
@@ -349,12 +354,44 @@ function ADPullDownList:onDraw(vehicle, uiScale)
     end
 end
 
+-- Overdrive: the row under the mouse in the opened list, a rounded highlight across the list
+function ADPullDownList:drawRowHighlight(displayIndex, uiScale)
+    local box = self:getBoxPositionByDisplayIndex(displayIndex)
+    local rowHeight = AutoDrive.Hud.listItemHeight
+    local gap = AutoDrive.Hud.gapWidth
+    ADHudStyle.roundRect(self.position.x + gap, box.y + (self.size.height - rowHeight) / 2, self.size.width - 2 * gap, rowHeight,
+        ADHudStyle.px(ADHudStyle.CHIP_RADIUS, uiScale), ADHudStyle.C.hover)
+end
+
+-- Overdrive: shortened texts by font size, width and text: the lists draw the same names every frame
+ADPullDownList.shortenedTexts = {}
+ADPullDownList.shortenedTextCount = 0
+ADPullDownList.SHORTENED_TEXTS_MAX = 2000
+
 function ADPullDownList:shortenTextToWidth(textInput, maxWidth, fontSize)
     if textInput == nil then
         return ""
     end
-    local maxNumChars = getTextLineLength(fontSize, textInput, maxWidth)
-    return utf8Substr(textInput, 0, maxNumChars)
+    local key = fontSize .. "|" .. maxWidth
+    local byWidth = ADPullDownList.shortenedTexts[key]
+    if byWidth == nil then
+        byWidth = {}
+        ADPullDownList.shortenedTexts[key] = byWidth
+    end
+    local text = byWidth[textInput]
+    if text == nil then
+        if ADPullDownList.shortenedTextCount >= ADPullDownList.SHORTENED_TEXTS_MAX then
+            -- renamed markers, filters etc. leave old entries behind: start over now and then
+            ADPullDownList.shortenedTexts = {[key] = {}}
+            byWidth = ADPullDownList.shortenedTexts[key]
+            ADPullDownList.shortenedTextCount = 0
+        end
+        local maxNumChars = getTextLineLength(fontSize, textInput, maxWidth)
+        text = utf8Substr(textInput, 0, maxNumChars)
+        byWidth[textInput] = text
+        ADPullDownList.shortenedTextCount = ADPullDownList.shortenedTextCount + 1
+    end
+    return text
 end
 
 function ADPullDownList:getListElementByDisplayIndex(vehicle, index)
