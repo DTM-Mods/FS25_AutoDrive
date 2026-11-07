@@ -44,6 +44,15 @@ function ADUnloaderClear.getWorkWidth(harvester, root)
     if AutoDrive.getFrontToolWidth ~= nil then
         width = math.max(AutoDrive.getFrontToolWidth(root) or 0, width)
     end
+    -- PropaineX edit (3.10.0.0): Nexat: header width from the module (in front of it, not of the carrier) and the
+    -- carrier's length is the rig's width
+    local module = AutoDrive.getSidewaysHarvester(harvester)
+    if module ~= nil then
+        if AutoDrive.getFrontToolWidth ~= nil then
+            width = math.max(AutoDrive.getFrontToolWidth(module) or 0, width)
+        end
+        width = math.max(width, AutoDrive.getHarvesterHalfSize(module) * 2)
+    end
     for _, unit in ipairs({harvester, root}) do
         if unit.size ~= nil and unit.size.width ~= nil then
             width = math.max(width, unit.size.width)
@@ -75,7 +84,9 @@ function ADUnloaderClear.getHarvesters(vehicle)
             local root = harvester.getRootVehicle ~= nil and harvester:getRootVehicle() or harvester
             if root ~= nil and root.components ~= nil and root ~= vehicle
                 and AutoDrive.getDistanceBetween(vehicle, root) < ADUnloaderClear.HARVESTER_RANGE then
-                table.insert(list, {harvester = harvester, root = root, width = ADUnloaderClear.getWorkWidth(harvester, root)})
+                -- PropaineX edit (3.10.0.0): frame = the vehicle facing the way it harvests (the module on a Nexat)
+                table.insert(list, {harvester = harvester, root = root, frame = AutoDrive.getHarvesterFrameVehicle(root),
+                    width = ADUnloaderClear.getWorkWidth(harvester, root)})
             end
         end
     end
@@ -100,10 +111,11 @@ end
 
 -- the strip in front of the harvester, margin wider on each side than it works
 function ADUnloaderClear.getAheadBox(entry, margin)
-    local root = entry.root
+    local root = entry.frame or entry.root -- PropaineX edit (3.10.0.0): Nexat
     local x, y, z = getWorldTranslation(root.components[1].node)
     local dirX, _, dirZ = AutoDrive.localDirectionToWorld(root, 0, 0, 1)
-    local length = (root.size ~= nil and root.size.length) or 10
+    local _, halfLength = AutoDrive.getHarvesterHalfSize(root)
+    local length = halfLength * 2
     local centre = length / 2 + ADUnloaderClear.AHEAD_LENGTH / 2
     return ADUnloaderEscape.makeBox(x + dirX * centre, y, z + dirZ * centre, dirX, dirZ,
         entry.width / 2 + margin, ADUnloaderClear.AHEAD_LENGTH / 2)
@@ -172,7 +184,7 @@ end
 -- from its own lane (header + AHEAD_MARGIN) toward the side with standing crop (it turns into the next pass). Crop on
 -- neither or both sides: both directions. nil when the field end isn't found ahead.
 function ADUnloaderClear.getTurnZone(entry, headland, fruits)
-    local root = entry.root
+    local root = entry.frame or entry.root -- PropaineX edit (3.10.0.0): Nexat
     local x, y, z = getWorldTranslation(root.components[1].node)
     local dirX, _, dirZ = AutoDrive.localDirectionToWorld(root, 0, 0, 1)
     local dist = nil
@@ -245,7 +257,7 @@ end
 
 -- the nearest clear spot, tried first in the directions away from the harvesters; else just outside the field.
 -- returns x, z, dirX, dirZ or nil
-function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
+function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits, minDistance)
     local x, _, z = getWorldTranslation(vehicle.components[1].node)
     local zones = ADUnloaderClear.getTurnZones(harvesters, fruits)
     local halfLength = math.max(AutoDrive.getTractorTrainLength(vehicle, true, false) or 0, 6) / 2
@@ -255,7 +267,7 @@ function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
         local hx, _, hz = getWorldTranslation(entry.root.components[1].node)
         local d = math.max(MathUtil.vector2Length(x - hx, z - hz), 1)
         awayX, awayZ = awayX + (x - hx) / d, awayZ + (z - hz) / d
-        local dx, _, dz = AutoDrive.localDirectionToWorld(entry.root, 0, 0, 1)
+        local dx, _, dz = AutoDrive.localDirectionToWorld(entry.frame or entry.root, 0, 0, 1) -- PropaineX edit (3.10.0.0): Nexat
         workX, workZ = workX + dx, workZ + dz
     end
     local workLength = MathUtil.vector2Length(workX, workZ)
@@ -276,7 +288,8 @@ function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
     end
     table.sort(directions, function(a, b) return a.score > b.score end)
     for _, ring in ipairs(ADUnloaderClear.SEARCH_RINGS) do
-        for _, dir in ipairs(directions) do
+        -- PropaineX edit (3.6.0.4): minDistance: only spots at least that far away (moving aside after no path)
+        for _, dir in ipairs(ring >= (minDistance or 0) and directions or {}) do
             local px, pz = x + dir.x * ring, z + dir.z * ring
             if ADUnloaderClear.isSafeSpot(vehicle, px, pz, workX, workZ, harvesters, zones, halfLength) then
                 return px, pz, workX, workZ
@@ -291,16 +304,37 @@ function ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
         if d > 0.01 then
             dx, dz = dx / d, dz / d
             local extra = math.max(ADUnloaderClear.OUTSIDE_DISTANCE - ADUnloaderEscape.EDGE_OUTSIDE, 0)
-            return ex + dx * extra, ez + dz * extra, dx, dz
+            if minDistance == nil or d + extra >= minDistance then
+                return ex + dx * extra, ez + dz * extra, dx, dz
+            end
         end
     end
     return nil
 end
 
--- every frame from CombineUnloaderMode:monitorTasks (server); true when it has started a move
+-- PropaineX edit (3.6.1.4): standing still while planning a route to a harvester (CatchCombinePipeTask planning or
+-- waiting to plan, EmptyHarvesterTask planning)
+function ADUnloaderClear.isPlanning(vehicle)
+    local task = vehicle.ad.taskModule ~= nil and vehicle.ad.taskModule:getActiveTask() or nil
+    if task == nil then
+        return false
+    end
+    if task.taskType == "CatchCombinePipeTask" then
+        return task.state == CatchCombinePipeTask.STATE_PATHPLANNING or task.state == CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
+    elseif task.taskType == "EmptyHarvesterTask" then
+        return task.state == EmptyHarvesterTask.STATE_PATHPLANNING
+    end
+    return false
+end
+
+-- every frame from CombineUnloaderMode:monitorTasks (server); true when it has started a move.
+-- PropaineX edit (3.6.1.4): also while it plans a route to a harvester, and then getting out of the way comes first: it
+-- moves at the first check (no UNSAFE_TIME), lets go of the job (the next free unloader is sent, or it is called again
+-- once it waits) and, without a clear spot, drives 25 m straight.
 function ADUnloaderClear.monitor(mode, dt)
     local vehicle = mode.vehicle
-    if g_server == nil or mode.state ~= mode.STATE_WAIT_TO_BE_CALLED then
+    local planning = mode.state ~= mode.STATE_WAIT_TO_BE_CALLED and ADUnloaderClear.isPlanning(vehicle)
+    if g_server == nil or (mode.state ~= mode.STATE_WAIT_TO_BE_CALLED and not planning) then
         mode.clearUnsafeTime = 0
         return false
     end
@@ -329,11 +363,19 @@ function ADUnloaderClear.monitor(mode, dt)
         return false
     end
     mode.clearUnsafeTime = (mode.clearUnsafeTime or 0) + elapsed
-    if mode.clearUnsafeTime < ADUnloaderClear.UNSAFE_TIME then
+    if not planning and mode.clearUnsafeTime < ADUnloaderClear.UNSAFE_TIME then
         return false
     end
     mode.clearUnsafeTime = 0
     local tx, tz, dirX, dirZ = ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
+    if planning then
+        Logging.info("[AD] %s: in a harvester's way (%s) while planning a route, moving out of the way first", ADDiag.name(vehicle), danger)
+        ADUnloaderClear.start(mode, tx, tz, dirX, dirZ, true)
+        mode.combine = nil
+        mode.followingUnloader = nil
+        mode.targetUnloader = nil
+        return true
+    end
     if tx == nil then
         ADUnloaderClear.onMoveFailed(vehicle)
         return false
@@ -343,15 +385,27 @@ function ADUnloaderClear.monitor(mode, dt)
     return true
 end
 
-function ADUnloaderClear.start(mode, x, z, dirX, dirZ)
+function ADUnloaderClear.start(mode, x, z, dirX, dirZ, straightFallback)
     local vehicle = mode.vehicle
     -- not idle while moving, or the harvest manager could assign it and get no answer
     ADHarvestManager:unregisterAsUnloader(vehicle)
     vehicle.ad.specialDrivingModule:releaseVehicle()
     vehicle.ad.taskModule:abortAllTasks()
-    mode.activeTask = MoveClearOfHarvesterTask:new(vehicle, {x = x, y = terrainY(x, z), z = z}, {x = dirX, z = dirZ})
+    local target = x ~= nil and {x = x, y = terrainY(x, z), z = z} or nil
+    local direction = dirX ~= nil and {x = dirX, z = dirZ} or nil
+    mode.activeTask = MoveClearOfHarvesterTask:new(vehicle, target, direction, straightFallback)
     mode.state = mode.STATE_MOVE_CLEAR
     vehicle.ad.taskModule:addTask(mode.activeTask)
+end
+
+-- PropaineX edit (3.6.0.4): after no path to a harvester: to the closest safe spot at least minDistance away, else
+-- minDistance straight ahead (MoveClearOfHarvesterTask straight fallback); then it waits for a call again
+function ADUnloaderClear.moveAside(mode, minDistance)
+    local vehicle = mode.vehicle
+    local harvesters = ADUnloaderClear.getHarvesters(vehicle)
+    local fruits = ADUnloaderClear.getFruits(harvesters)
+    local x, z, dirX, dirZ = ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits, minDistance)
+    ADUnloaderClear.start(mode, x, z, dirX, dirZ, true)
 end
 
 local function getMode(vehicle)

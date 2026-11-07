@@ -218,6 +218,7 @@ end
 ADSpecialDrivingModule.CATCH_UP_GAIN = 3
 ADSpecialDrivingModule.CATCH_UP_LEAD = 1
 ADSpecialDrivingModule.UNDER_PIPE_DISTANCE = 1
+ADSpecialDrivingModule.SWING_ROUND_SPEED = 8 -- km/h, PropaineX edit (3.8.1.4)
 
 -- PropaineX edit (3.5.0.4): drive like a semi while chasing a harvester's pipe (chaseCatchUp) with a trailer attached:
 -- * never steer tighter than TRAILER_TURN_RADIUS (a spot inside the turning circle used to make it drive in circles
@@ -225,8 +226,10 @@ ADSpecialDrivingModule.UNDER_PIPE_DISTANCE = 1
 -- * jackknife guard: cab more than JACKKNIFE_ANGLE off the trailer -> wheels straight, at most STRAIGHTEN_SPEED, until
 --   it is back under JACKKNIFE_RELEASE
 ADSpecialDrivingModule.TRAILER_TURN_RADIUS = 12   -- m
-ADSpecialDrivingModule.JACKKNIFE_ANGLE = 45       -- deg
-ADSpecialDrivingModule.JACKKNIFE_RELEASE = 15     -- deg
+-- PropaineX edit (3.9.1.4): 45/15 deg made it straighten at 8 km/h in every hard turn (slow, long lazy arcs); only a
+-- real fold now, and no speed cap (forward, a semi's trailer follows)
+ADSpecialDrivingModule.JACKKNIFE_ANGLE = 75       -- deg
+ADSpecialDrivingModule.JACKKNIFE_RELEASE = 60     -- deg
 ADSpecialDrivingModule.STRAIGHTEN_SPEED = 8       -- km/h
 ADSpecialDrivingModule.MIN_TRAILER_LENGTH = 4     -- m: shorter attachments (weights, small tools) don't count
 
@@ -263,7 +266,7 @@ function ADSpecialDrivingModule:limitTrailerSteering(lx, lz, distance)
         self.straighteningTrailer = true
     end
     if self.straighteningTrailer then
-        return 0, 1, ADSpecialDrivingModule.STRAIGHTEN_SPEED
+        return 0, 1, nil
     end
     local a = math.atan2(lx, lz)
     local maxA = math.asin(math.min(1, math.max(distance or 0, 0.1) / (2 * ADSpecialDrivingModule.TRAILER_TURN_RADIUS)))
@@ -274,8 +277,10 @@ function ADSpecialDrivingModule:limitTrailerSteering(lx, lz, distance)
     return lx, lz, nil
 end
 
-function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDynamicCollision, maxAcc, maxSpeed, chaseCatchUp)
-    local speed = math.min(self.vehicle.ad.stateModule:getFieldSpeedLimit(), maxSpeed)
+-- PropaineX edit (3.9.0.4): optional steerPoint: steer at it, judge speed by point (pipe lock looks ahead)
+function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDynamicCollision, maxAcc, maxSpeed, chaseCatchUp, steerPoint)
+    local fieldLimit = self.vehicle.ad.stateModule:getFieldSpeedLimit()
+    local speed = math.min(fieldLimit, maxSpeed)
     local acc = math.max(0.75, maxAcc)
 
     local x, y, z = getWorldTranslation(self.vehicle.components[1].node)
@@ -287,13 +292,23 @@ function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDyn
         if self.distanceToChasePos < under then
             -- under the pipe: match the combine's speed, no faster
             speed = maxFollowSpeed
-        elseif aheadZ < 0 then
-            -- past the spot: drop back
+        elseif aheadZ < 0 and self.distanceToChasePos < 3 and maxFollowSpeed < 1 then
+            -- PropaineX edit (3.8.2.4): just past the spot of a standing combine (moving along the trailer): stop, no
+            -- swinging round for a step of a few metres
+            speed = 0
+        elseif aheadZ < 0 and self.distanceToChasePos < 20 and maxFollowSpeed < 1 then
+            -- PropaineX edit (3.8.1.4): past the spot of a standing combine: dropping back meant speed 0 and standing
+            -- there (15 s -> "stuck", backing out); drive on slowly and swing round to it instead
+            speed = ADSpecialDrivingModule.SWING_ROUND_SPEED
+        elseif aheadZ < 0 and self.distanceToChasePos < 20 then
+            -- past the spot: drop back (the moving combine comes up to us)
+            -- PropaineX edit (3.7.0.4): only when close; a spot far behind used to give speed 0 (it stood still), now
+            -- it drives on and turns round to it (semi turning circle, limitTrailerSteering)
             speed = math.max(maxFollowSpeed - (self.distanceToChasePos - under) * ADSpecialDrivingModule.CATCH_UP_GAIN, 0)
         elseif self.distanceToChasePos < 20 then
             speed = maxFollowSpeed + ADSpecialDrivingModule.CATCH_UP_LEAD + (self.distanceToChasePos - under) * ADSpecialDrivingModule.CATCH_UP_GAIN
         end
-        speed = math.min(speed, self.vehicle.ad.stateModule:getFieldSpeedLimit())
+        speed = math.min(speed, fieldLimit)
     elseif self.distanceToChasePos < 0.5 then
         speed = maxFollowSpeed * 1
     elseif self.distanceToChasePos < 7 then
@@ -304,11 +319,13 @@ function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDyn
 
     --print("Targetspeed: " .. speed .. " distance: " .. self.distanceToChasePos .. " maxFollowSpeed: " .. maxFollowSpeed)
 
-    local lx, lz = AutoDrive.getDriveDirection(self.vehicle, point.x, point.y, point.z)
+    local sp = steerPoint or point
+    local lx, lz = AutoDrive.getDriveDirection(self.vehicle, sp.x, sp.y, sp.z)
     if chaseCatchUp then
         -- PropaineX edit (3.5.0.4): drive like a semi (see limitTrailerSteering)
         local straightenSpeed
-        lx, lz, straightenSpeed = self:limitTrailerSteering(lx, lz, self.distanceToChasePos)
+        local steerDistance = steerPoint ~= nil and MathUtil.vector2Length(x - sp.x, z - sp.z) or self.distanceToChasePos
+        lx, lz, straightenSpeed = self:limitTrailerSteering(lx, lz, steerDistance)
         if straightenSpeed ~= nil then
             speed = math.min(speed, straightenSpeed)
         end

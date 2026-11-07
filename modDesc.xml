@@ -55,7 +55,7 @@ Changelog: Необходимые корректировки для FS25, нас
 ]]>
 		</zh>
 	</description>
-	<version>3.5.0.4</version>
+	<version>3.0.1.4</version>
 	<multiplayer supported="true" />
 	<iconFilename>icon_AutoDrive.dds</iconFilename>
 	<extraSourceFiles>

@@ -287,12 +287,12 @@ function ADHarvestManager.isHarvesterActive(harvester)
             local chasingRear = false
             local pipeSide = AutoDrive.getPipeSide(harvester)
             if pipeSide == AutoDrive.CHASEPOS_LEFT then
-                local leftBlocked = harvester.ad.sensors.leftSensor:pollInfo()
-                local leftFrontBlocked = harvester.ad.sensors.leftFrontSensor:pollInfo()
+                local leftBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).leftSensor:pollInfo()
+                local leftFrontBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).leftFrontSensor:pollInfo()
                 chasingRear = leftBlocked or leftFrontBlocked
             else
-                local rightBlocked = harvester.ad.sensors.rightSensor:pollInfo()
-                local rightBlockedBlocked = harvester.ad.sensors.rightFrontSensor:pollInfo()
+                local rightBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).rightSensor:pollInfo()
+                local rightBlockedBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).rightFrontSensor:pollInfo()
                 chasingRear = rightBlocked or rightBlockedBlocked
             end
 

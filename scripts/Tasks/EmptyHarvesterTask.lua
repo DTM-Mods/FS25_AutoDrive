@@ -50,6 +50,7 @@ end
 
 function EmptyHarvesterTask:new(vehicle, combine)
     local o = EmptyHarvesterTask:create()
+    o.taskType = "EmptyHarvesterTask" -- PropaineX edit (3.6.1.4): ADUnloaderClear.isPlanning
     o.vehicle = vehicle
     o.combine = combine
     o.state = EmptyHarvesterTask.STATE_PATHPLANNING
@@ -118,6 +119,20 @@ function EmptyHarvesterTask:update(dt)
         end
         self:switchToFollow()
         return
+    end
+
+    -- PropaineX edit (3.6.0.4): no path to the pipe within PATH_TIMEOUT (searching plus the waits after a failed
+    -- search) -> hand the job off or move aside and plan again (CombineUnloaderMode:onPathTimeout)
+    if self.state == EmptyHarvesterTask.STATE_PATHPLANNING then
+        self.pathWait = (self.pathWait or 0) + dt
+        if self.pathWait > CombineUnloaderMode.PATH_TIMEOUT then
+            self.pathWait = 0
+            self.vehicle.ad.pathFinderModule:abort()
+            self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:onPathTimeout()
+            return
+        end
+    else
+        self.pathWait = 0
     end
 
     if self.state == EmptyHarvesterTask.STATE_PATHPLANNING then
