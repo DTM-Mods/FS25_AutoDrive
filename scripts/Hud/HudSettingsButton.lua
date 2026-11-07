@@ -36,6 +36,13 @@ end
 function ADHudSettingsButton:onDraw(vehicle, uiScale)
     self:updateState(vehicle)
     if self.isVisible then
+        -- Overdrive: on a chip (ADHudStyle), green for a yes / no setting that is on
+        local x, y, w, h = self.position.x, self.position.y, self.size.width, self.size.height
+        if not self.isInset then
+            ADHudStyle.insetOverlay(self.ov, x, y, w, h)
+            self.isInset = true
+        end
+        ADHudStyle.chip(x, y, w, h, uiScale, ADHudStyle.isHovered(x, y, w, h), #self.images == 2 and self.state == 2)
         self.ov:render()
     end
 end
@@ -43,7 +50,10 @@ end
 function ADHudSettingsButton:updateState(vehicle)
     local newState = AutoDrive.getSettingState(self.setting, vehicle)
     self.isVisible = not AutoDrive.isEditorModeEnabled() or AutoDrive.getSetting("wideHUD")
-    self.ov:setSliceId(self.images[newState])
+    if newState ~= self.shownState then
+        self.ov:setSliceId(self.images[newState])
+        self.shownState = newState
+    end
     self.state = newState
 end
 

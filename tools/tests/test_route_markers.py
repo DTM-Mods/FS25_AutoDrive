@@ -59,6 +59,8 @@ s.execute("""
     function reset() LINES, SPHERES, ARROWS, TEXTS, SQUARES = {}, {}, {}, {}, {} end
 """)
 s.execute(read("scripts", "Manager", "RouteCheck.lua"))
+import hud_style_stub
+hud_style_stub.load(s)
 s.execute(read("scripts", "Manager", "RouteMarkers.lua"))
 
 # changes are counted (and the old markChanges still runs); checked only after 1.5 s without changes
@@ -79,9 +81,10 @@ texts = list(s.eval("TEXTS").values())
 assert "Dead end" in texts and "Loose" not in texts
 assert not any(t.startswith("Route check") for t in texts)
 # the count under the HUD comes on its own, on a dark box as wide as its text, drawn before the HUD
-s.execute("reset(); BOXES = {}; ADRouteMarkers:drawSummary(vehicle)")
+s.execute("reset(); ROUND_RECTS = {}; ADRouteMarkers:drawSummary(vehicle)")
 assert list(s.eval("TEXTS").values()) == ["Route check: 2 problems, the nearest 30 m away"]
-assert s.eval("#BOXES") == 1 and s.eval("BOXES[1]") > s.eval("getTextWidth(0.012, TEXTS[1])")
+assert s.eval("#ROUND_RECTS") == 1 and s.eval("ROUND_RECTS[1].w") > s.eval("getTextWidth(0.012, TEXTS[1])")
+assert s.eval("ROUND_RECTS[1].color == ADHudStyle.C.bg")
 s.execute("SETTINGS.showRouteProblems = false; reset(); ADRouteMarkers:drawSummary(vehicle); SETTINGS.showRouteProblems = true")
 assert s.eval("#TEXTS") == 0
 s.execute("reset()")

@@ -122,17 +122,29 @@ AutoDrive.colors = {
 	ad_color_previewOk = { 0.3, 0.9, 0, 1 },
 	ad_color_previewNotOk = { 1, 0.1, 0, 1 },
 	ad_color_textInputBackground = { 0.0227, 0.5346, 0.8519, 1 }, -- Giants original
-	ad_color_hudTextDefault = { 1, 1, 1, 1 },
-	ad_color_hudTextHover = { 0.51, 0.67, 0.05, 1 },
-	ad_color_hudTextSpecial = { 0.66, 0.83, 0.34, 1 },
-	ad_color_hudTextHoverSpecial = { 0.45, 0.73, 0.05, 1 },
-	ad_color_header = { 0.171, 0.323, 0.000, 1 },           -- 115 154 0 255
-	ad_color_background = { 0, 0, 0, 0.67 },                -- 0 0 0 173
+	-- Overdrive: the HUD in CourseCorrect's look (ADHudStyle); linear values, the sRGB colour behind --
+	ad_color_hudTextDefault = { 0.8524, 0.8727, 0.8933, 1 },       -- #edf0f2
+	ad_color_hudTextHover = { 0.0474, 0.6121, 0.2273, 1 },         -- #40cc82
+	ad_color_hudTextSpecial = { 0.0290, 0.4854, 0.1726, 1 },       -- #33b873
+	ad_color_hudTextHoverSpecial = { 0.1726, 0.7549, 0.3494, 1 },  -- #73e09e
+	ad_color_header = { 0.0290, 0.4854, 0.1726, 1 },               -- #33b873, the line along the top of the HUD
+	ad_color_background = { 0.0021, 0.0029, 0.0044, 0.94 },        -- #0f1216
 	ad_color_markerText = { 0.5, 1, 0.5, 1 },         -- 188 255 188 255
 	ad_color_rightOfWayCenter = { 0, 0.65, 0.7, 1 },
 }
 
 AutoDrive.currentColors = {} -- this will hold the current colors, derived from default colors above, overwritten by local settings
+
+-- Overdrive: the HUD colours before the new look: a saved colour still at one of these was never changed by the
+-- player, so it gets the new default instead of keeping the old look
+AutoDrive.previousHudColors = {
+	ad_color_hudTextDefault = { 1, 1, 1, 1 },
+	ad_color_hudTextHover = { 0.51, 0.67, 0.05, 1 },
+	ad_color_hudTextSpecial = { 0.66, 0.83, 0.34, 1 },
+	ad_color_hudTextHoverSpecial = { 0.45, 0.73, 0.05, 1 },
+	ad_color_header = { 0.171, 0.323, 0.000, 1 },
+	ad_color_background = { 0, 0, 0, 0.67 },
+}
 
 AutoDrive.fuelFillTypes = {
 	"DIESEL",

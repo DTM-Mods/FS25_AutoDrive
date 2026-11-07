@@ -17,12 +17,13 @@ ADNodeSelection.ON_GROUND = 0.5        -- closer than this to the ground: a move
 ADNodeSelection.COLOR_BOX = {1, 0.65, 0, 0.12}
 ADNodeSelection.COLOR_BORDER = {1, 0.65, 0, 0.9}
 ADNodeSelection.COLOR_TEXT = {1, 0.65, 0, 1}
-ADNodeSelection.COLOR_BACKGROUND = {0, 0, 0, 0.82}
-ADNodeSelection.COLOR_BUTTON = {0.18, 0.18, 0.18, 0.95}
-ADNodeSelection.COLOR_HOVER = {0.35, 0.35, 0.35, 0.95}
-ADNodeSelection.COLOR_ACTIVE = {1, 0.6, 0.1, 0.95}
-ADNodeSelection.COLOR_DANGER = {0.55, 0.1, 0.1, 0.95}
-ADNodeSelection.COLOR_DANGER_HOVER = {0.8, 0.15, 0.15, 0.95}
+-- the menu in the Overdrive look (ADHudStyle, colours as they look on screen)
+ADNodeSelection.COLOR_BACKGROUND = ADHudStyle.C.bg
+ADNodeSelection.COLOR_BUTTON = ADHudStyle.C.chip
+ADNodeSelection.COLOR_HOVER = ADHudStyle.C.hover
+ADNodeSelection.COLOR_ACTIVE = ADHudStyle.C.accent
+ADNodeSelection.COLOR_DANGER = ADHudStyle.C.danger
+ADNodeSelection.COLOR_DANGER_HOVER = ADHudStyle.C.dangerHover
 ADNodeSelection.TEXT_SIZE = 0.013
 ADNodeSelection.ROW_HEIGHT = 0.026
 ADNodeSelection.PADDING = 0.006
@@ -609,8 +610,8 @@ end
 function ADNodeSelection:drawMenu()
     local menu = self.menu
     local l = menu.layout
-    drawFilledRect(l.x, l.y, l.width, l.height, unpack(self.COLOR_BACKGROUND))
-    drawFrame(l.x, l.y, l.width, l.height, 0.001, unpack(self.COLOR_BORDER))
+    ADHudStyle.panel(l.x, l.y, l.width, l.height, 1, self.COLOR_BACKGROUND)
+    local chipRadius = ADHudStyle.px(ADHudStyle.CHIP_RADIUS)
     local hoveredButton = self:getMenuButtonAt(g_lastMousePosX, g_lastMousePosY)
     setTextAlignment(RenderText.ALIGN_LEFT)
     for _, row in ipairs(menu.rows) do
@@ -619,7 +620,7 @@ function ADNodeSelection:drawMenu()
             if row.title then
                 setTextColor(unpack(self.COLOR_TEXT))
             else
-                setTextColor(0.85, 0.85, 0.85, 1)
+                ADHudStyle.setTextColor(ADHudStyle.C.muted)
             end
             renderText(l.x + self.PADDING, row.textY, self.TEXT_SIZE, row.label)
         end
@@ -630,8 +631,8 @@ function ADNodeSelection:drawMenu()
             elseif b.active then
                 color = self.COLOR_ACTIVE
             end
-            drawFilledRect(b.rect.x, b.rect.y, b.rect.width, b.rect.height, unpack(color))
-            setTextColor(1, 1, 1, 1)
+            ADHudStyle.roundRect(b.rect.x, b.rect.y, b.rect.width, b.rect.height, chipRadius, color)
+            ADHudStyle.setTextColor(ADHudStyle.C.text)
             setTextBold(false)
             renderText(b.rect.x + self.PADDING, row.textY, self.TEXT_SIZE, b.label)
         end

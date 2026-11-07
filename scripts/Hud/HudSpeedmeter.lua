@@ -22,6 +22,13 @@ function ADHudSpeedmeter:new(posX, posY, width, height, fieldSpeed)
 end
 
 function ADHudSpeedmeter:onDraw(vehicle, uiScale)
+    -- Overdrive: on a chip (ADHudStyle)
+    local x, y, w, h = self.position.x, self.position.y, self.size.width, self.size.height
+    if not self.isInset then
+        ADHudStyle.insetOverlay(self.ov, x, y, w, h)
+        self.isInset = true
+    end
+    ADHudStyle.chip(x, y, w, h, uiScale, ADHudStyle.isHovered(x, y, w, h), false)
     self.ov:render()
 
     if AutoDrive.pullDownListExpanded == 0 then

@@ -598,6 +598,10 @@
 		<text name="AD_wpPanel_vehicles"							 text="Vehicles" />
 		<text name="AD_wpPanel_driveHere"							 text="Drive here" />
 		<text name="AD_wpPanel_sendVehicle"							 text="Send vehicle" />
+		<text name="AD_wpPanel_park"							 text="Park here" />
+		<text name="AD_wpPanel_parkName"							 text="Park %s" />
+		<text name="AD_wpPanel_parkSet"							 text="%s parks at %s when its job is done" />
+		<text name="AD_wpPanel_parkCleared"							 text="%s: no parking place any more" />
 		<text name="AD_wpPanel_road"							 text="Road: %s waypoints" />
 		<text name="AD_wpPanel_direction"							 text="Direction" />
 		<text name="AD_wpPanel_oneWay"							 text="One-way" />

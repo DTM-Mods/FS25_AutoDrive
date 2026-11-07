@@ -90,6 +90,8 @@ s.execute("""
         return table.concat(list, ",")
     end
 """)
+import hud_style_stub
+hud_style_stub.load(s)
 s.execute(read("scripts", "Manager", "NodeSelection.lua"))
 sel = lambda: list(s.eval("ADNodeSelection:getIds()").values())
 

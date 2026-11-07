@@ -17,6 +17,8 @@ s.execute("""
         if sendLocal then ev:run(LOCAL_CONNECTION) end
     end
 """)
+import hud_style_stub
+hud_style_stub.load(s)
 for f in [("Utils", "TidyTools.lua"), ("Events", "Graph", "MoveWayPointEvent.lua"), ("Events", "Graph", "MoveWayPointsEvent.lua"),
           ("Events", "Graph", "SetConnectionEvent.lua"), ("Events", "Graph", "RoadEvent.lua"), ("Events", "Graph", "DeleteWayPointsEvent.lua"), ("Gui", "WaypointPanel.lua"), ("Manager", "NodeSelection.lua")]:
     s.execute(t.read(os.path.join(t.MOD, "scripts", *f)))
@@ -38,6 +40,7 @@ s.execute("""
     AutoDrive.playSample = function() end
     OPENED = 0
     AutoDrive.onOpenEnterTargetName = function() OPENED = OPENED + 1 end
+    AutoDrive.getSelectedWorkTool = function(v) return SELECTED_TOOL end
     g_gameSettings = {getValue = function() return 1 end}
     g_screenWidth, g_screenHeight = 1920, 1080
     g_time = 0
@@ -220,6 +223,44 @@ assert s.eval("click('Vehicles', 'Drive here')") and s.eval("SENT_TO[1] == V") a
 assert s.eval("click('Vehicles', 'Send vehicle')") and s.eval("SEND_DIALOG[1]") is None and s.eval("SEND_DIALOG[2]") == 1
 assert s.eval("#ADUndoManager.undoStack") == 0
 
+# --- park here: the vehicle (or its selected implement, like AutoDrive's own park button) parks at this target when
+# its job is done; set through AutoDrive's park event; No clears it; a lit button does nothing; no undo step
+s.execute("""
+    PARK_SENT, MESSAGES = {}, {}
+    V.getName = function() return "Fendt" end
+    V.advd = {setParkDestination = function(self, tool, id) table.insert(PARK_SENT, {tool, id}); tool.advd.parkDestination = id end}
+    draw()
+""")
+assert s.eval("find('Park here', 'No').active") and not s.eval("find('Park here', 'Yes').active")
+assert s.eval("click('Park here', 'Yes')") and s.eval("PARK_SENT[1][1] == V") and s.eval("PARK_SENT[1][2]") == 1
+assert s.eval("MESSAGES[1]") == "Fendt parks at Grain Mill when its job is done", s.eval("MESSAGES[1]")
+assert s.eval("find('Park here', 'Yes').active") and not s.eval("find('Park here', 'No').active")
+s.execute("click('Park here', 'Yes')")
+assert s.eval("#PARK_SENT") == 1
+assert s.eval("click('Park here', 'No')") and s.eval("PARK_SENT[2][2]") == -1 and s.eval("MESSAGES[2]") == "Fendt: no parking place any more"
+s.execute("SELECTED_TOOL = {getName = function() return 'Trailer' end, advd = {}}; click('Park here', 'Yes')")
+assert s.eval("PARK_SENT[3][1] == SELECTED_TOOL") and s.eval("MESSAGES[3]") == "Trailer parks at Grain Mill when its job is done"
+s.execute("SELECTED_TOOL = nil")
+assert s.eval("#ADUndoManager.undoStack") == 0
+# a waypoint without a target: "Park here" creates a target named after the vehicle (numbered when the name is taken)
+# and parks there as soon as it exists (in multiplayer it comes back from the server); undone like any new target
+s.execute("""
+    AutoDriveCreateMapMarkerEvent = {sendEvent = function(id, name) CREATE_SENT = {id, name} end}
+    ADGraphManager.mapMarkers[1].name = "Park Fendt"
+    V.ad.selectedNodeId = 4; MESSAGES = {}; draw()
+""")
+assert s.eval("click('Target', 'Park here')") and s.eval("CREATE_SENT[1]") == 4 and s.eval("CREATE_SENT[2]") == "Park Fendt 2"
+assert s.eval("#PARK_SENT") == 3 and s.eval("P.pendingPark ~= nil")    # not there yet: waiting
+s.execute("ADGraphManager:createMapMarker(4, 'Park Fendt 2', false); draw()")
+assert s.eval("P.pendingPark") is None and s.eval("PARK_SENT[4][1] == V") and s.eval("PARK_SENT[4][2]") == 2
+assert s.eval("MESSAGES[1]") == "Fendt parks at Park Fendt 2 when its job is done" and s.eval("find('Park here', 'Yes').active")
+s.execute("ADUndoManager:undo(nil); draw()")
+assert s.eval("#ADGraphManager.mapMarkers") == 1 and s.eval("shown('No target')")
+# the target never comes (no server answer): given up after a while, nothing set later
+s.execute("click('Target', 'Park here'); g_time = g_time + P.PARK_WAIT + 1; draw()")
+assert s.eval("P.pendingPark") is None and s.eval("#PARK_SENT") == 4
+s.execute("ADGraphManager.mapMarkers[1].name = 'Grain Mill'; V.ad.selectedNodeId = 3; ADUndoManager:clear(); draw()")
+
 # --- undo everything: back to the start
 steps = 0
 step("Horn", "No")
@@ -360,4 +401,4 @@ assert s.globals().snapshot() == s.eval("BEFORE_DEL")
 # --- an error switches the panel off instead of breaking the HUD
 s.execute("V.ad.selectedNodeId = 3; local orig = P.getRows; P.getRows = function() error('boom') end; Logging = {error = function() LOGGED = true end}; draw(); P.getRows = orig")
 assert s.eval("P.failed") and s.eval("LOGGED") and s.eval("P.rect == nil")
-print("OK: waypoint panel (height +/-, delete waypoint, shown when, stays while the mouse is on it, construction screen ignores left clicks, road: zone, side road, direction, tidy; remove connection, drive here, send vehicle, layout, connections incl. reverse in, road to junction, every button one undo step, target, close, error guard)")
+print("OK: waypoint panel (height +/-, delete waypoint, shown when, stays while the mouse is on it, construction screen ignores left clicks, road: zone, side road, direction, tidy; remove connection, drive here, send vehicle, park here (also on a waypoint without a target), layout, connections incl. reverse in, road to junction, every button one undo step, target, close, error guard)")

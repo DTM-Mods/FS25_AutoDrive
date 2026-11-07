@@ -1,5 +1,23 @@
 ADHudIcon = ADInheritsFrom(ADGenericHudElement)
 
+ADHudIcon.TITLE = "AutoDrive Overdrive"
+ADHudIcon.SEPARATOR = " · "
+-- Overdrive: the title bar (screen height units, times the UI scale)
+ADHudIcon.TITLE_SIZE = 0.0165
+ADHudIcon.DETAIL_SIZE = 0.0115
+ADHudIcon.HEADER_PAD_Y = 0.009
+ADHudIcon.HEADER_PAD_X = 12      -- 1080p pixels
+ADHudIcon.TITLE_GAP = 0.004      -- between the title and the details
+
+function ADHudIcon.getHeaderPadX(uiScale)
+    return ADHudStyle.px(ADHudIcon.HEADER_PAD_X, uiScale) / g_screenAspectRatio
+end
+
+--- the middle of the title line, for the header's top edge at 'top'
+function ADHudIcon.getTitleCenterY(top, uiScale)
+    return top - ADHudIcon.HEADER_PAD_Y * uiScale - ADHudIcon.TITLE_SIZE * uiScale / 2
+end
+
 function ADHudIcon:new(posX, posY, width, height, image, layer, name)
     local o = ADHudIcon:create()
     o:init(posX, posY, width, height)
@@ -19,44 +37,53 @@ function ADHudIcon:onDraw(vehicle, uiScale)
     self:updateIcon(vehicle)
 
     if self.name == "header" then
+        -- Overdrive: no bar of its own, the title and the details on the panel
         self:onDrawHeader(vehicle, uiScale)
+        return
+    end
+    if self.name == "background" then
+        if self.isVisible then
+            self:onDrawPanel(uiScale)
+        end
+        return
     end
 
     if self.isVisible and self.ov ~= nil then
-        if self.name == "header" then
-            self.ov:setColor(unpack(AutoDrive.currentColors.ad_color_header))
-        elseif self.name == "background" then
-            self.ov:setColor(unpack(AutoDrive.currentColors.ad_color_background))
-        end
         self.ov:render()
     end
 end
 
-function ADHudIcon:onDrawHeader(vehicle, uiScale)
-    local adFontSize = 0.011 * uiScale
-    local textHeight = getTextHeight(adFontSize, "text")
-    local adPosX = self.position.x + AutoDrive.Hud.gapWidth
-    local adPosY = self.position.y + (self.size.height - textHeight) / 2
-
-    if AutoDrive.Hud.isShowingTips then
-        adPosY = self.position.y + (AutoDrive.Hud.gapHeight)
-    end
-
-    setTextBold(true)
-    setTextColor(unpack(AutoDrive.currentColors.ad_color_hudTextDefault))
-    setTextAlignment(RenderText.ALIGN_LEFT)
-    self:renderDefaultText(vehicle, adFontSize, adPosX, adPosY)
-    if AutoDrive.Hud.isShowingTips then
-        adPosY = adPosY + textHeight + AutoDrive.Hud.gapHeight
-        adPosY = adPosY + (textHeight + AutoDrive.Hud.gapHeight) * (self.lastLineCount - 1)
-        self:renderEditorTips(textHeight, adFontSize, adPosX, adPosY)
-    end
+-- Overdrive: the HUD's panel (ADHudStyle): rounded, with a shadow and the header colour as the line along the top;
+-- it grows upwards with the header text's extra lines
+function ADHudIcon:onDrawPanel(uiScale)
+    local header = AutoDrive.Hud ~= nil and AutoDrive.Hud.headerElement or nil
+    local extra = header ~= nil and header.extraHeight or 0
+    ADHudStyle.panel(self.position.x, self.position.y, self.size.width, self.size.height + extra, uiScale,
+        AutoDrive.currentColors.ad_color_background, true, AutoDrive.currentColors.ad_color_header, true)
 end
 
-function ADHudIcon:renderDefaultText(vehicle, fontSize, posX, posY)
+-- Overdrive: a title bar like CourseCorrect's: "AutoDrive Overdrive" large and bold at the top, below it the details
+-- (version, mode, time, tooltip, task) in grey, wrapped over more lines when long: the bar then grows upwards and the
+-- header buttons move up with the title. The editor tips (extended header) below them.
+function ADHudIcon:onDrawHeader(vehicle, uiScale)
+    local hud = AutoDrive.Hud
+    local detailSize = ADHudIcon.DETAIL_SIZE * uiScale
+    local detailHeight = getTextHeight(detailSize, "text")
+    local posX = self.position.x + ADHudIcon.getHeaderPadX(uiScale)
+
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    self:renderDefaultText(vehicle, detailSize, posX, uiScale)
+    if hud.isShowingTips and AutoDrive.pullDownListExpanded == 0 then
+        setTextColor(unpack(AutoDrive.currentColors.ad_color_hudTextDefault))
+        self:renderEditorTips(detailHeight, detailSize, posX, self.position.y + hud.gapHeight)
+    end
+    setTextBold(false)
+end
+
+function ADHudIcon:renderDefaultText(vehicle, fontSize, posX, uiScale)
+    local hud = AutoDrive.Hud
     local textHeight = getTextHeight(fontSize, "text")
-    local textToShow = "AutoDrive Overdrive"
-    textToShow = textToShow .. " - " .. AutoDrive.version
+    local textToShow = AutoDrive.version
     textToShow = textToShow .. " - " .. AutoDriveHud:getModeName(vehicle)
     textToShow = self:addVehicleDriveTimeString(vehicle, textToShow)
     textToShow = self:addTooltipString(vehicle, textToShow)    
@@ -72,26 +99,82 @@ function ADHudIcon:renderDefaultText(vehicle, fontSize, posX, posY)
         end
     end
 
-    local reservedWidth = 4 * AutoDrive.Hud.gapWidth + 3 * AutoDrive.Hud.headerIconWidth
-    if AutoDrive.isEditorModeEnabled() then
-        -- undo / redo icons
-        reservedWidth = 8 * AutoDrive.Hud.gapWidth + 5 * AutoDrive.Hud.headerIconWidth
+    -- the details have the whole width below the title (the header buttons are on the title line)
+    -- measuring the text is the expensive part and it rarely changes, so it is wrapped again only when it changed
+    local maxWidth = self.size.width - 2 * (posX - self.position.x)
+    if textToShow ~= self.wrappedText or fontSize ~= self.wrappedFontSize or maxWidth ~= self.wrappedMaxWidth then
+        self.wrappedLines = self:splitTextByLength(textToShow, fontSize, maxWidth)
+        self.wrappedText, self.wrappedFontSize, self.wrappedMaxWidth = textToShow, fontSize, maxWidth
     end
-    local lines = self:splitTextByLength(textToShow, fontSize, self.size.width - reservedWidth)
+    local lines = self.wrappedLines
 
-    -- a long header text wraps, the header grows upwards by the extra lines
-    self.extraHeight = (textHeight + AutoDrive.Hud.gapHeight) * (#lines - 1)
+    -- a long header text wraps, the header grows upwards by the extra lines, the header buttons move up with the title
+    self.extraHeight = (textHeight + hud.gapHeight) * (#lines - 1)
     if #lines ~= self.lastLineCount and self.ov ~= nil then
         self.ov:setDimension(nil, self.size.height + self.extraHeight)
     end
-
-    for lineNumber, lineText in pairs(lines) do
-        if AutoDrive.pullDownListExpanded == 0 then
-            renderText(posX, posY, fontSize, lineText)
-            posY = posY + textHeight + AutoDrive.Hud.gapHeight
-        end
+    for _, button in ipairs(hud.headerButtons or {}) do
+        button:setY(button.headerBaseY + self.extraHeight)
     end
     self.lastLineCount = #lines
+    if AutoDrive.pullDownListExpanded ~= 0 then
+        return
+    end
+
+    local fullTitleSize = ADHudIcon.TITLE_SIZE * uiScale
+    local top = self.position.y + self.size.height + self.extraHeight
+    local titleY = ADHudIcon.getTitleCenterY(top, uiScale) - fullTitleSize / 2
+    setTextBold(true)
+    local title, titleSize = self:fitTitle(fullTitleSize, self:getTitleRoom(posX, uiScale))
+    setTextColor(unpack(AutoDrive.currentColors.ad_color_hudTextDefault))
+    renderText(posX, titleY + (fullTitleSize - titleSize) / 2, titleSize, title)
+
+    setTextBold(false)
+    ADHudStyle.setTextColor(ADHudStyle.C.muted)
+    local posY = titleY - ADHudIcon.TITLE_GAP * uiScale - textHeight
+    for _, lineText in ipairs(lines) do
+        renderText(posX, posY, fontSize, (string.gsub(lineText, " %- ", ADHudIcon.SEPARATOR)))
+        posY = posY - textHeight - hud.gapHeight
+    end
+    setTextColor(unpack(AutoDrive.currentColors.ad_color_hudTextDefault))
+end
+
+-- Overdrive: the room for the title, from its left edge to the leftmost header button shown (undo / redo in the
+-- editor) less a gap; the title is drawn above the buttons, so it must not reach them
+function ADHudIcon:getTitleRoom(posX, uiScale)
+    local right = self.position.x + self.size.width
+    for _, button in ipairs(AutoDrive.Hud.headerButtons or {}) do
+        if button.isVisible and button.position.x < right then
+            right = button.position.x
+        end
+    end
+    return right - ADHudIcon.getHeaderPadX(uiScale) / 2 - posX
+end
+
+ADHudIcon.SHORT_TITLE = "AutoDrive"
+ADHudIcon.MIN_TITLE_SCALE = 0.8
+
+--- the title and its size that fit into 'room': the full title, smaller down to MIN_TITLE_SCALE, else the short
+--- title (smaller when even that does not fit); measured only when the room or the size changed
+function ADHudIcon:fitTitle(size, room)
+    if size ~= self.fittedSize or room ~= self.fittedRoom then
+        self.fittedSize, self.fittedRoom = size, room
+        self.fittedTitle, self.fittedTitleSize = ADHudIcon.TITLE, size
+        local width = getTextWidth(size, ADHudIcon.TITLE)
+        if width > room then
+            local scale = room / width
+            if scale >= ADHudIcon.MIN_TITLE_SCALE then
+                self.fittedTitleSize = size * scale
+            else
+                self.fittedTitle = ADHudIcon.SHORT_TITLE
+                width = getTextWidth(size, ADHudIcon.SHORT_TITLE)
+                if width > room and room > 0 then
+                    self.fittedTitleSize = size * room / width
+                end
+            end
+        end
+    end
+    return self.fittedTitle, self.fittedTitleSize
 end
 
 function ADHudIcon:renderEditorTips(textHeight, fontSize, posX, posY)
