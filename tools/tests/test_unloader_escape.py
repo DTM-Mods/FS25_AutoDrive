@@ -12,6 +12,7 @@ s.execute("""
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Hud", "GenericHudElement.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Utils", "UtilFuncs.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Utils", "CollisionDetectionUtils.lua")))
+s.execute(t.read(os.path.join(t.MOD, "scripts", "Utils", "CombineUtil.lua")))  # getSidewaysHarvester (Nexat front)
 for f in [("Tasks", "AbstractTask.lua"), ("Manager", "UnloaderEscape.lua"), ("Tasks", "EscapeToFieldEdgeTask.lua"), ("Events", "UnloaderEscapeEvent.lua")]:
     s.execute(t.read(os.path.join(t.MOD, "scripts", *f)))
 s.execute("""

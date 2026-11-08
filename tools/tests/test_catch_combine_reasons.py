@@ -10,6 +10,9 @@ s.execute(t.read(os.path.join(t.MOD, "scripts", "Hud", "GenericHudElement.lua"))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Utils", "AutoDriveTON.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Tasks", "AbstractTask.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Tasks", "CatchCombinePipeTask.lua")))
+# the unloader mode's constants the tasks read (PATH_TIMEOUT, states); the whole mode needs much more of the game
+mode_src = t.read(os.path.join(t.MOD, "scripts", "Modes", "CombineUnloaderMode.lua"))
+s.execute("CombineUnloaderMode = CombineUnloaderMode or {}\n" + "\n".join(re.findall(r"^CombineUnloaderMode\.[A-Z_]+ = [^\r\n]+", mode_src, re.M)))
 s.execute("""
     AutoDrive.debugPrint = function() end
     AutoDrive.MODE_UNLOAD = 4
