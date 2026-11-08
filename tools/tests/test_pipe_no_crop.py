@@ -3,6 +3,7 @@ the path finder first searches with a bigger step budget, may use fallback 1 and
 (fruit); without a path it says so and the task stands still, says why and plans again. Chasing, and driving to the
 network, are as before."""
 import os
+import re
 import run_undo_test as t
 
 s = t.make_runtime(True)
@@ -99,6 +100,9 @@ s.execute(t.read(os.path.join(t.MOD, "scripts", "Utils", "AutoDriveTON.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Tasks", "AbstractTask.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Tasks", "CatchCombinePipeTask.lua")))
 s.execute(t.read(os.path.join(t.MOD, "scripts", "Tasks", "EmptyHarvesterTask.lua")))
+# the unloader mode's constants the tasks read (PATH_TIMEOUT, states); the whole mode needs much more of the game
+mode_src = t.read(os.path.join(t.MOD, "scripts", "Modes", "CombineUnloaderMode.lua"))
+s.execute("CombineUnloaderMode = CombineUnloaderMode or {}\n" + "\n".join(re.findall(r"^CombineUnloaderMode\.[A-Z_]+ = [^\r\n]+", mode_src, re.M)))
 s.execute("""
     AutoDrive.MODE_UNLOAD = 4
     AutoDrive.CHASEPOS_LEFT = 1
@@ -113,16 +117,18 @@ s.execute("""
     AutoDrive.getTractorTrainLength = function() return 10 end
     AutoDrive.setTrailerCoverOpen = function() end
     PATH, CROP, PLANS, STOPPED, FAILED = {}, true, 0, 0, 0
-    COMBINE = {components = {{node = 2}}, ad = {isChopper = false}}
+    COMBINE = {components = {{node = 2}}, ad = {isChopper = false, noMovementTimer = {elapsedTime = 60000}, driveForwardTimer = {elapsedTime = 0}}}  -- standing a minute
     PFM = {reset = function() end, startPathPlanningToPipe = function() PLANS = PLANS + 1 end, hasFinished = function() return true end,
         getPath = function() return PATH end, update = function() end, addDelayTimer = function(self, d) self.delayTime = d end,
         getCurrentState = function() return 1, 2, 3, 4 end, isNoWayAroundCrop = function() return CROP end,
-        isTargetBlocked = function() return false end, delayTime = 0}
+        isTargetBlocked = function() return false end, delayTime = 0,
+        abort = function() ABORTS = (ABORTS or 0) + 1 end}
     UNLOADER = {components = {{node = 1}}, lastSpeedReal = 1, ad = {
         modes = {[4] = {
             getPipeChasePosition = function() return {x = 0, z = 10}, AutoDrive.CHASEPOS_LEFT end,
             notifyAboutFailedPathfinder = function() FAILED = FAILED + 1 end,
-            setToWaitForCall = function() end}},
+            setToWaitForCall = function() end,
+            onPathTimeout = function() TIMEOUTS = (TIMEOUTS or 0) + 1 end}},
         pathFinderModule = PFM,
         specialDrivingModule = {stopVehicle = function() STOPPED = STOPPED + 1 end, update = function() end},
         drivePathModule = {setWayPoints = function() end, isTargetReached = function() return false end, update = function() end},
@@ -149,8 +155,14 @@ s.execute("TASK:update(3000); TASK:update(1500)")        # wait over, a second's
 assert s.eval("TASK:getStateName()") == "STATE_PATHPLANNING" and s.eval("PLANS") == 2
 s.execute("TASK:update(16)")                             # still nothing: waits again, not logged again
 assert info().endswith("$l10n_AD_task_catch_no_way_around_crop; (5 s)") and s.eval("#LOG") == 1
-s.execute("TASK:update(6000); TASK:update(1500); PATH = {{x = 0, z = 0}}; CROP = false; TASK:update(16)")
+# 10 s without a way to the combine (the crop waits count too): PATH_TIMEOUT stops the search and lets the mode hand
+# the job to the next unloader or move aside and plan again (3.6.0.4), once
+s.execute("TASK:update(6000)")
+assert s.eval("TIMEOUTS") == 1 and s.eval("ABORTS") == 1 and s.eval("TASK.pathWait") == 0
+# the next try finds a path: drives, and the crop message may be logged again
+s.execute("TASK = CatchCombinePipeTask:new(UNLOADER, COMBINE); PATH = {{x = 0, z = 0}}; CROP = false; TASK:update(5000); TASK:update(16)")
 assert s.eval("TASK:getStateName()") == "STATE_DRIVING" and s.eval("UNLOADER.ad.noWayAroundCropLogged") is None
+assert s.eval("TIMEOUTS") == 1
 
 # the task at a standing combine: no path because of the crop -> stands still for the path finder's 10 s delay with
 # the reason, logged once, then plans again
@@ -173,4 +185,4 @@ for f in os.listdir(os.path.join(t.MOD, "translations")):
     assert 'name="AD_task_catch_no_way_around_crop"' in t.read(os.path.join(t.MOD, "translations", f)), f
 print("OK: to a combine's pipe with avoid fruit on: bigger search (%d steps), field border fallbacks, never through the crop; "
       "no path -> waits with 'no way around the crop' and plans again (catching: 5 s, at a standing combine: 10 s), "
-      "logged once, not counted as stuck; chasing and network paths unchanged" % (total * 3))
+      "logged once, not counted as stuck, after 10 s without a way handed on or moves aside; chasing and network paths unchanged" % (total * 3))
