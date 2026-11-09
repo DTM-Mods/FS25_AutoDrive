@@ -67,6 +67,7 @@ def main():
         run("test_refuel_choice.py"),
         run("test_pipe_no_crop.py"),
         run("test_hud_style.py"),
+        run("test_harvester_finished.py"),
     ]
     if not all(results):
         sys.exit(1)

@@ -34,6 +34,7 @@ end
 
 function CombineUnloaderMode:reset()
     self.state = self.STATE_INIT
+    self.harvestFinished = false -- od.54
     self.activeTask = nil
     ADHarvestManager:unregisterAsUnloader(self.vehicle)
     self.combine = nil
@@ -321,6 +322,10 @@ function CombineUnloaderMode:getNextTask()
     elseif self.state == self.STATE_LEAVE_CROP then
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_LEAVE_CROP")
         self:setToWaitForCall()
+    elseif self.state == self.STATE_DRIVE_TO_UNLOAD and self.harvestFinished then
+        -- PropaineX edit (od.54): harvester finished its job: unloaded, now AutoDrive off (no more wages)
+        Logging.info("[AD] %s: unloaded after the harvester finished, AutoDrive off", ADDiag.name(self.vehicle))
+        nextTask = StopAndDisableADTask:new(self.vehicle, ADTaskModule.DONT_PROPAGATE)
     elseif self.state == self.STATE_DRIVE_TO_UNLOAD then
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_DRIVE_TO_UNLOAD")
         nextTask = DriveToDestinationTask:new(self.vehicle, self.vehicle.ad.stateModule:getFirstMarker().id)
@@ -442,7 +447,56 @@ end
 -- PropaineX edit (3.4.0.4): our harvester stopped working (ADHarvestManager:fireUnloader). 50 % or more in the
 -- trailer: drive off to unload (leaving the field first, as for a full trailer); less: wait for the next call here
 CombineUnloaderMode.LEAVE_UNLOAD_LEVEL = 0.5
+-- PropaineX edit (od.54): the harvester finished its job (ADHarvestManager:onAIJobStopped). Grain on board: drive
+-- off and unload (field exit first, as for a full trailer), then AutoDrive off (getNextTask). Empty: AutoDrive off here.
+function CombineUnloaderMode:onHarvesterFinished(harvester)
+    if self.harvestFinished then
+        return
+    end
+    -- a queued follower is handled on its own by the same loop
+    self:unregisterFollowingUnloader()
+    ADHarvestManager:unregisterAsUnloader(self.vehicle)
+    self.followingUnloader = nil
+    self.targetUnloader = nil
+    self.combine = nil
+    self.harvestFinished = true
+    if self.state == self.STATE_DRIVE_TO_UNLOAD and self.vehicle.ad.taskModule:getActiveTask() ~= nil then
+        -- already on the way to unload: let it finish, AutoDrive goes off after (getNextTask)
+        Logging.info("[AD] %s: %s finished, unloading this load, then AutoDrive off", ADDiag.name(self.vehicle), ADDiag.name(harvester))
+        return
+    end
+    self.vehicle.ad.taskModule:abortAllTasks()
+    local trailers, _ = AutoDrive.getAllUnits(self.vehicle)
+    local fillLevel, _, _, _ = AutoDrive.getAllFillLevels(trailers)
+    if fillLevel > 0.1 then
+        Logging.info("[AD] %s: %s finished, unloading %.0f l, then AutoDrive off", ADDiag.name(self.vehicle),
+            ADDiag.name(harvester), fillLevel)
+        local x, y, z = getWorldTranslation(self.vehicle.components[1].node)
+        local distanceToStart = 0
+        local firstMarker = self.vehicle.ad.stateModule:getFirstMarker()
+        if firstMarker ~= nil and firstMarker ~= 0 and firstMarker.id ~= nil then
+            local point = ADGraphManager:getWayPointById(firstMarker.id)
+            if point ~= nil then
+                distanceToStart = MathUtil.vector2Length(x - point.x, z - point.z)
+            end
+        end
+        if AutoDrive.checkIsOnField(x, y, z) and distanceToStart > 30 then
+            self.vehicle.ad.taskModule:addTask(ExitFieldTask:new(self.vehicle))
+            self.state = self.STATE_EXIT_FIELD
+        else
+            self.vehicle.ad.taskModule:addTask(UnloadAtDestinationTask:new(self.vehicle, self.vehicle.ad.stateModule:getSecondMarker().id))
+            self.state = self.STATE_DRIVE_TO_UNLOAD
+        end
+    else
+        Logging.info("[AD] %s: %s finished, trailer empty, AutoDrive off", ADDiag.name(self.vehicle), ADDiag.name(harvester))
+        self.vehicle.ad.taskModule:addTask(StopAndDisableADTask:new(self.vehicle, ADTaskModule.DONT_PROPAGATE))
+    end
+end
+
 function CombineUnloaderMode:onHarvesterLeft()
+    if self.harvestFinished then
+        return -- already on its way to unload and switch off
+    end
     self.vehicle.ad.taskModule:abortAllTasks()
     self.followingUnloader = nil
     self.targetUnloader = nil

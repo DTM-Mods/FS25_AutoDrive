@@ -3,6 +3,20 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.54 (2026-11-09): unloaders switch off when the harvester is finished
+*Untested in the game; tested with mock vehicles (13 cases).*
+
+- When a harvester or forage harvester's helper (the game's helper or Courseplay) finishes the field by itself
+  ("finished job"), the AutoDrive unloaders working for it switch AutoDrive off, so they stop costing helper wages.
+- Empty unloaders switch off where they are. An unloader with grain on board drives off and unloads first (leaving
+  the field first, as for a full trailer), then switches off instead of driving back to the field. One already on its
+  way to unload finishes that trip, then switches off.
+- "Working for it" means set to the same field pins (first target) as the harvester. If another harvester on the same
+  pins is still working, the unloaders stay on for that one.
+- Nothing changes when you stop the harvester yourself, take it over, or it stops for another reason (fuel, broken,
+  full, ...): the unloaders keep working as before.
+- Logged: "[AD] Combine finished its job: 2 unloader(s) switching AutoDrive off", and one line per unloader.
+
 ## 3.10.0.0 (2026-11-07): Nexat harvester fix
 *Untested in the game; Lua syntax checked, helpers tested with mock vehicles.*
 
