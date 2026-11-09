@@ -1,16 +1,30 @@
+<p align="center">
+  <a href="https://github.com/DTM-Mods"><img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/dtm-header.jpg" alt="DTM Mods by PropaineX & Fennell" width="100%"></a>
+</p>
+
 # AutoDrive Overdrive
 
-[![CI](https://github.com/chrisdfennell/FS25_AutoDrive/actions/workflows/ci.yml/badge.svg)](https://github.com/chrisdfennell/FS25_AutoDrive/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/chrisdfennell/FS25_AutoDrive?label=release)](https://github.com/chrisdfennell/FS25_AutoDrive/releases/latest)
+[![CI](https://github.com/DTM-Mods/FS25_AutoDrive/actions/workflows/ci.yml/badge.svg)](https://github.com/DTM-Mods/FS25_AutoDrive/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/DTM-Mods/FS25_AutoDrive?label=release)](https://github.com/DTM-Mods/FS25_AutoDrive/releases/latest)
 
 AutoDrive Overdrive is an unofficial edition of [AutoDrive](https://github.com/Stephan-S/FS25_AutoDrive) for Farming Simulator 25, by the AutoDrive Team (Stephan-S, Axel32019, TyKonKet and [many contributors](credits.txt)), released under the [MIT licence](LICENSE).
 It is based on AutoDrive 3.0.1.4 and adds route editor improvements, waypoint actions, a route check with fixes, a route preview on the map, a fleet overview with send-to and driver statistics, best price unloading and work schedules. For the official mod and its support, see the original README below.
 
 ## Download
-Get **FS25_AutoDrive.zip** from the [latest release](https://github.com/chrisdfennell/FS25_AutoDrive/releases/latest) and put it into your mods folder (`Documents/My Games/FarmingSimulator2025/mods`), replacing the official AutoDrive zip.
+Get **FS25_AutoDrive.zip** from the [latest release](https://github.com/DTM-Mods/FS25_AutoDrive/releases/latest) and put it into your mods folder (`Documents/My Games/FarmingSimulator2025/mods`), replacing the official AutoDrive zip.
 Keep the file name: the mod only loads as `FS25_AutoDrive.zip`, and that is also what keeps your savegames, routes and settings working.
 
 Versions are `<AutoDrive version>-od.<build>`, e.g. `3.0.1.4-od.1` is the first Overdrive build based on AutoDrive 3.0.1.4. The version shows in the header of the AutoDrive HUD.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/patch-notes.jpg" alt="Patch notes" width="100%">
+</p>
+
+Release notes for every build are on the [releases page](https://github.com/DTM-Mods/FS25_AutoDrive/releases). PropaineX's edits are listed in [PATCH_NOTES.md](PATCH_NOTES.md).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/features.jpg" alt="Features" width="100%">
+</p>
 
 ## What Overdrive adds
 
@@ -342,3 +356,10 @@ Download: https://hof-hirschfeld.de/category/autodrive/
 ## Course Editor
 The course editor is now maintained by @KillBait and can be found here:
 https://github.com/KillBait/AutoDrive_Course_Editor
+
+---
+
+<p align="center">
+  <a href="https://github.com/DTM-Mods"><img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/dtm-intro.gif" alt="DTM Mods by PropaineX & Fennell" width="420"></a><br>
+  <sub>Part of <a href="https://github.com/DTM-Mods">DTM Mods</a> (Dead To Me) by PropaineX & Fennell</sub>
+</p>
