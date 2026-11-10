@@ -1,0 +1,119 @@
+# When the upstream mod this fork is based on publishes a release we have not merged yet, opens a
+# pull request that merges upstream into our default branch, and posts it to #upstream-updates in
+# the DTM Mods Discord. The pull request follows upstream's default branch, so it picks up later
+# upstream commits until it is merged. A closed pull request for a release is not opened again.
+# Needs: the secret DISCORD_UPSTREAM_WEBHOOK, and "Allow GitHub Actions to create and approve pull
+# requests" switched on (organization and repository Actions settings).
+# Note: pull requests opened by GITHUB_TOKEN do not start CI; run the build by hand if needed.
+name: Upstream sync
+
+on:
+  schedule:
+    - cron: "37 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: write   # keep this scheduled workflow from being switched off after 60 quiet days
+
+concurrency:
+  group: upstream-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open a pull request for a new upstream release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          WEBHOOK: ${{ secrets.DISCORD_UPSTREAM_WEBHOOK }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, time, urllib.error, urllib.parse, urllib.request
+
+          def api(path, data=None, method=None):
+              req = urllib.request.Request("https://api.github.com/" + path,
+                  data=json.dumps(data).encode() if data is not None else None, method=method,
+                  headers={"Authorization": "Bearer " + os.environ["GH_TOKEN"], "User-Agent": "dtm-upstream-sync",
+                           "Accept": "application/vnd.github+json", "Content-Type": "application/json"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.load(r)
+
+          repo = os.environ["REPO"]
+          me = api(f"repos/{repo}")
+          if not me.get("parent"):
+              raise SystemExit(f"{repo} is not a fork")
+          up = me["parent"]["full_name"]
+          owner, name = up.split("/")
+          base, head = me["default_branch"], me["parent"]["default_branch"]
+          mod = name.removeprefix("FS25_").replace("_", " ")
+
+          rel = next((r for r in api(f"repos/{up}/releases?per_page=20") if not r["draft"] and not r["prerelease"]), None)
+          if not rel:
+              raise SystemExit(f"{up} has no releases")
+          tag = rel["tag_name"]
+          missing = api(f"repos/{repo}/compare/{base}...{owner}:{name}:{urllib.parse.quote(tag)}")["ahead_by"]
+          if not missing:
+              print(f"{up} {tag} is already merged")
+              raise SystemExit(0)
+
+          title = f"Merge upstream {mod} {tag}"
+          prs = api(f"repos/{repo}/pulls?state=all&per_page=50&head={owner}:{head}")
+          for pr in prs:
+              if pr["state"] == "open":
+                  if pr["title"] != title:
+                      api(f"repos/{repo}/pulls/{pr['number']}", {"title": title}, "PATCH")
+                      print(f"Renamed PR #{pr['number']} to {title}")
+                  else:
+                      print(f"PR #{pr['number']} is already open")
+                  raise SystemExit(0)
+              if tag in pr["title"]:
+                  print(f"PR #{pr['number']} for {tag} was closed, not opening it again")
+                  raise SystemExit(0)
+
+          body = (f"Merges upstream [{up}](https://github.com/{up}) `{head}` into our `{base}`, "
+                  f"for the upstream release [{tag}]({rel['html_url']}).\n\n"
+                  f"Opened by the Upstream sync workflow. It follows upstream `{head}`, so later upstream commits "
+                  "show up here until it is merged. CI does not start on its own for this pull request, so run "
+                  "the build by hand before merging if needed.")
+          try:
+              pr = api(f"repos/{repo}/pulls", {"title": title, "head": f"{owner}:{head}", "base": base,
+                                               "body": body, "maintainer_can_modify": False}, "POST")
+          except urllib.error.HTTPError as e:
+              raise SystemExit(f"Could not open the pull request: HTTP {e.code} {e.read().decode(errors='replace')}")
+          print(f"Opened PR #{pr['number']}: {pr['html_url']}")
+
+          mergeable = None
+          for _ in range(6):
+              time.sleep(5)
+              mergeable = api(f"repos/{repo}/pulls/{pr['number']}").get("mergeable")
+              if mergeable is not None:
+                  break
+          state = {True: "It merges cleanly.", False: "It has merge conflicts to sort out."}.get(mergeable, "GitHub is still checking whether it merges cleanly.")
+
+          if not os.environ.get("WEBHOOK"):
+              raise SystemExit("The DISCORD_UPSTREAM_WEBHOOK secret is not set")
+          payload = {
+              "username": "Upstream Watch",
+              "allowed_mentions": {"parse": []},
+              "content": f"Opened a pull request to merge **{mod} {tag}** into our fork.",
+              "embeds": [{
+                  "title": f"#{pr['number']} {title}", "url": pr["html_url"],
+                  "description": f"{missing} upstream commit{'s' if missing != 1 else ''} to merge. {state}",
+                  "color": 0x2ECC71 if mergeable else 0xF59E0B,
+                  "footer": {"text": repo},
+              }],
+          }
+          req = urllib.request.Request(os.environ["WEBHOOK"] + "?wait=true", data=json.dumps(payload).encode(),
+                                       headers={"Content-Type": "application/json", "User-Agent": "dtm-upstream-sync"})
+          with urllib.request.urlopen(req, timeout=30) as r:
+              print("Posted to Discord, HTTP", r.status)
+          EOF
+
+      - name: Keep the schedule alive
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/upstream-sync.yml/enable"
