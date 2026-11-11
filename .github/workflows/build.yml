@@ -1,0 +1,40 @@
+# Checks the mod on every push and pull request, and publishes a release when you push a tag
+# v<version in modDesc.xml>. The steps live in DTM-Mods/.github (.github/workflows/fs25-mod.yml).
+# This file is the same in every DTM mod repository; only the settings under "with:" differ.
+#
+# Try a release without publishing it: Actions > Build > Run workflow, enter the tag (v1.2.0.0).
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      test-tag:
+        description: "Try a release without publishing it: the tag, e.g. v1.2.0.0 (leave empty to just build)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write     # publish releases on tags
+  actions: write      # start the Discord release post
+
+jobs:
+  mod:
+    uses: DTM-Mods/.github/.github/workflows/fs25-mod.yml@main
+    with:
+      test-tag: ${{ inputs.test-tag || '' }}
+      # Settings for this mod (see DTM-Mods/.github ci/README.md):
+      # AutoDrive Overdrive: tools/build_mod.py bundles the scripts and stamps the full version
+      # (3.0.1.4-od.57) into the HUD. Release tags are v<modDesc version>-od.<build>.
+      max-files: 0
+      version-suffix: '-od\.[0-9]+'
+      build-command: python tools/build_mod.py --version "$BUILD_VERSION" --out dist/FS25_AutoDrive.zip
+      test-command: |
+        python -m pip install --quiet lupa==2.8
+        python tools/ci_checks.py
+        python tools/tests/run_all.py 100
+      notes-command: python tools/release_notes.py "$VERSION"
+      install-note: none                     # its notes have their own Install section
