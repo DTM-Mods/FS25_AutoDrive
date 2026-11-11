@@ -214,9 +214,16 @@ Other mods: `AutoDrive.getRefuelDestination(vehicle)` gives the target name (`""
 ### Pipe offset front/back
 New vehicle setting for combine unloaders, **Pipe Offset Front/Back** (setting `pipeZOffset`, -5 m to +5 m in 0.25 m steps, default 0). Pipe Offset moves the unloader out from the combine or in; this one moves its place beside the combine forward (+, towards the combine's front) or back (-), to fill a long trailer evenly or to keep the cab clear of a wide header. It is used for the place it drives to and the place it keeps while unloading, not when it chases behind the combine (Follow distance does that) and not for auto-aiming choppers or sugarcane harvesters. On the vehicle tab next to Pipe Offset and on the Overdrive tab. Other mods can set it like any vehicle setting (`AutoDrive.setSettingState`, then `AutoDriveUpdateSettingsEvent.sendEvent(vehicle)`).
 
+### Getting out of a harvester's way comes first
+Every combine unloader, whatever its settings, puts getting out of a harvester's way above everything else. It counts as in the way of a harvester driven by a helper (AutoDrive's harvester helper or Courseplay) when both stand still, nothing is falling into its trailer, and it stands
+- in front of the harvester, or
+- within 3 m of it (header included) while the harvester has been stuck in a turn for 6 seconds (a Courseplay harvester stuck mid-turn used to count as "turning" for ever and was never checked).
+
+After 4 seconds in the way it lets go of its job and drives, with its collisions on, to the nearest clear spot (the same search as *Keep out of the harvester's way*). There it waits to be called and the chase starts over. If it is still in the way after that (its move stands still for 10 seconds, or it blocks the harvester again within 2 minutes), it uses **Drive clear when blocked** below when that is on, otherwise it moves out of the way again. Code: `ADUnloaderEscape.monitor` / `ADUnloaderEscape.yield` in `scripts/Manager/UnloaderEscape.lua`.
+
 ### Drive clear when blocked
 New vehicle setting for combine unloaders, **Drive clear when blocked** (off by default). When the unloader
-- stands in front of a harvester driven by a helper (AutoDrive's harvester helper or Courseplay) for 6 seconds, with both standing still, or
+- still blocks a standing harvester after moving out of its way (see above), or
 - is stuck against another vehicle (where AutoDrive would otherwise reverse),
 
 it switches off its collisions with other vehicles (its trailers too; the ground, buildings and trees still count), drives through to the nearest field edge and a few metres past it, waits there until no other vehicle is near, switches its collisions back on and carries on with its job. Collisions only come back when nothing overlaps, otherwise the physics would throw the vehicles apart; if AutoDrive is stopped during the escape they come back by themselves once the unloader is clear. A message tells you when a driver does this, and it happens at most every 90 seconds per vehicle.
