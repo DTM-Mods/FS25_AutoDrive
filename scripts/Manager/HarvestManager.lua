@@ -110,7 +110,79 @@ function ADHarvestManager:fireUnloader(unloader, harvester)
     self:unregisterAsUnloader(unloader)
 end
 
+-- PropaineX edit (od.54): a harvester's helper (game helper or Courseplay) FINISHED its job by itself: its unloaders
+-- switch AutoDrive off so they stop costing helper wages. Only the 'finished job' message counts (both raise
+-- AIMessageSuccessFinishedJob through AISystem:stopJob -> MessageType.AI_JOB_STOPPED); the player stopping it, out of
+-- fuel, broken, ... keep the old behaviour. Unloaders on the same pins (first marker) belong to it; while another
+-- harvester on those pins still works they keep going. One with grain on board unloads first, then switches off.
+function ADHarvestManager:subscribeJobStopped()
+    if self.jobStoppedSubscribed or g_messageCenter == nil or MessageType == nil or MessageType.AI_JOB_STOPPED == nil then
+        return
+    end
+    self.jobStoppedSubscribed = true
+    g_messageCenter:subscribe(MessageType.AI_JOB_STOPPED, ADHarvestManager.onAIJobStopped, ADHarvestManager)
+end
+
+function ADHarvestManager:onAIJobStopped(job, aiMessage)
+    if g_server == nil or job == nil or aiMessage == nil or AIMessageSuccessFinishedJob == nil then
+        return
+    end
+    if aiMessage.isa == nil or not aiMessage:isa(AIMessageSuccessFinishedJob) then
+        return
+    end
+    local jobVehicle = job.vehicleParameter ~= nil and job.vehicleParameter.getVehicle ~= nil and job.vehicleParameter:getVehicle() or nil
+    if jobVehicle == nil or jobVehicle.getRootVehicle == nil then
+        return
+    end
+    local root = jobVehicle:getRootVehicle()
+    -- find the harvester AutoDrive knows (combine itself, or the tractor pulling a trailed forage harvester)
+    local finished = nil
+    for _, list in pairs({self.harvesters, self.idleHarvesters}) do
+        for _, harvester in pairs(list) do
+            if harvester ~= nil and harvester.getRootVehicle ~= nil and harvester:getRootVehicle() == root then
+                finished = harvester
+                break
+            end
+        end
+        if finished ~= nil then
+            break
+        end
+    end
+    if finished == nil or finished.ad == nil or finished.ad.stateModule == nil then
+        return
+    end
+    local marker = finished.ad.stateModule:getFirstMarker()
+    if marker == nil then
+        return
+    end
+    -- another harvester on the same pins still working: the unloaders stay for it
+    for _, harvester in pairs(self.harvesters) do
+        if harvester ~= finished and harvester.ad ~= nil and harvester.ad.stateModule ~= nil
+            and harvester.ad.stateModule:getFirstMarker() == marker then
+            local vehicle = harvester.isTrailedHarvester and harvester.trailingVehicle or harvester
+            if vehicle ~= nil and vehicle.getIsAIActive ~= nil and vehicle:getIsAIActive() and vehicle:getRootVehicle() ~= root then
+                Logging.info("[AD] %s finished its job; unloaders stay on for %s", ADDiag.name(finished), ADDiag.name(harvester))
+                return
+            end
+        end
+    end
+    local count = 0
+    for _, unloader in pairs(AutoDrive.getAllVehicles()) do
+        if unloader.ad ~= nil and unloader.ad.stateModule ~= nil and unloader.ad.modes ~= nil
+            and unloader.ad.stateModule:isActive() and unloader.ad.stateModule:getMode() == AutoDrive.MODE_UNLOAD
+            and unloader.ad.stateModule:getFirstMarker() == marker then
+            local mode = unloader.ad.modes[AutoDrive.MODE_UNLOAD]
+            if mode ~= nil and mode.onHarvesterFinished ~= nil and unloader.ad.stateModule:getCurrentMode() == mode then
+                count = count + 1
+                mode:onHarvesterFinished(finished)
+            end
+        end
+    end
+    Logging.info("[AD] %s finished its job: %d unloader(s) switching AutoDrive off", ADDiag.name(finished), count)
+end
+
 function ADHarvestManager:update(dt)
+    self:subscribeJobStopped()
     self.assignmentDelayTimer:timer(true, 10000, dt)
     for _, idleHarvester in pairs(self.idleHarvesters) do
         local vehicle = idleHarvester

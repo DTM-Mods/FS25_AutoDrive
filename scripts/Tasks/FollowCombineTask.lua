@@ -18,6 +18,7 @@ FollowCombineTask.TAIL_CLEARANCE = 3       -- m, PropaineX edit (3.8.3.4, 3 m in
 FollowCombineTask.CLEAR_EXTRA = 6           -- m beyond the combine's length to pull forward
 FollowCombineTask.CLEAR_MAX_TIME = 15000    -- ms
 FollowCombineTask.CLEAR_BLOCKED_TIME = 3000 -- ms not moving while pulling forward -> back out instead
+FollowCombineTask.GO_AROUND_TIME = 10000    -- ms, PropaineX edit (od.55): stuck at a standing harvester -> drive round it
 
 FollowCombineTask.MAX_REVERSE_DISTANCE = 20
 FollowCombineTask.MIN_COMBINE_DISTANCE = 25
@@ -624,7 +625,9 @@ function FollowCombineTask:followChasePoint(dt)
             totalSpeedLimit = math.max(combineSpeed + 20, 10)
         end
         -- PropaineX edit: stronger catch-up to stay under the pipe (chaseCatchUp)
-        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed, false, acc, totalSpeedLimit, true)
+        -- PropaineX edit (od.56): never steer into the harvester (keep-out gap)
+        local steer = self.combine.ad.isHarvester and not self.combine.ad.isChopper and self:keepOffHarvester(self.chasePos, true) or nil
+        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed, false, acc, totalSpeedLimit, true, steer)
     end
 end
 
@@ -757,7 +760,16 @@ function FollowCombineTask:updateBackOff(dt)
             self.backingOff = nil
             return false
         end
-        if self.vehicle.lastSpeedReal * 3600 < 1 then
+        if sdm.frontHold and math.abs(self.combineTurnRate or 0) < FollowCombineTask.TURN_DEADBAND then
+            -- PropaineX edit (od.56): held at the harvester's front and its turn is over: it has passed, chase again
+            Logging.info("[AD] %s: %s has come round, forward again", ADDiag.name(self.vehicle), ADDiag.name(c))
+            self.backingOff = nil
+            sdm.frontHold = false
+            return false
+        end
+        if sdm.frontHold then
+            self.backOffStopped = 0 -- PropaineX edit (od.56): held so it doesn't back into the harvester's front: not blocked
+        elseif self.vehicle.lastSpeedReal * 3600 < 1 then
             self.backOffStopped = (self.backOffStopped or 0) + dt
         else
             self.backOffStopped = 0
@@ -790,17 +802,19 @@ function FollowCombineTask:updateBackOff(dt)
     if math.abs(w) < FollowCombineTask.TURN_DEADBAND or v < 0.1 or gap > FollowCombineTask.BACK_OFF_START_GAP then
         return false
     end
-    if v / math.abs(w) >= FollowCombineTask.SEMI_RADIUS then
-        return false
-    end
     local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
     local tx, _, tz = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
     local _, cHalfL = AutoDrive.getHarvesterHalfSize(c) -- PropaineX edit (3.10.0.0): Nexat
     if tx * w <= 0 or tz < -cHalfL then
         return false -- outside of the turn, or already behind its tail
     end
-    Logging.info("[AD] %s: inside of %s's turn (radius %.0f m), backing up to %d m", ADDiag.name(self.vehicle),
-        ADDiag.name(c), v / math.abs(w), FollowCombineTask.BACK_OFF_GAP)
+    -- PropaineX edit (od.56): OUR radius on the inside is the harvester's minus how far in we are beside it (a 13 m
+    -- turn with the truck 8 m to the inside is a 5 m turn for the semi: it folded its trailer)
+    if v / math.abs(w) - math.abs(tx) >= FollowCombineTask.SEMI_RADIUS then
+        return false
+    end
+    Logging.info("[AD] %s: inside of %s's turn (radius %.0f m, %.0f m for us), backing up to %d m", ADDiag.name(self.vehicle),
+        ADDiag.name(c), v / math.abs(w), v / math.abs(w) - math.abs(tx), FollowCombineTask.BACK_OFF_GAP)
     self.backingOff = true
     self.backOffTime = 0
     self.backOffStopped = 0
@@ -809,6 +823,17 @@ function FollowCombineTask:updateBackOff(dt)
 end
 
 -- PropaineX edit (3.9.0.4): pipe lock (see update)
+-- PropaineX edit (od.55): truck clearly beside the harvester (outside its width) on its pipe side, its front level
+-- with the harvester's tail or further forward
+function FollowCombineTask:isBesidePipeSide()
+    local c = self.combine
+    local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
+    local lx, _, lz = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
+    local halfW, halfL = AutoDrive.getHarvesterHalfSize(c)
+    local frontZ = lz + (self.vehicle.size ~= nil and self.vehicle.size.length or 0) / 2
+    return math.abs(lx) > halfW and AutoDrive.sign(lx) == AutoDrive.getPipeSide(c) and frontZ >= -halfL
+end
+
 function FollowCombineTask:isPipeLock()
     return self.activeUnloading == true and self.combine.ad.isHarvester and not self.combine.ad.isChopper
 end
@@ -838,6 +863,35 @@ function FollowCombineTask:updatePipeLock(dt)
         else
             self.noFlowTime = (self.noFlowTime or 0) + dt
         end
+        -- PropaineX edit (od.55): the spot behind a standing harvester is no pipe: nothing falls in there (it held
+        -- still behind it for good). Only beside it on its pipe side counts. Standing still, grain in it, nothing falling
+        -- in and not beside the pipe for GO_AROUND_TIME: drive round it and start the approach over
+        local beside = self:isBesidePipeSide()
+        local behind = self.chaseSide == AutoDrive.CHASEPOS_REAR and not beside
+        if not flowing and not beside and (self.combineFillPercent or 0) > 0.1
+            and (self.vehicle.lastSpeedReal or 0) <= 0.0004 then
+            self.goAroundTime = (self.goAroundTime or 0) + dt
+        else
+            self.goAroundTime = 0
+        end
+        if self.goAroundTime > FollowCombineTask.GO_AROUND_TIME then
+            self.goAroundTime = 0
+            Logging.info("[AD] %s: nothing falling in for %d s at standing %s (not beside its pipe), driving round it to %d m behind and starting over",
+                ADDiag.name(self.vehicle), FollowCombineTask.GO_AROUND_TIME / 1000, ADDiag.name(self.combine), ADUnloaderClear.GO_AROUND_BEHIND)
+            ADUnloaderClear.goAround(self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD], self.combine)
+            return
+        end
+        if behind then
+            -- hold still (no chasing a spot behind it) until the timer above sends it round
+            self.creepAnchor = nil
+            sdm:stopVehicle()
+            sdm:update(dt)
+            sdm.isBlocked = false
+            if sdm.stoppedTimer ~= nil then
+                sdm.stoppedTimer:timer(false)
+            end
+            return
+        end
         local nearPipe = self.creepAnchor
         if not nearPipe and self.chasePos ~= nil then
             local vx, _, vz = getWorldTranslation(self.vehicle.components[1].node)
@@ -861,6 +915,7 @@ function FollowCombineTask:updatePipeLock(dt)
         self.creepForward = nil
         self.creepTurned = nil
         self.noFlowTime = 0
+        self.goAroundTime = 0 -- PropaineX edit (od.55)
     end
     -- drive to the spot under the pipe at the combine's speed (catch up when behind, drop back when past it), aimed at
     -- where the pipe will be in LEAD_TIME (the combine's speed and turn rate), so it doesn't lag behind every swing
@@ -879,6 +934,7 @@ function FollowCombineTask:updatePipeLock(dt)
     -- beside the truck can't be steered onto by a semi, it stayed metres off after every lane change)
     -- PropaineX edit (3.9.1.4): INSIDE of a turn tighter than a semi can follow (combine turning toward our side): back
     -- straight up until the gap to the combine is BACK_OFF_GAP, then forward at once (user: the only chase reverse)
+    self:updateTurnRate(dt) -- PropaineX edit (od.56)
     if self:updateBackOff(dt) then
         return
     end
@@ -892,28 +948,63 @@ function FollowCombineTask:updatePipeLock(dt)
     -- 3.9.1.4: only when actually BESIDE it on the other side; from behind its tail it just comes up the pipe side
     local clearlyWrong = tx * cxl < 0 and math.abs(tx) > halfW and tz > -halfL and math.abs(self.combineTurnRate or 0) < 0.05
     self.wrongSideTime = clearlyWrong and (self.wrongSideTime or 0) + dt or 0
-    if self.wrongSideTime > 1000 or (self.comingRound and tx * cxl < 0) then
+    -- PropaineX edit (od.56): beside it on the wrong side: STOP and let it drive past (was: drive to a spot behind it,
+    -- which swung the semi round in an arc into the harvester). Once our front is behind its tail, the lane approach
+    -- below brings it up the pipe side. (A standing harvester: the go-around above takes over after GO_AROUND_TIME.)
+    local frontZ, rearZ = self:getCabSpanZ()
+    if self.wrongSideTime > 1000 or (self.comingRound and tx * cxl < 0 and frontZ > -halfL - FollowCombineTask.LANE_BEHIND) then
         self.comingRound = true
-        local cur = tx >= 0 and 1 or -1
-        local wx, wz, sx, sz
-        if tz > -halfL - 6 then
-            -- drop back on our side, wheels straight along the combine's line
-            wx, _, wz = AutoDrive.localToWorld(c, tx, 0, -halfL - 12, c.ad.ADRootNode)
-            sx, _, sz = AutoDrive.localToWorld(c, tx, 0, tz + 25, c.ad.ADRootNode)
-        else
-            -- behind its tail: across to our side
-            wx, _, wz = AutoDrive.localToWorld(c, cxl, 0, -halfL - 6, c.ad.ADRootNode)
-            sx, sz = wx, wz
-        end
         if not self.wrongSideLogged then
             self.wrongSideLogged = true
-            Logging.info("[AD] %s: on the wrong side of %s, coming round behind it", ADDiag.name(self.vehicle), ADDiag.name(c))
+            Logging.info("[AD] %s: on the wrong side of %s, stopping to let it pass, then coming up its pipe side", ADDiag.name(self.vehicle), ADDiag.name(c))
         end
-        sdm:driveToPoint(dt, {x = wx, y = vy, z = wz}, combineSpeed, false, 1, FollowCombineTask.FLAT_OUT, true, {x = sx, y = vy, z = sz})
+        sdm:stopVehicle()
+        sdm:update(dt)
         return
     end
     self.comingRound = nil
     self.wrongSideLogged = nil
+    -- PropaineX edit (od.56): facing AGAINST the harvester (it came round at the end of the row) and not yet behind it:
+    -- turning a semi round here crosses its path. Stop and let it pass; once our front is behind its tail, the chase
+    -- turns round behind it.
+    local hx, _, hz = AutoDrive.localDirectionToWorld(self.vehicle, 0, 0, 1)
+    local cfx, _, cfz = AutoDrive.localDirectionToWorld(c, 0, 0, 1, c.ad.ADRootNode)
+    local facingAgainst = hx * cfx + hz * cfz < FollowCombineTask.AGAINST_COS
+    -- also: the whole cab ahead of its front (e.g. after pulling ahead out of a tail swing): no turning round toward
+    -- a spot behind us, that crosses its path; stand and let it come past
+    local cabAhead = rearZ > halfL
+    if (cabAhead or (facingAgainst and frontZ > -halfL - FollowCombineTask.LANE_BEHIND)) and combineSpeed > 0.5 then
+        if not self.againstLogged then
+            self.againstLogged = true
+            Logging.info("[AD] %s: ahead of / facing %s, stopping to let it pass", ADDiag.name(self.vehicle), ADDiag.name(c))
+        end
+        sdm:stopVehicle()
+        sdm:update(dt)
+        return
+    end
+    self.againstLogged = nil
+    -- PropaineX edit (od.56): behind its tail and not yet in the pipe-side lane: line up in the lane BEHIND the tail
+    -- first, then straight up it (no lazy arc that cuts round the tail onto the other side)
+    local laneSteer = self:getLaneApproach(tx, tz, cxl, halfW, halfL)
+    if laneSteer ~= nil then
+        if self:cabHeadsIntoHarvester() then
+            if not self.headInLogged then
+                self.headInLogged = true
+                Logging.info("[AD] %s: pointing into %s, stopping", ADDiag.name(self.vehicle), ADDiag.name(c))
+            end
+            sdm:stopVehicle()
+            sdm:update(dt)
+            return
+        end
+        self.headInLogged = nil
+        local laneMax = FollowCombineTask.FLAT_OUT
+        if self:getGapToCombine() < FollowCombineTask.CLOSE_GAP then
+            laneMax = combineSpeed + FollowCombineTask.CLOSE_EXTRA
+        end
+        sdm:driveToPoint(dt, laneSteer.target, math.min(combineSpeed, laneMax), false, 1, laneMax, true, laneSteer.steer)
+        return
+    end
+    self.laneLogged = nil
     local target = self:predictChasePos(dt)
     -- straight line: the combine's heading smoothed over LINE_SMOOTH ms; its small wobbles don't reach our wheels
     local fx, _, fz = AutoDrive.localDirectionToWorld(self.combine, 0, 0, 1, self.combine.ad.ADRootNode)
@@ -939,7 +1030,244 @@ function FollowCombineTask:updatePipeLock(dt)
     if aheadZ < -1 and hx * self.lineDir.x + hz * self.lineDir.z > 0 then
         maxSpeed = combineSpeed * 0.5
     end
-    sdm:driveToPoint(dt, target, combineSpeed, false, 1, maxSpeed, true, steer)
+    -- PropaineX edit (od.56): never steer into the harvester (keep-out gap)
+    target, steer = self:keepOffHarvester(target), self:keepOffHarvester(steer, true)
+    -- a TRAILER corner too close (it cuts in behind the cab, or the harvester's tail swings out in a turn): steering
+    -- the cab out doesn't move it in time, so drop back (half the harvester's speed) until it is clear again
+    local followSpeed = combineSpeed
+    local side = tx >= 0 and 1 or -1
+    local inside, byTrailer = self:getKeepOutIntrusion(side)
+    local w = self.combineTurnRate or 0
+    local swingAway = w * tx < 0 and math.abs(w) >= FollowCombineTask.TURN_DEADBAND and inside ~= nil
+        and inside > -FollowCombineTask.SWING_WATCH and self:isParallel()
+    if swingAway then
+        -- it turns AWAY from us while we are beside it: its tail swings out at us faster than it drives on, so pull
+        -- ahead out of the swing at once, wheels straight along our heading (catch-up maths works from followSpeed)
+        followSpeed = combineSpeed + FollowCombineTask.SWING_ESCAPE
+        local hx, _, hz = AutoDrive.localDirectionToWorld(self.vehicle, 0, 0, 1)
+        steer = {x = vx + hx * 25, y = vy, z = vz + hz * 25}
+        target = steer
+        maxSpeed = FollowCombineTask.FLAT_OUT
+        if not self.swingLogged then
+            self.swingLogged = true
+            Logging.info("[AD] %s: %s turns away, its tail swings at us: pulling ahead", ADDiag.name(self.vehicle), ADDiag.name(c))
+        end
+    else
+        self.swingLogged = nil
+        -- a TRAILER corner too close (it cuts in behind the cab): steering the cab out doesn't move it in time, so
+        -- drop back (half the harvester's speed) until it is clear again
+        if byTrailer and inside ~= nil and inside > -FollowCombineTask.DRIFT_IN then
+            followSpeed = combineSpeed * 0.5
+            maxSpeed = math.min(maxSpeed, followSpeed)
+            if not self.trailerInLogged then
+                self.trailerInLogged = true
+                Logging.info("[AD] %s: trailer close to %s, dropping back", ADDiag.name(self.vehicle), ADDiag.name(c))
+            end
+        elseif inside == nil or inside < -FollowCombineTask.DRIFT_IN - 0.5 then
+            self.trailerInLogged = nil
+        end
+    end
+    -- PropaineX edit (od.56): close to the harvester and not straight with it (coming in at an angle): no catch-up
+    -- sprint, at most CLOSE_EXTRA over its speed (35 km/h at an angle beside it could not stop in time)
+    if not self:isParallel(FollowCombineTask.CLOSE_ANGLE) and self:getGapToCombine() < FollowCombineTask.CLOSE_GAP then
+        followSpeed = math.min(followSpeed, combineSpeed + FollowCombineTask.CLOSE_EXTRA)
+        maxSpeed = math.min(maxSpeed, combineSpeed + FollowCombineTask.CLOSE_EXTRA)
+    end
+    -- PropaineX edit (od.56): the cab's own path (where it rolls if the wheels go straight, e.g. the jackknife guard
+    -- straightening a folded trailer, which ignores the steering) runs into the harvester within HEAD_IN_PROBE m: stop
+    if self:cabHeadsIntoHarvester() then
+        if not self.headInLogged then
+            self.headInLogged = true
+            Logging.info("[AD] %s: pointing into %s, stopping", ADDiag.name(self.vehicle), ADDiag.name(c))
+        end
+        sdm:stopVehicle()
+        sdm:update(dt)
+        return
+    end
+    self.headInLogged = nil
+    sdm:driveToPoint(dt, target, followSpeed, false, 1, maxSpeed, true, steer)
+end
+
+FollowCombineTask.HEAD_IN_PROBE = 5 -- m ahead of the cab's front checked for the harvester (more at speed)
+FollowCombineTask.HEAD_IN_DECEL = 3 -- m/s2 a loaded semi is counted on to brake with
+FollowCombineTask.CLOSE_GAP = 15     -- m: this close to the harvester and not straight with it...
+FollowCombineTask.CLOSE_ANGLE = 10   -- deg: "straight with it" for that speed cap
+FollowCombineTask.CLOSE_EXTRA = 8    -- km/h: ...at most this much faster than the harvester
+
+function FollowCombineTask:cabHeadsIntoHarvester()
+    local c = self.combine
+    local halfW, halfL = AutoDrive.getHarvesterHalfSize(c)
+    local hl = (self.vehicle.size ~= nil and self.vehicle.size.length or 0) / 2
+    local hw = self:getOwnHalfWidth()
+    -- at least HEAD_IN_PROBE, more at speed: braking distance (v^2 / 2a, HEAD_IN_DECEL) + 2 m
+    local v = (self.vehicle.lastSpeedReal or 0) * 1000
+    local probe = math.max(FollowCombineTask.HEAD_IN_PROBE, v * v / (2 * FollowCombineTask.HEAD_IN_DECEL) + 2)
+    for d = 1, probe do
+        for _, sx in ipairs({-hw, 0, hw}) do
+            local wx, wy, wz = AutoDrive.localToWorld(self.vehicle, sx, 0, hl + d)
+            local lx, _, lz = AutoDrive.worldToLocal(c, wx, wy, wz, c.ad.ADRootNode)
+            if math.abs(lx) < halfW + FollowCombineTask.KEEP_OUT_GAP and math.abs(lz) < halfL + FollowCombineTask.KEEP_OUT_GAP then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- PropaineX edit (od.56): KEEP-OUT GAP. Our "lane" beside the harvester is the harvester's half width + our half width +
+-- KEEP_OUT_GAP out from its centre line, never further out than the spot under the pipe (so the trailer stays under
+-- it). No point the truck drives or steers at may lie closer in than that lane, within the harvester's length
+-- (+ KEEP_OUT_LENGTH): such a point is moved straight out sideways, to the side the truck is on. A truck or trailer
+-- already more than DRIFT_IN m inside its lane beside the harvester: the steer point goes STEER_AWAY m further out, so it
+-- steers away. Result: the steering can never close in on the harvester, whatever the chase maths says.
+FollowCombineTask.KEEP_OUT_GAP = 1.0    -- m between the truck's side and the harvester's side
+FollowCombineTask.KEEP_OUT_MIN = 0.4    -- m: the lane is never closer than this, even for a short pipe
+FollowCombineTask.KEEP_OUT_LENGTH = 2   -- m before its front and behind its tail that count too
+FollowCombineTask.AGAINST_COS = math.cos(math.rad(110)) -- facing more than 110 deg off the harvester's heading
+FollowCombineTask.PARALLEL_ANGLE = 30   -- deg: pulling ahead out of a tail swing only when this close to its heading
+FollowCombineTask.SWING_WATCH = 6       -- m: beside it within this of the keep-out strip counts for the tail swing
+FollowCombineTask.SWING_ESCAPE = 8      -- km/h over the harvester's speed when pulling out of its tail swing
+FollowCombineTask.DRIFT_IN = 0.5        -- m inside the lane before it steers away
+FollowCombineTask.STEER_AWAY = 2        -- m extra out for the steer point when steering away
+FollowCombineTask.LANE_BEHIND = 4       -- m: lane approach lines up this far behind the tail (front of the truck)
+FollowCombineTask.LANE_TOLERANCE = 1.5  -- m sideways off the pipe lane that still counts as in it
+FollowCombineTask.LANE_MIN_AHEAD = 6    -- m: the lane steer point is never closer ahead than this (full lock swings it in)
+
+-- the cab's front and rear (m, along the harvester's heading, in its frame): the larger and the smaller of the two,
+-- whichever way the cab faces
+function FollowCombineTask:getCabSpanZ()
+    local c = self.combine
+    local hl = (self.vehicle.size ~= nil and self.vehicle.size.length or 0) / 2
+    local fx, fy, fz = AutoDrive.localToWorld(self.vehicle, 0, 0, hl)
+    local rx, ry, rz = AutoDrive.localToWorld(self.vehicle, 0, 0, -hl)
+    local _, _, a = AutoDrive.worldToLocal(c, fx, fy, fz, c.ad.ADRootNode)
+    local _, _, b = AutoDrive.worldToLocal(c, rx, ry, rz, c.ad.ADRootNode)
+    return math.max(a, b), math.min(a, b)
+end
+
+-- true when the cab points within PARALLEL_ANGLE of the harvester's heading
+function FollowCombineTask:isParallel(maxAngle)
+    local hx, _, hz = AutoDrive.localDirectionToWorld(self.vehicle, 0, 0, 1)
+    local cfx, _, cfz = AutoDrive.localDirectionToWorld(self.combine, 0, 0, 1, self.combine.ad.ADRootNode)
+    return hx * cfx + hz * cfz > math.cos(math.rad(maxAngle or FollowCombineTask.PARALLEL_ANGLE))
+end
+
+function FollowCombineTask:getOwnHalfWidth()
+    local w = self.vehicle.size ~= nil and self.vehicle.size.width or 3
+    for _, trailer in pairs(self.trailers or {}) do
+        if trailer.size ~= nil and (trailer.size.width or 0) > w then
+            w = trailer.size.width
+        end
+    end
+    return w / 2
+end
+
+-- lane distance from the harvester's centre line
+function FollowCombineTask:getKeepOutLane()
+    local c = self.combine
+    local halfW = AutoDrive.getHarvesterHalfSize(c)
+    local lane = halfW + self:getOwnHalfWidth() + FollowCombineTask.KEEP_OUT_GAP
+    if self.chasePos ~= nil and self.chaseSide ~= AutoDrive.CHASEPOS_REAR then
+        local cxl = AutoDrive.worldToLocal(c, self.chasePos.x, self.chasePos.y, self.chasePos.z, c.ad.ADRootNode)
+        lane = math.min(lane, math.abs(cxl))
+    end
+    -- whatever the pipe spot says: never closer than touching distance + KEEP_OUT_MIN
+    return math.max(lane, halfW + self:getOwnHalfWidth() + FollowCombineTask.KEEP_OUT_MIN)
+end
+
+-- how far (m) the closest corner of the truck or a trailer is inside the keep-out strip (harvester's side +
+-- KEEP_OUT_GAP) on the given side, among corners level with the harvester (front to back, + KEEP_OUT_LENGTH); <= 0 is
+-- clear, nil when no corner is level with it. Corners, not centres: a trailer at an angle (or the harvester's tail
+-- swinging in a turn) touches with a corner first.
+function FollowCombineTask:getKeepOutIntrusion(side)
+    local c = self.combine
+    local halfW, halfL = AutoDrive.getHarvesterHalfSize(c)
+    local reach = halfL + FollowCombineTask.KEEP_OUT_LENGTH
+    local edge = halfW + FollowCombineTask.KEEP_OUT_GAP
+    local worst, worstIsTrailer = nil, false
+    local units = {self.vehicle}
+    for _, trailer in pairs(self.trailers or {}) do
+        if trailer ~= self.vehicle then
+            table.insert(units, trailer)
+        end
+    end
+    for _, unit in pairs(units) do
+        if unit.components ~= nil and unit.components[1] ~= nil and unit.size ~= nil then
+            local node = unit.components[1].node
+            local hw, hl = (unit.size.width or 0) / 2, (unit.size.length or 0) / 2
+            for _, k in ipairs({{-1, -1}, {1, -1}, {-1, 1}, {1, 1}, {-1, 0}, {1, 0}}) do
+                local wx, wy, wz = localToWorld(node, k[1] * hw, 0, k[2] * hl)
+                local lx, _, lz = AutoDrive.worldToLocal(c, wx, wy, wz, c.ad.ADRootNode)
+                if math.abs(lz) <= reach and lx * side > 0 then
+                    local inside = edge - lx * side
+                    if worst == nil or inside > worst then
+                        worst, worstIsTrailer = inside, unit ~= self.vehicle
+                    end
+                end
+            end
+        end
+    end
+    return worst, worstIsTrailer
+end
+
+function FollowCombineTask:keepOffHarvester(point, isSteer)
+    if point == nil then
+        return point
+    end
+    local c = self.combine
+    local _, halfL = AutoDrive.getHarvesterHalfSize(c)
+    local px, _, pz = AutoDrive.worldToLocal(c, point.x, point.y or 0, point.z, c.ad.ADRootNode)
+    local lane = self:getKeepOutLane()
+    local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
+    local tx = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
+    local side = tx >= 0 and 1 or -1
+    local minX = lane
+    local reach = halfL + FollowCombineTask.KEEP_OUT_LENGTH
+    if isSteer then
+        local inside = self:getKeepOutIntrusion(side)
+        if inside ~= nil and inside > -FollowCombineTask.DRIFT_IN then
+            -- a corner closer than KEEP_OUT_GAP + DRIFT_IN to its side: steer out, further the deeper it is
+            minX = math.max(minX, math.abs(px)) + FollowCombineTask.STEER_AWAY + math.max(inside, 0) * 2
+            if not self.keepOutLogged then
+                self.keepOutLogged = true
+                Logging.info("[AD] %s: %.1f m from %s's side, steering away", ADDiag.name(self.vehicle),
+                    math.max(FollowCombineTask.KEEP_OUT_GAP - inside, 0), ADDiag.name(c))
+            end
+        elseif inside == nil or inside < -FollowCombineTask.DRIFT_IN - 0.5 then
+            self.keepOutLogged = nil
+        end
+        -- the steer point lies ahead but decides the steering beside the harvester: it counts at any distance
+        -- while we are beside or behind it
+        reach = math.max(reach, math.abs(pz) + 1)
+    end
+    if math.abs(pz) > reach or (px * side >= minX and not (isSteer and self.keepOutLogged)) then
+        return point
+    end
+    local wx, _, wz = AutoDrive.localToWorld(c, side * minX, 0, pz, c.ad.ADRootNode)
+    return {x = wx, y = point.y, z = wz}
+end
+
+-- behind the tail and off the pipe lane: {target, steer} that line it up in the lane behind the tail; nil otherwise
+function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
+    if self.chaseSide == AutoDrive.CHASEPOS_REAR then
+        return nil
+    end
+    local frontZ = self:getCabSpanZ()
+    if frontZ > -halfL or math.abs(tx - cxl) <= FollowCombineTask.LANE_TOLERANCE then
+        return nil
+    end
+    -- drive toward the pipe spot (speed), steer at a point in the pipe lane LOOK_AHEAD m ahead of us but never level
+    -- with the harvester (it stays behind its tail until we are lined up): it lines up in the lane while it rolls on
+    -- (a lane point to stop at left it standing just off the lane)
+    local c = self.combine
+    local _, y, _ = getWorldTranslation(self.vehicle.components[1].node)
+    local steerZ = math.max(tz + FollowCombineTask.LANE_MIN_AHEAD, math.min(tz + FollowCombineTask.LOOK_AHEAD, -halfL - FollowCombineTask.LANE_BEHIND))
+    local sx, _, sz = AutoDrive.localToWorld(c, cxl, 0, steerZ, c.ad.ADRootNode)
+    if not self.laneLogged then
+        self.laneLogged = true
+        Logging.info("[AD] %s: behind %s, lining up on its pipe side before coming up", ADDiag.name(self.vehicle), ADDiag.name(c))
+    end
+    return {target = self.chasePos, steer = {x = sx, y = y, z = sz}}
 end
 
 FollowCombineTask.LOOK_AHEAD = 12 -- m: steering aims this far along the combine's line (longer = straighter, calmer)
@@ -951,12 +1279,11 @@ FollowCombineTask.FLAT_OUT = 200 -- km/h: no cap of our own (AutoDrive's chase h
 FollowCombineTask.PIPE_LOCK_RANGE = 50 -- m
 FollowCombineTask.LEAD_TIME = 1.5 -- s
 
--- the chase point, moved with the combine as if it kept its speed and turn rate for LEAD_TIME
-function FollowCombineTask:predictChasePos(dt)
+-- the combine's turn rate (rad/s, + = toward local +x), smoothed: last frame's heading seen from the current frame
+function FollowCombineTask:updateTurnRate(dt)
     local c = self.combine
     local cx, cy, cz = getWorldTranslation(c.components[1].node)
     local fx, _, fz = AutoDrive.localDirectionToWorld(c, 0, 0, 1, c.ad.ADRootNode)
-    -- turn rate (rad/s, + = toward local +x): last frame's heading seen from the current combine frame
     local rate = 0
     if self.lastCombineFwd ~= nil and dt > 0 then
         local px, _, pz = AutoDrive.worldToLocal(c, cx + self.lastCombineFwd.x, cy, cz + self.lastCombineFwd.z, c.ad.ADRootNode)
@@ -964,7 +1291,16 @@ function FollowCombineTask:predictChasePos(dt)
     end
     self.lastCombineFwd = {x = fx, z = fz}
     self.combineTurnRate = 0.9 * (self.combineTurnRate or rate) + 0.1 * rate -- smoothed
-    local w = self.combineTurnRate
+end
+
+-- the chase point, moved with the combine as if it kept its speed and turn rate for LEAD_TIME
+function FollowCombineTask:predictChasePos(dt)
+    local c = self.combine
+    local cx, cy, cz = getWorldTranslation(c.components[1].node)
+    local fx, _, fz = AutoDrive.localDirectionToWorld(c, 0, 0, 1, c.ad.ADRootNode)
+    -- PropaineX edit (od.56): turn rate now kept up to date every frame by updateTurnRate (it went stale while backing
+    -- off, so the back-off never saw the turn end)
+    local w = self.combineTurnRate or 0
     -- straight line: below TURN_DEADBAND the combine counts as driving straight (no chasing its wobble)
     if math.abs(w) < FollowCombineTask.TURN_DEADBAND then
         w = 0

@@ -180,6 +180,22 @@ function ADSpecialDrivingModule:driveReverse(dt, maxSpeed, maxAcceleration, guid
     local speed = maxSpeed
     local acc = maxAcceleration
 
+    -- PropaineX edit (od.56): a combine unloader never reverses into the area in front of its harvester: stop and
+    -- hold there until the harvester has passed (ADUnloaderClear.reverseIntoFront)
+    local intoFront, frontCombine = false, nil
+    if ADUnloaderClear ~= nil and ADUnloaderClear.reverseIntoFront ~= nil then
+        intoFront, frontCombine = ADUnloaderClear.reverseIntoFront(self.vehicle, self.frontHold)
+    end
+    if intoFront and not self.frontHold then
+        Logging.info("[AD] %s: reversing would put it in front of %s, stopping until it has passed", ADDiag.name(self.vehicle), ADDiag.name(frontCombine))
+    elseif not intoFront and self.frontHold then
+        Logging.info("[AD] %s: clear of the front of the harvester, may reverse again", ADDiag.name(self.vehicle))
+    end
+    self.frontHold = intoFront
+    if intoFront then
+        self:stopAndHoldVehicle(dt)
+        return
+    end
 
     if self.vehicle.ad.collisionDetectionModule:checkReverseCollision() then
         self:stopAndHoldVehicle(dt)
@@ -308,7 +324,9 @@ function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDyn
         elseif self.distanceToChasePos < 20 then
             speed = maxFollowSpeed + ADSpecialDrivingModule.CATCH_UP_LEAD + (self.distanceToChasePos - under) * ADSpecialDrivingModule.CATCH_UP_GAIN
         end
-        speed = math.min(speed, fieldLimit)
+        -- PropaineX edit (od.56): maxSpeed caps the catch-up too (it was only applied before the catch-up maths, so
+        -- the callers' caps, e.g. "ease off when ahead of the pipe", never took effect)
+        speed = math.min(speed, fieldLimit, maxSpeed)
     elseif self.distanceToChasePos < 0.5 then
         speed = maxFollowSpeed * 1
     elseif self.distanceToChasePos < 7 then

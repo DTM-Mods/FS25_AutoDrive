@@ -34,6 +34,10 @@ end
 
 -- the path finder found nothing (in time): drive straight when allowed, else give up as before
 function MoveClearOfHarvesterTask:onNoPath()
+    if self.harvester ~= nil then
+        -- PropaineX edit (od.55)
+        Logging.info("[AD] %s: no way round %s on the field with room, waiting for a call", ADDiag.name(self.vehicle), ADDiag.name(self.harvester))
+    end
     if self.straightFallback then
         self:startStraight()
     else
@@ -53,6 +57,35 @@ function MoveClearOfHarvesterTask:setUp()
     pfm:reset()
     pfm:startPathPlanningTo({x = self.target.x, y = self.target.y, z = self.target.z}, {x = self.direction.x, z = self.direction.z})
     table.insert(pfm.appendWayPoints, {x = self.target.x, y = self.target.y, z = self.target.z})
+    if self.stayOnField then
+        -- PropaineX edit (od.55): going round a harvester (ADUnloaderClear.goAround): field only, whatever the setting
+        pfm.restrictToField = true
+        pfm.stayOnField = true
+    end
+end
+
+-- PropaineX edit (od.55): every unit of the train (truck and trailers) at least CLEAR_GAP m outside the harvester's
+-- outline (its whole rig, see AutoDrive.getHarvesterHalfSize)
+MoveClearOfHarvesterTask.CLEAR_GAP = 5 -- m
+function MoveClearOfHarvesterTask.isClearOf(vehicle, harvester)
+    if harvester == nil or harvester.components == nil or harvester.ad == nil then
+        return true
+    end
+    local halfW, halfL = AutoDrive.getHarvesterHalfSize(harvester)
+    local units = AutoDrive.getAllUnits(vehicle) or {vehicle}
+    for _, unit in pairs(units) do
+        if unit.components ~= nil and unit.components[1] ~= nil and unit.size ~= nil then
+            local ux, uy, uz = getWorldTranslation(unit.components[1].node)
+            local lx, _, lz = AutoDrive.worldToLocal(harvester, ux, uy, uz, harvester.ad.ADRootNode)
+            local reach = math.max(unit.size.width or 0, unit.size.length or 0) / 2 -- any way the unit is turned
+            local gx = math.abs(lx) - halfW - reach
+            local gz = math.abs(lz) - halfL - reach
+            if gx < MoveClearOfHarvesterTask.CLEAR_GAP and gz < MoveClearOfHarvesterTask.CLEAR_GAP then
+                return false
+            end
+        end
+    end
+    return true
 end
 
 function MoveClearOfHarvesterTask:update(dt)
@@ -102,7 +135,13 @@ function MoveClearOfHarvesterTask:update(dt)
         end
     else
         if self.vehicle.ad.drivePathModule:isTargetReached() then
-            ADUnloaderClear.onMoveDone(self.vehicle)
+            -- PropaineX edit (od.55): round a harvester: only done when the whole train has cleared it
+            if self.harvester ~= nil and not MoveClearOfHarvesterTask.isClearOf(self.vehicle, self.harvester) then
+                Logging.info("[AD] %s: drove round %s but is not clear of it, waiting for a call", ADDiag.name(self.vehicle), ADDiag.name(self.harvester))
+                ADUnloaderClear.onMoveFailed(self.vehicle)
+            else
+                ADUnloaderClear.onMoveDone(self.vehicle)
+            end
             self:finished()
         elseif self.elapsed > MoveClearOfHarvesterTask.DRIVE_TIME then
             ADUnloaderClear.onMoveFailed(self.vehicle)

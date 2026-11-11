@@ -7,6 +7,63 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.56 (2026-11-10): unloader never steers into the harvester, never reverses into its front
+*Untested in the game; tested in the driving simulation (tools/tests/test_unloader_sim.py: 13 scenarios plus a sweep of
+60 runs with headland U-turns of 8 to 20 m radius, toward and away, both pipe sides).*
+
+- Keep-out gap: while chasing the pipe, no point the truck drives or steers at may lie closer to the harvester than
+  its side + the truck's half width + 1 m (never further out than the pipe spot, so the trailer stays under the pipe).
+  A corner of the truck or a trailer closer than 1.5 m to the harvester's side: it steers away. A trailer corner too
+  close: it drops back to half the harvester's speed.
+- The cab's own path runs into the harvester within its braking distance (e.g. the jackknife guard straightening the
+  wheels): it stops.
+- Close to the harvester (within 15 m) and coming in at an angle: at most 8 km/h faster than the harvester.
+- Wrong side: beside the harvester on the side without the pipe it stops and lets the harvester drive past (it used to
+  aim at a spot behind and swing round in an arc into the harvester). Behind its tail and off the pipe side: it lines
+  up on the pipe side BEHIND the tail first, then comes straight up it.
+- Never in front: a combine unloader may reverse, but never into the area in front of its harvester (its path ahead,
+  30 m, its width + 6 m each side, turning with it). It stops at the edge and holds until the harvester has passed.
+  Ahead of the harvester, or facing against it after a headland turn: it stops and lets it pass instead of turning
+  round in its path.
+- Headland turn AWAY from the truck: the harvester's tail swings out at it, so it pulls ahead out of the swing.
+- Inside of a turn: "too tight for a semi" now counts the truck's own radius (the harvester's minus how far inside it
+  is), so it backs off in time instead of folding the trailer; the back-off ends as soon as the harvester has come round.
+- Fixed: the maximum speed given to the chase (e.g. "ease off when ahead of the pipe", 3.9.1.4) was overridden by the
+  catch-up maths and never applied.
+- Logged: "steering away", "trailer close to ..., dropping back", "pointing into ..., stopping", "on the wrong side
+  ..., stopping to let it pass", "lining up on its pipe side", "reversing would put it in front of ..., stopping until
+  it has passed", "turns away, its tail swings at us: pulling ahead", "ahead of / facing ..., stopping to let it pass".
+
+## 3.0.1.4-od.55 (2026-11-10): unloader no longer sits behind a standing harvester
+*Untested in the game; tested with mock vehicles (15 cases).*
+
+- With Active unloading, an unloader whose chase spot was BEHIND a standing harvester (pipe not out, e.g. a beet
+  harvester waiting for "needs to be unloaded") counted that spot as "at the pipe" and sat there for good, while the
+  harvester waited for a truck under its pipe.
+- Now only beside the harvester on its pipe side (front level with its tail or further forward) counts as at the pipe.
+  Behind it, the unloader holds still instead of chasing a spot behind it.
+- Standing still, grain in the harvester, nothing falling in and not beside the pipe for 10 s: the unloader drives
+  FORWARD round the harvester (path finder, the harvester is an obstacle, held to the field whatever the setting, no
+  fallback that leaves the field, never reverses) to 25 m behind its tail, then starts the approach over (a fresh
+  approach to a standing harvester goes to the pipe side). It only counts as done when the truck and every trailer are
+  at least 5 m outside the harvester's outline. No way round on the field: it waits for the next call.
+- Beside the pipe nothing changes: the creep along the trailer still handles a heaped-full spot.
+- Logged: "nothing falling in for 10 s at standing ..., driving round it", and when there is no way round.
+
+## 3.0.1.4-od.54 (2026-11-09): unloaders switch off when the harvester is finished
+*Untested in the game; tested with mock vehicles (13 cases).*
+
+- When a harvester or forage harvester's helper (the game's helper or Courseplay) finishes the field by itself
+  ("finished job"), the AutoDrive unloaders working for it switch AutoDrive off, so they stop costing helper wages.
+- Empty unloaders switch off where they are. An unloader with grain on board drives off and unloads first (leaving
+  the field first, as for a full trailer), then switches off instead of driving back to the field. One already on its
+  way to unload finishes that trip, then switches off.
+- "Working for it" means set to the same field pins (first target) as the harvester. If another harvester on the same
+  pins is still working, the unloaders stay on for that one.
+- Nothing changes when you stop the harvester yourself, take it over, or it stops for another reason (fuel, broken,
+  full, ...): the unloaders keep working as before.
+- Logged: "[AD] Combine finished its job: 2 unloader(s) switching AutoDrive off", and one line per unloader.
+
 ## 3.10.0.0 (2026-11-07): Nexat harvester fix
 *Untested in the game; Lua syntax checked, helpers tested with mock vehicles.*
 
