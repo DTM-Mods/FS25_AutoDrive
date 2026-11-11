@@ -115,6 +115,7 @@ function PathFinderModule:reset()
     self.retryCounter = 0
     self.delayTime = 0
     self.restrictToField = false
+    self.stayOnField = false -- PropaineX edit (od.55)
     self.avoidFruitSetting = false
     self.destinationId = 0
     self.fallBackMode1 = false
@@ -458,6 +459,9 @@ function PathFinderModule:startPathPlanningTo(targetPoint, targetVector)
     self.startIsOnField = AutoDrive.checkIsOnField(vehicleWorldX, vehicleWorldY, vehicleWorldZ) and self.vehicle.ad.sensors.frontSensorField:pollInfo(true)
     self.endIsOnField = AutoDrive.checkIsOnField(targetX, vehicleWorldY, targetZ)
     self.restrictToField = AutoDrive.getSetting("restrictToField", self.vehicle) and self.startIsOnField and self.endIsOnField
+    -- PropaineX edit (od.55): set by the caller after this call (MoveClearOfHarvesterTask going round a harvester):
+    -- field only, no fallback that leaves the field
+    self.stayOnField = false
     self.goingToPipe = false
     self.chasingVehicle = false
     self.isSecondChasingVehicle = false
@@ -744,8 +748,8 @@ function PathFinderModule:update(dt)
             e) 'try different field exit strategy'
         --]]
         -- Only allow fallback if we are not heading for a moving vehicle
-        local fallBackModeAllowed1 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.restrictToField) and (not self.fallBackMode1)    -- disable restrict to field
-        local fallBackModeAllowed2 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.restrictToField) and (not self.fallBackMode2)    -- disable restrict to field border
+        local fallBackModeAllowed1 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.restrictToField) and (not self.fallBackMode1) and (not self.stayOnField)    -- disable restrict to field
+        local fallBackModeAllowed2 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.restrictToField) and (not self.fallBackMode2) and (not self.stayOnField)    -- disable restrict to field border
         local fallBackModeAllowed3 = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.avoidFruitSetting) and (not self.fallBackMode3)    -- disable avoid fruit
         local increaseStepsAllowed = (not self.chasingVehicle) and (not self.isSecondChasingVehicle) and (self.max_pathfinder_steps < PathFinderModule.MAX_PATHFINDER_STEPS_TOTAL * self.pathFinderTime)    -- increase number of steps if possible
         -- Overdrive: up to a combine's pipe: a bigger search before any fallback, and never through the crop with avoid fruit on

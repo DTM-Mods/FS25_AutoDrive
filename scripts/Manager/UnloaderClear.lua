@@ -408,6 +408,21 @@ function ADUnloaderClear.moveAside(mode, minDistance)
     ADUnloaderClear.start(mode, x, z, dirX, dirZ, true)
 end
 
+-- PropaineX edit (od.55): stuck at a standing harvester with nothing falling in (FollowCombineTask): drive FORWARD
+-- round it (path finder, field only, the harvester is an obstacle) to GO_AROUND_BEHIND m behind its tail, facing its
+-- way; never reverses (no straight fallback). Then it waits for a call and starts the approach over. No path: it waits
+-- for a call where it is.
+ADUnloaderClear.GO_AROUND_BEHIND = 25 -- m behind the harvester's tail
+function ADUnloaderClear.goAround(mode, combine)
+    local node = combine.ad.ADRootNode
+    local _, halfL = AutoDrive.getHarvesterHalfSize(combine)
+    local x, _, z = AutoDrive.localToWorld(combine, 0, 0, -(halfL + ADUnloaderClear.GO_AROUND_BEHIND), node)
+    local dirX, _, dirZ = AutoDrive.localDirectionToWorld(combine, 0, 0, 1, node)
+    ADUnloaderClear.start(mode, x, z, dirX, dirZ, false)
+    mode.activeTask.harvester = combine
+    mode.activeTask.stayOnField = true
+end
+
 local function getMode(vehicle)
     return vehicle ~= nil and vehicle.ad ~= nil and vehicle.ad.modes ~= nil and vehicle.ad.modes[AutoDrive.MODE_UNLOAD] or nil
 end
@@ -432,4 +447,61 @@ function ADUnloaderClear.onMoveFailed(vehicle)
     else
         mode.clearCooldownUntil = (g_time or 0) + ADUnloaderClear.MOVE_COOLDOWN
     end
+end
+
+-- PropaineX edit (od.56): never REVERSE into the area in front of the harvester being unloaded (its path ahead and,
+-- at the end of a row, where it swings round). Reversing anywhere else is fine. Before every reverse step of a combine
+-- unloader: if any corner of the truck or a trailer is in that area now, or would be after REVERSE_LOOK m more of
+-- reversing, it stops and holds still until the harvester has passed (the area moves on with it), then carries on.
+-- The area: from the harvester's front, FRONT_LENGTH m ahead, its half width + FRONT_SIDE m to each side, in the
+-- harvester's own frame (so when it turns, the area turns with it).
+ADUnloaderClear.FRONT_LENGTH = 30   -- m ahead of the harvester's front
+ADUnloaderClear.FRONT_SIDE = 6      -- m beyond its half width on each side
+ADUnloaderClear.REVERSE_LOOK = 4    -- m of reversing looked ahead
+ADUnloaderClear.RELEASE_LOOK = 10   -- m looked ahead before a HELD unloader may reverse again (no stop-go at the edge)
+ADUnloaderClear.FRONT_RANGE = 80    -- m: harvesters further away than this are not looked at
+
+function ADUnloaderClear.isInFront(combine, x, z)
+    local lx, _, lz = AutoDrive.worldToLocal(combine, x, 0, z, combine.ad.ADRootNode)
+    local halfW, halfL = AutoDrive.getHarvesterHalfSize(combine)
+    return lz > halfL and lz < halfL + ADUnloaderClear.FRONT_LENGTH and math.abs(lx) < halfW + ADUnloaderClear.FRONT_SIDE
+end
+
+-- the harvester this unloader works for, while AutoDrive drives it in "unload combine" mode
+function ADUnloaderClear.getWorkCombine(vehicle)
+    local mode = getMode(vehicle)
+    local state = vehicle ~= nil and vehicle.ad ~= nil and vehicle.ad.stateModule or nil
+    if mode == nil or mode.combine == nil or state == nil or state:getMode() ~= AutoDrive.MODE_UNLOAD then
+        return nil
+    end
+    local combine = mode.combine
+    if combine.ad == nil or combine.components == nil or combine.components[1] == nil then
+        return nil
+    end
+    return combine
+end
+
+-- true: the next bit of reversing would put (or keeps) the train in front of the harvester -> stop and hold
+function ADUnloaderClear.reverseIntoFront(vehicle, holding)
+    local combine = ADUnloaderClear.getWorkCombine(vehicle)
+    if combine == nil or AutoDrive.getDistanceBetween(vehicle, combine) > ADUnloaderClear.FRONT_RANGE then
+        return false
+    end
+    local units = AutoDrive.getAllUnits(vehicle) or {vehicle}
+    for _, unit in pairs(units) do
+        if unit.components ~= nil and unit.components[1] ~= nil and unit.size ~= nil then
+            local node = unit.components[1].node
+            local hw, hl = (unit.size.width or 0) / 2, (unit.size.length or 0) / 2
+            for _, c in ipairs({{-hw, hl}, {hw, hl}, {-hw, -hl}, {hw, -hl}}) do
+                local look = holding and ADUnloaderClear.RELEASE_LOOK or ADUnloaderClear.REVERSE_LOOK
+                for back = 0, look do -- every metre: a coarser step could jump over the area's edge
+                    local x, _, z = localToWorld(node, c[1], 0, c[2] - back)
+                    if ADUnloaderClear.isInFront(combine, x, z) then
+                        return true, combine
+                    end
+                end
+            end
+        end
+    end
+    return false
 end
