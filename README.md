@@ -4,7 +4,7 @@
 
 # AutoDrive Overdrive
 
-[![CI](https://github.com/DTM-Mods/FS25_AutoDrive/actions/workflows/ci.yml/badge.svg)](https://github.com/DTM-Mods/FS25_AutoDrive/actions/workflows/ci.yml)
+[![Build](https://github.com/DTM-Mods/FS25_AutoDrive/actions/workflows/build.yml/badge.svg)](https://github.com/DTM-Mods/FS25_AutoDrive/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/DTM-Mods/FS25_AutoDrive?label=release)](https://github.com/DTM-Mods/FS25_AutoDrive/releases/latest)
 
 AutoDrive Overdrive is an unofficial edition of [AutoDrive](https://github.com/Stephan-S/FS25_AutoDrive) for Farming Simulator 25, by the AutoDrive Team (Stephan-S, Axel32019, TyKonKet and [many contributors](credits.txt)), released under the [MIT licence](LICENSE).
@@ -308,7 +308,7 @@ All key bindings can be changed in the game's control settings. Like AutoDrive's
   <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/for-developers.jpg" alt="For developers" width="100%">
 </p>
 
-Every push and pull request runs the [CI workflow](.github/workflows/ci.yml):
+Every push and pull request runs the [Build workflow](.github/workflows/build.yml), the shared DTM Mods build ([settings](https://github.com/DTM-Mods/.github/blob/main/ci/README.md)):
 - a Lua 5.1 syntax check, the Lua version the game uses
 - static checks: XML files, translation placeholders, every script loaded by `register.lua` exists ([tools/ci_checks.py](tools/ci_checks.py))
 - static checks also make sure every text the code uses exists in English, and that the mod's startup check accepts its title
@@ -317,7 +317,7 @@ Every push and pull request runs the [CI workflow](.github/workflows/ci.yml):
 
 Run the same locally with `pip install lupa`, then `python tools/ci_checks.py` and `python tools/tests/run_all.py`.
 
-**Releasing:** push a tag like `v3.0.1.4-od.2`, or start the [Release workflow](.github/workflows/release.yml) from the Actions tab and enter the version (with "dry run" it only builds). The workflow runs all checks, builds `FS25_AutoDrive.zip` with [tools/build_mod.py](tools/build_mod.py), writes the release notes and publishes the release. The version must start with the version in `modDesc.xml`.
+**Releasing:** push a tag like `v3.0.1.4-od.59`. The Build workflow runs all checks, builds `FS25_AutoDrive.zip` with [tools/build_mod.py](tools/build_mod.py), writes the release notes ([tools/release_notes.py](tools/release_notes.py)) and publishes the release. The version must be the version in `modDesc.xml` plus `-od.<build>`. To try a release first without publishing anything: Actions > Build > Run workflow, and enter the tag.
 
 The mod zip contains `drawing`, `gui`, `scripts`, `sounds`, `textures`, `translations`, `icon_AutoDrive.dds`, `modDesc.xml`, `register.lua`, `LICENSE` (as `LICENSE.txt`) and `credits.txt`. The `tools` and `.github` folders are for development and not part of the mod.
 
