@@ -101,15 +101,33 @@ s.execute("POS[20] = {58, 50}")
 assert not s.eval("E.isInFrontOfHarvester(UNLOADER, HARVESTER)")
 s.execute("POS[20] = {50, 64}")
 
-# --- blocking the harvester: after 6 s of both standing, the escape starts (once, then a pause)
+# --- blocking the harvester (od.57): after 4 s of both standing it first gets out of the way
+#     (ADUnloaderClear.start); still blocking it 6 s after that, the escape starts (once, then a pause)
+s.execute("""
+    YIELDS = {}
+    ADDiag.name = ADDiag.name or function(v) return v.unitName or "?" end
+    ADUnloaderClear = {
+        getHarvesters = function() return {HARVESTER} end,
+        getFruits = function() return {} end,
+        findSafeSpot = function() return nil end,
+        start = function(mode, x, z, dirX, dirZ, yielding) YIELDS[#YIELDS + 1] = {yielding = yielding} end,
+    }
+""")
+for _ in range(39):
+    assert not s.eval("E.monitor(MODE, 100, false)")
+assert s.eval("E.monitor(MODE, 100, false)")          # gets out of the way
+assert s.eval("#YIELDS") == 1 and s.eval("YIELDS[1].yielding") and s.eval("MODE.combine") is None
+s.execute("MODE.combine = HARVESTER")                  # back at the harvester, in its way again
 for _ in range(59):
     assert not s.eval("E.monitor(MODE, 100, false)")
 assert s.eval("E.monitor(MODE, 100, false)")
 assert s.eval("MODE.state") == "escape" and s.eval("#TASKS") == 1 and s.eval("MESSAGES[1]").endswith("$l10n_AD_escape_harvester; (Combine)"), s.eval("MESSAGES[1]")
 assert s.eval("E.monitor(MODE, 100, false)")         # while escaping the escape owns the vehicle
 s.execute("MODE.state = 'chase'; MODE.escapeHarvesterTime = 0")
-for _ in range(80):
-    assert not s.eval("E.monitor(MODE, 100, false)")   # cooldown
+for _ in range(59):
+    assert not s.eval("E.monitor(MODE, 100, false)")   # cooldown: no escape...
+assert s.eval("E.monitor(MODE, 100, false)") and s.eval("#YIELDS") == 2   # ...it gets out of the way again
+s.execute("MODE.combine = HARVESTER; MODE.state = 'chase'")
 s.execute("g_time = g_time + E.COOLDOWN + 1")
 # the harvester driven by a person, or the unloader being filled: no escape
 s.execute("HARVESTER_AI = false")
