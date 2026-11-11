@@ -300,6 +300,7 @@ All key bindings can be changed in the game's control settings. Like AutoDrive's
 <p align="center">
   <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/for-developers.jpg" alt="For developers" width="100%">
 </p>
+
 Every push and pull request runs the [CI workflow](.github/workflows/ci.yml):
 - a Lua 5.1 syntax check, the Lua version the game uses
 - static checks: XML files, translation placeholders, every script loaded by `register.lua` exists ([tools/ci_checks.py](tools/ci_checks.py))
@@ -327,6 +328,7 @@ Direct Download: https://github.com/Stephan-S/FS25_AutoDrive/releases/latest/dow
 <p align="center">
   <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/support.jpg" alt="Support" width="100%">
 </p>
+
 For help & support, feel free to join us on Discord: 
 https://discord.gg/2XfnM59DFy
 
