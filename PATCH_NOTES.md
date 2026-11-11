@@ -3,6 +3,19 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.58 (2026-11-11): unloader waits at the end of a row
+*Untested in the game; tested with mock vehicles (tools/tests/test_end_of_row_wait.py).*
+
+- At the end of a row the harvester raises its header or switches it off. The unloader now stops right where it is
+  and waits: it doesn't follow the turn, pull forward or back up. Once every header is lowered and switched on again
+  (the harvester is ready to harvest), it starts chasing again.
+- A rounded headland corner is harvested with the header down, so the unloader chases through it as before.
+- This comes before the pipe lock (Active unloading) and the old turn handling. It only starts after the header has
+  been seen working, never while the harvester calls for an unload or is 99 % full, and lasts at most 60 s. Not for
+  forage harvesters, nor for harvesters where no header is found.
+- Logged: "end of row: <harvester> header up, standing here until it is harvesting again", "... header down and on
+  again, chasing again", "end of row: stop waiting for ... (it calls for an unload / waited too long)".
+
 ## 3.0.1.4-od.57 (2026-11-11): unloaders get out of a harvester's way first
 *Untested in the game.*
 

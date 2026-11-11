@@ -69,6 +69,7 @@ def main():
         run("test_hud_style.py"),
         run("test_harvester_finished.py"),
         run("test_go_around.py"),
+        run("test_end_of_row_wait.py"),
         run("test_unloader_sim.py"),
     ]
     if not all(results):

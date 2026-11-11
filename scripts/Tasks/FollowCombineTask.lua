@@ -70,6 +70,12 @@ function FollowCombineTask:update(dt)
 
     self:updateStates(dt)
 
+    -- PropaineX edit (od.58): END OF ROW. Before everything else (pipe lock included): header up or off = end of the
+    -- row, stand where we are until it is down and on again.
+    if self:updateEndOfRowWait(dt) then
+        return
+    end
+
     -- PropaineX edit (3.9.0.4): PIPE LOCK. Active unloading on a combine (not a forage harvester): under the pipe, at
     -- the pipe's speed, all the time. None of the turn / pass-by / reverse / pull-forward / wrong-side handling below.
     if self:isPipeLock() then
@@ -605,6 +611,85 @@ function FollowCombineTask:getTurnHoldBackPos()
     local back = -(self.combine.size.length / 2) - FollowCombineTask.TURN_HOLD_BACK - (self.vehicle.size.length or 0) / 2
     local x, y, z = AutoDrive.localToWorld(self.combine, sideX, 0, back, self.combine.ad.ADRootNode)
     return {x = x, y = cy, z = z}
+end
+
+-- PropaineX edit (od.58): END OF ROW WAIT. A harvester (not a forage harvester) raises its header or switches it off
+-- at the end of a row; a rounded headland corner is harvested with the header down, so that is chased as before.
+-- Header up or off (after we have seen it working): the runner stops where it is (no following, no pulling forward,
+-- no reversing) until every header is lowered and switched on again, then the chase starts over.
+-- Not while the harvester is calling for an unload (it stands still then) and at most MAX_TURN_TIME.
+function FollowCombineTask:isHeaderWorking()
+    local root = self.combineRootVehicle
+    if root == nil then
+        return nil
+    end
+    local found, working = false, true
+    local function check(v)
+        if v ~= nil and v.spec_cutter ~= nil then
+            found = true
+            local lowered = true
+            if v.getIsLowered ~= nil and (v.getAllowsLowering == nil or v:getAllowsLowering()) then
+                lowered = v:getIsLowered(true)
+            end
+            local on = v.getIsTurnedOn == nil or v:getIsTurnedOn()
+            if not (lowered and on) then
+                working = false
+            end
+        end
+    end
+    local children = root.getChildVehicles ~= nil and root:getChildVehicles() or nil
+    if children ~= nil then
+        for _, v in pairs(children) do
+            check(v)
+        end
+    else
+        check(root)
+    end
+    if not found then
+        return nil -- no header found: feature off for this harvester
+    end
+    return working
+end
+
+function FollowCombineTask:updateEndOfRowWait(dt)
+    if not self.combine.ad.isHarvester or self.combine.ad.isChopper then
+        return false
+    end
+    local working = self:isHeaderWorking()
+    if working == nil then
+        self.endOfRowWait = nil
+        return false
+    end
+    if working then
+        self.headerSeenWorking = true
+        if self.endOfRowWait then
+            self.endOfRowWait = nil
+            Logging.info("[AD] %s: end of row: %s header down and on again, chasing again", ADDiag.name(self.vehicle), ADDiag.name(self.combine))
+            if self.state ~= FollowCombineTask.STATE_FINISHED then
+                self.state = FollowCombineTask.STATE_CHASING
+            end
+        end
+        return false
+    end
+    local calling = AutoDrive:getIsCPWaitingForUnload(self.combine) or (self.combineFillPercent or 0) >= 99
+    if not self.endOfRowWait then
+        if not self.headerSeenWorking or calling or self.state == FollowCombineTask.STATE_FINISHED then
+            return false
+        end
+        self.endOfRowWait = true
+        self.endOfRowWaitTime = 0
+        Logging.info("[AD] %s: end of row: %s header up, standing here until it is harvesting again", ADDiag.name(self.vehicle), ADDiag.name(self.combine))
+    end
+    self.endOfRowWaitTime = self.endOfRowWaitTime + dt
+    if calling or self.endOfRowWaitTime > FollowCombineTask.MAX_TURN_TIME then
+        Logging.info("[AD] %s: end of row: stop waiting for %s (%s)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), calling and "it calls for an unload" or "waited too long")
+        self.endOfRowWait = nil
+        self.headerSeenWorking = nil -- wait again only after it has harvested again
+        return false
+    end
+    self.vehicle.ad.specialDrivingModule:stopVehicle()
+    self.vehicle.ad.specialDrivingModule:update(dt)
+    return true
 end
 
 function FollowCombineTask:followChasePoint(dt)
