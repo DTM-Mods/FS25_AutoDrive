@@ -297,7 +297,9 @@ All key bindings can be changed in the game's control settings. Like AutoDrive's
 - The mod keeps the name `FS25_AutoDrive`, so it replaces the official AutoDrive mod: install either one, not both. Savegames, routes and settings of the official version keep working.
 - In multiplayer, all players need the same version of the mod.
 - The new texts are translated into all languages of the mod. Corrections from native speakers are welcome.
-## For developers
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/for-developers.jpg" alt="For developers" width="100%">
+</p>
 Every push and pull request runs the [CI workflow](.github/workflows/ci.yml):
 - a Lua 5.1 syntax check, the Lua version the game uses
 - static checks: XML files, translation placeholders, every script loaded by `register.lua` exists ([tools/ci_checks.py](tools/ci_checks.py))
@@ -322,7 +324,9 @@ FS25 version of the AutoDrive mod
 ### Latest Release: 3.0.1.4
 Direct Download: https://github.com/Stephan-S/FS25_AutoDrive/releases/latest/download/FS25_AutoDrive.zip
 
-## Discord Server:
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DTM-Mods/.github/main/assets/support.jpg" alt="Support" width="100%">
+</p>
 For help & support, feel free to join us on Discord: 
 https://discord.gg/2XfnM59DFy
 
