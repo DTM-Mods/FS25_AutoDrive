@@ -267,6 +267,40 @@ function ADUnloaderEscape.getHarvesters(mode)
     return list
 end
 
+-- PropaineX edit (od.57): the unloader within this (m) of the harvester (it and its header) counts as in the way of
+-- a turn that is stuck
+ADUnloaderEscape.TURN_SIDE_MARGIN = 3
+-- a "turning" harvester that has stood this long (ms) is stuck in its turn, not turning
+ADUnloaderEscape.TURN_STAND_TIME = 6000
+ADUnloaderEscape.standSince = setmetatable({}, {__mode = "k"})    -- harvester root -> g_time it stopped
+
+-- PropaineX edit (od.57): any unit of the unloader within margin of any unit of the harvester (header included)
+function ADUnloaderEscape.isBesideHarvester(vehicle, harvester, margin)
+    local mine = ADUnloaderEscape.getUnitBoxes(vehicle)
+    for _, hbox in ipairs(ADUnloaderEscape.getUnitBoxes(harvester)) do
+        local grown = ADUnloaderEscape.growBox(hbox, margin)
+        for _, box in ipairs(mine) do
+            if AutoDrive.boxesIntersect(grown, box) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- PropaineX edit (od.57): how long (ms) the harvester has stood still, 0 while it moves
+function ADUnloaderEscape.getStandTime(root)
+    local now = g_time or 0
+    if root.lastSpeedReal * 3600 >= 1 then
+        ADUnloaderEscape.standSince[root] = nil
+        return 0
+    end
+    if ADUnloaderEscape.standSince[root] == nil then
+        ADUnloaderEscape.standSince[root] = now
+    end
+    return now - ADUnloaderEscape.standSince[root]
+end
+
 -- the harvester that the unloader stands in front of, while both stand still; nil if none
 function ADUnloaderEscape.getBlockedHarvester(mode)
     local vehicle = mode.vehicle
@@ -276,9 +310,19 @@ function ADUnloaderEscape.getBlockedHarvester(mode)
     for _, harvester in ipairs(ADUnloaderEscape.getHarvesters(mode)) do
         local root = harvester.getRootVehicle ~= nil and harvester:getRootVehicle() or harvester
         if root ~= nil and root.components ~= nil and root.lastSpeedReal ~= nil and root.lastSpeedReal * 3600 < 1
-            and ADUnloaderEscape.isHelperDriven(root) and not AutoDrive.combineIsTurning(harvester)
-            and ADUnloaderEscape.isInFrontOfHarvester(vehicle, root) then
-            return root
+            and ADUnloaderEscape.isHelperDriven(root) then
+            if not AutoDrive.combineIsTurning(harvester) then
+                if ADUnloaderEscape.isInFrontOfHarvester(vehicle, root) then
+                    return root
+                end
+            -- PropaineX edit (od.57): a Courseplay harvester stuck mid-turn counts as "turning" for ever
+            -- (AutoDrive.combineIsTurning), so it was never checked. Stood still TURN_STAND_TIME in its turn: stuck.
+            -- The front box doesn't follow the turn, so close beside it (header included) counts too
+            elseif ADUnloaderEscape.getStandTime(root) >= ADUnloaderEscape.TURN_STAND_TIME
+                and (ADUnloaderEscape.isInFrontOfHarvester(vehicle, root)
+                    or ADUnloaderEscape.isBesideHarvester(vehicle, root, ADUnloaderEscape.TURN_SIDE_MARGIN)) then
+                return root
+            end
         end
     end
     return nil
@@ -286,29 +330,78 @@ end
 
 -- every frame from CombineUnloaderMode:monitorTasks; returns true when the escape owns the vehicle (the upstream
 -- stuck handling must not run then). stuck: the upstream "we are stuck" condition
+-- PropaineX edit (od.57): getting out of a harvester's way comes FIRST, for every combine unloader (setting or not).
+-- Blocking a standing harvester (in front of it, or beside it while it is stuck in a turn) with nothing falling in:
+--   1. after YIELD_TIME: let go of the job and drive (collisions on, path finder) to the nearest clear spot
+--      (ADUnloaderClear.start); there it waits to be called and the chase starts over
+--   2. still blocking it after that (the move got nowhere, or it came back and blocked it again within YIELD_WINDOW):
+--      after HARVESTER_BLOCK_TIME the escape (collisions off, to the field edge), only with "Drive clear when blocked"
+ADUnloaderEscape.YIELD_TIME = 4000
+ADUnloaderEscape.YIELD_WINDOW = 120000
+-- a yield move standing still while still blocking the harvester this long (ms): escalate
+ADUnloaderEscape.YIELD_STUCK_TIME = 10000
+
+function ADUnloaderEscape.yield(mode, harvester)
+    local vehicle = mode.vehicle
+    local harvesters = ADUnloaderClear.getHarvesters(vehicle)
+    local fruits = ADUnloaderClear.getFruits(harvesters)
+    local x, z, dirX, dirZ = ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
+    Logging.info("[AD] %s: in the way of standing %s, getting out of its way first%s", ADDiag.name(vehicle),
+        harvester ~= nil and ADDiag.name(harvester) or "?", x == nil and " (no clear spot, straight on)" or "")
+    mode.escapeHarvesterTime = 0
+    mode.yieldAt = g_time or 0
+    ADUnloaderClear.start(mode, x, z, dirX, dirZ, true)
+    mode.combine = nil
+    mode.followingUnloader = nil
+    mode.targetUnloader = nil
+end
+
 function ADUnloaderEscape.monitor(mode, dt, stuck)
     if mode.state == mode.STATE_ESCAPE then
         return true
     end
     local vehicle = mode.vehicle
-    if g_server == nil or not ADUnloaderEscape.isEnabled(vehicle) then
+    if g_server == nil then
         mode.escapeHarvesterTime = 0
         return false
     end
-    if mode.escapeCooldownUntil ~= nil and (g_time or 0) < mode.escapeCooldownUntil then
-        return false
-    end
+    local enabled = ADUnloaderEscape.isEnabled(vehicle)
+    local cooling = mode.escapeCooldownUntil ~= nil and (g_time or 0) < mode.escapeCooldownUntil
     -- blocking a harvester: the time it stands with the unloader in front of it, while nothing is unloaded into it
     local fillLevel = mode.trailers ~= nil and #mode.trailers > 0 and AutoDrive.getAllFillLevels(mode.trailers) or 0
     local filling = mode.escapeLastFill ~= nil and fillLevel > mode.escapeLastFill + 1
     mode.escapeLastFill = fillLevel
-    if not filling and ADUnloaderEscape.getBlockedHarvester(mode) ~= nil then
+    local blocked = not filling and ADUnloaderEscape.getBlockedHarvester(mode) or nil
+    if blocked ~= nil then
         mode.escapeHarvesterTime = (mode.escapeHarvesterTime or 0) + dt
     else
         mode.escapeHarvesterTime = 0
     end
+    local recentYield = mode.yieldAt ~= nil and (g_time or 0) - mode.yieldAt < ADUnloaderEscape.YIELD_WINDOW
+    if blocked ~= nil then
+        if mode.state == mode.STATE_MOVE_CLEAR then
+            -- already moving out of the way: only a move that gets nowhere escalates
+            if mode.escapeHarvesterTime >= ADUnloaderEscape.YIELD_STUCK_TIME and enabled and not cooling then
+                ADUnloaderEscape.start(mode, "harvester")
+                return true
+            end
+            return false
+        end
+        if not recentYield and mode.escapeHarvesterTime >= ADUnloaderEscape.YIELD_TIME then
+            ADUnloaderEscape.yield(mode, blocked)
+            return true
+        end
+        -- no escape allowed (setting off, or cooling down): yield again rather than stand in its way
+        if recentYield and (not enabled or cooling) and mode.escapeHarvesterTime >= ADUnloaderEscape.HARVESTER_BLOCK_TIME then
+            ADUnloaderEscape.yield(mode, blocked)
+            return true
+        end
+    end
+    if not enabled or cooling then
+        return false
+    end
     local reason = nil
-    if mode.escapeHarvesterTime >= ADUnloaderEscape.HARVESTER_BLOCK_TIME then
+    if recentYield and mode.escapeHarvesterTime >= ADUnloaderEscape.HARVESTER_BLOCK_TIME then
         reason = "harvester"
     elseif stuck and ADUnloaderEscape.isTouchingOtherVehicle(vehicle, ADUnloaderEscape.CONTACT_MARGIN) then
         reason = "stuck"

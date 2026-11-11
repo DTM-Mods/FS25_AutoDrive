@@ -3,6 +3,22 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.57 (2026-11-11): unloaders get out of a harvester's way first
+*Untested in the game.*
+
+- Getting out of the way now comes before everything else, for every combine unloader (setting on or off). Standing
+  in the way of a standing harvester for 4 s with nothing falling in, it lets go of the job and drives, collisions
+  on, to the nearest clear spot. There it waits to be called and the chase starts over. Logged: "in the way of
+  standing ..., getting out of its way first".
+- Still in its way after that (the move stands still 10 s, or it blocks the harvester again within 2 minutes): with
+  "Drive clear when blocked" on, collisions off and to the field edge; with it off, it moves out of the way again.
+
+- Drive clear when blocked (vehicle setting): a Courseplay harvester stuck in a headland turn counted as "turning"
+  for ever, so the harvester check never looked at it. The truck sat beside its header for an hour ("standing still:
+  no known reason", Courseplay "Blocked by an object"). Now a turning harvester that has stood still 6 s counts as
+  stuck, and the truck in front of it OR within 3 m of it (header included) counts as in its way. After the usual
+  6 s with nothing falling in, the truck switches its vehicle collisions off and drives to the field edge.
+
 ## 3.0.1.4-od.56 (2026-11-10): unloader never steers into the harvester, never reverses into its front
 *Untested in the game; tested in the driving simulation (tools/tests/test_unloader_sim.py: 13 scenarios plus a sweep of
 60 runs with headland U-turns of 8 to 20 m radius, toward and away, both pipe sides).*
