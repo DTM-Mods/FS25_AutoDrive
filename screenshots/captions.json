@@ -1,0 +1,17 @@
+{
+  "2.jpg": {
+    "title": "Fleet overview",
+    "text": "Every AutoDrive vehicle with its job, load and fuel; enter one or start and stop it from here.",
+    "at": "bottom"
+  },
+  "3.jpg": {
+    "title": "Overdrive settings",
+    "text": "Best price unloading, driving through obstructions, and start and stop times for each vehicle.",
+    "at": "bottom"
+  },
+  "4.jpg": {
+    "title": "Vehicle settings",
+    "text": "Corner speed, pipe offsets, refuelling, repairs and parking, set per vehicle.",
+    "at": "bottom"
+  }
+}
