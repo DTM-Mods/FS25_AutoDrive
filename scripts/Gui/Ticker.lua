@@ -386,6 +386,16 @@ function ADTicker.buildSegments()
     return segments
 end
 
+-- the strip at the bottom of the screen the ticker takes while it is switched on: the HUD, the waypoint panel and the
+-- selection menu stay above it. By the setting, not by whether the bar is drawn right now (it is hidden while a menu
+-- is open), so nothing jumps when a menu opens.
+function ADTicker.getReservedHeight()
+    if AutoDrive.getSetting("tickerBar") and g_dedicatedServer == nil then
+        return ADTicker.HEIGHT
+    end
+    return 0
+end
+
 function ADTicker.isShown()
     if not AutoDrive.getSetting("tickerBar") or g_dedicatedServer ~= nil then
         return false

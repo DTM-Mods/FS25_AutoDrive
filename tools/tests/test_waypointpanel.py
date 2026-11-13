@@ -96,6 +96,13 @@ assert s.eval("P.rect.x > HUD.posX + HUD.width")
 s.execute("HUD.posX = 0.85; HUD.width = 0.14; draw()")
 assert s.eval("P.rect.x + P.rect.width < HUD.posX")
 s.execute("HUD.posX = 0.1; HUD.width = 0.2; draw()")
+# a HUD low on the screen: the panel taller than the room below the HUD's top goes up, never below the screen or,
+# when the ticker is on, behind it
+s.execute("HUD.rowHeader = 0.1; draw()")
+assert abs(s.eval("P.rect.y")) < 1e-9 and s.eval("P.rect.y + P.rect.height") > 0.13
+s.execute("ADTicker = {getReservedHeight = function() return 0.026 end}; draw()")
+assert abs(s.eval("P.rect.y") - 0.026) < 1e-9
+s.execute("ADTicker = nil; HUD.rowHeader = 0.52; draw()")
 
 # --- big maps: 5-digit waypoint numbers fit in the title and in the connection rows (about 10 pixels a letter)
 s.execute("""

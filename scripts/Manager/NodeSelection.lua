@@ -422,7 +422,8 @@ function ADNodeSelection:layoutMenu(x, y, rows)
     width = width + pad * 2
     local height = #rows * rowHeight + pad * 2
     x = math.max(0, math.min(x, 1 - width))
-    y = math.min(1, math.max(y, height))
+    -- (above the ticker when it is on)
+    y = math.min(1, math.max(y, height + (ADTicker ~= nil and ADTicker.getReservedHeight() or 0)))
     local layout = {x = x, y = y - height, width = width, height = height, buttons = {}}
     for i, row in ipairs(rows) do
         local rowY = y - pad - i * rowHeight

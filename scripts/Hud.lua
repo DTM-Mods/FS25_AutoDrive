@@ -14,6 +14,8 @@ AutoDriveHud.debug = false
 AutoDriveHud.defaultHeaderHeight = 0.046
 AutoDriveHud.extendedHeaderHeight = 0.250
 AutoDriveHud.headerButtonSize = 0.024
+-- Overdrive: the lowest the HUD goes, above the ticker: room for the route-check line under it (ADRouteMarkers)
+AutoDriveHud.BOTTOM_ROOM = 0.03
 
 function AutoDriveHud:new()
 	local o = {}
@@ -142,7 +144,9 @@ function AutoDriveHud:createHudAt(hudX, hudY)
 	self.listItemWidth, self.listItemHeight = getNormalizedScreenValues(uiScale * listItemSize, uiScale * listItemSize)
 
 	self.posX = math.clamp(hudX, 0, 1 - self.width)
-	self.posY = math.clamp(hudY, 2 * self.gapHeight, 1 - (self.height + 3 * self.gapHeight + self.headerHeight))
+	-- Overdrive: not lower than the ticker (when it is on) plus room for the route-check line under the HUD
+	self.screenBottom = ADTicker ~= nil and ADTicker.getReservedHeight() or 0
+	self.posY = math.clamp(hudY, self.screenBottom + AutoDriveHud.BOTTOM_ROOM, 1 - (self.height + 3 * self.gapHeight + self.headerHeight))
 
 	AutoDrive.HudX = self.posX
 	AutoDrive.HudY = self.posY
@@ -384,7 +388,9 @@ function AutoDriveHud:drawHud(vehicle)
 			self.lastUIScale = uiScale
 		end
 
-		if self.lastUIScale ~= uiScale then
+		-- (Overdrive: also when the ticker is switched on or off, so the HUD moves up above it)
+		local screenBottom = ADTicker ~= nil and ADTicker.getReservedHeight() or 0
+		if self.lastUIScale ~= uiScale or (self.screenBottom ~= nil and self.screenBottom ~= screenBottom) then
 			self:createHudAt(self.posX, self.posY)
 		end
 		self.lastUIScale = uiScale

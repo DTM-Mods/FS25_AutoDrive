@@ -626,7 +626,7 @@ function ADWaypointPanel.getUiScale()
     return uiScale
 end
 
--- next to the HUD: right of it, or left when there is no room; the tops line up
+-- next to the HUD: right of it, or left when there is no room
 function ADWaypointPanel.layout(hud, numRows, uiScale)
     local width = ADWaypointPanel.WIDTH_PIXELS * uiScale / g_screenWidth
     local rowHeight = ADWaypointPanel.ROW_PIXELS * uiScale / g_screenHeight
@@ -637,10 +637,12 @@ function ADWaypointPanel.layout(hud, numRows, uiScale)
     if x + width > 1 then
         x = hud.posX - gapX - width
     end
+    -- tops lined up; a panel taller than that goes up, never below the ticker (when it is on) or the screen
+    local bottom = ADTicker ~= nil and ADTicker.getReservedHeight() or 0
     local top = (hud.rowHeader or hud.posY) + (hud.headerHeight or 0)
-    local y = math.max(0, math.min(top, 1) - height)
+    local y = math.max(bottom, math.min(top, 1) - height)
     if y + height > 1 then
-        y = math.max(0, 1 - height)
+        y = math.max(bottom, 1 - height)
     end
     return {x = x, y = y, width = width, height = height, rowHeight = rowHeight, gapX = gapX, gapY = gapY}
 end
