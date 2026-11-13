@@ -3,6 +3,18 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.59 (2026-11-11): thin keep-out strip on the pipe side, no second try up the same line
+*Untested in the game; unloader simulator sweep passes (60 runs, no contact).*
+
+- The keep-out strip round the harvester is now thin (0.5 m) on its PIPE side, so a truck gets in under the pipe
+  instead of turning away before it gets there. The other side, the front and the back keep the wide strip (1 m).
+  The pipe side is taken from the spot under the pipe, so left or right pipes both work.
+- While the harvester turns in toward the pipe side (more than about 2 deg/s), the pipe side gets the full gap again.
+- A truck pushed out of the strip on the side WITHOUT the pipe remembers it. Next time it is beside the harvester on
+  that side it stops at once, lets the harvester pass, then comes up the pipe side from behind the tail. No more
+  coming up the same line again and again. Forgotten once it is under the pipe. Logged: "pushed out on the side of
+  <harvester> without the pipe, next try comes up its pipe side".
+
 ## 3.0.1.4-od.58 (2026-11-11): unloader waits at the end of a row
 *Untested in the game; tested with mock vehicles (tools/tests/test_end_of_row_wait.py).*
 
