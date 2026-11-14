@@ -3,6 +3,12 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.59 (2026-11-13): author name, HUD above the ticker bar
+
+- The author now shows as **DTM Mods, Fennell** in the mod list, with credit to the AutoDrive Team, who made the original mod.
+- The HUD, the waypoint panel and the selection menu stay above the ticker bar when it is on.
+- The English mod description lists what Overdrive adds.
+
 ## 3.0.1.4-od.58 (2026-11-11): unloader waits at the end of a row
 *Untested in the game; tested with mock vehicles (tools/tests/test_end_of_row_wait.py).*
 
