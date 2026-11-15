@@ -1230,6 +1230,9 @@ FollowCombineTask.STEER_AWAY = 2        -- m extra out for the steer point when 
 FollowCombineTask.LANE_BEHIND = 4       -- m: lane approach lines up this far behind the tail (front of the truck)
 FollowCombineTask.LANE_TOLERANCE = 1.5  -- m sideways off the pipe lane that still counts as in it
 FollowCombineTask.LANE_MIN_AHEAD = 6    -- m: the lane steer point is never closer ahead than this (full lock swings it in)
+-- PropaineX edit (od.61): the lane we aim at is always this far outside the steer-away line, so reaching it can't trip it
+FollowCombineTask.KEEP_OUT_AIM_MARGIN = 0.3 -- m
+FollowCombineTask.STEER_GAIN = 2            -- m steered out per m inside the strip (gentle for small, firm for deep)
 
 -- the cab's front and rear (m, along the harvester's heading, in its frame): the larger and the smaller of the two,
 -- whichever way the cab faces
@@ -1291,7 +1294,9 @@ function FollowCombineTask:getKeepOutLane(side)
         lane = math.min(lane, math.abs(cxl))
     end
     -- whatever the pipe spot says: never closer than touching distance + KEEP_OUT_MIN
-    return math.max(lane, halfW + self:getOwnHalfWidth() + FollowCombineTask.KEEP_OUT_MIN)
+    -- PropaineX edit (od.61): and never inside the steer-away line + KEEP_OUT_AIM_MARGIN
+    local floor = math.max(FollowCombineTask.KEEP_OUT_MIN, self:getKeepOutGap(side) + FollowCombineTask.KEEP_OUT_AIM_MARGIN)
+    return math.max(lane, halfW + self:getOwnHalfWidth() + floor)
 end
 
 -- how far (m) the closest corner of the truck or a trailer is inside the keep-out strip (harvester's side +
@@ -1349,7 +1354,9 @@ function FollowCombineTask:keepOffHarvester(point, isSteer)
         local inside = self:getKeepOutIntrusion(side)
         if inside ~= nil and inside > -driftIn then
             -- a corner closer than KEEP_OUT_GAP + DRIFT_IN to its side: steer out, further the deeper it is
-            minX = math.max(minX, math.abs(px)) + FollowCombineTask.STEER_AWAY + math.max(inside, 0) * 2
+            -- PropaineX edit (od.61): push grows with how deep it is, capped at STEER_AWAY; eases off as it clears
+            local push = math.min(FollowCombineTask.STEER_AWAY, (inside + driftIn) * FollowCombineTask.STEER_GAIN)
+            minX = math.max(minX, math.abs(px)) + push
             if not self.keepOutLogged then
                 self.keepOutLogged = true
                 Logging.info("[AD] %s: %.1f m from %s's side, steering away", ADDiag.name(self.vehicle),
@@ -1362,7 +1369,7 @@ function FollowCombineTask:keepOffHarvester(point, isSteer)
                 Logging.info("[AD] %s: pushed out on the side of %s without the pipe, next try comes up its pipe side",
                     ADDiag.name(self.vehicle), ADDiag.name(c))
             end
-        elseif inside == nil or inside < -driftIn - 0.5 then
+        elseif inside == nil or inside < -driftIn - 0.2 then -- PropaineX edit (od.61): was 0.5
             self.keepOutLogged = nil
         end
         -- the steer point lies ahead but decides the steering beside the harvester: it counts at any distance

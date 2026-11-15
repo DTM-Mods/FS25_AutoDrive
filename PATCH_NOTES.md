@@ -3,6 +3,19 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.61 (2026-11-14, PropaineX): unloaders stop swerving beside the harvester
+*Untested in the game.*
+
+- Trucks coming up beside a harvester no longer jerk away and swerve left and right next to it. They aimed at a
+  spot 0.4 m from its side, closer in than their own 0.5 m steer-away line, so reaching their target set off the
+  steer-away every time.
+- The spot a truck aims at is now always 0.3 m outside the steer-away line (0.8 m from the harvester on the pipe side,
+  1.3 m on the other side).
+- Steering away now depends on how far in it is: a few cm in gets a small nudge, 1 m or more in still gets the full
+  2 m. It eases off as the truck clears (released 0.2 m clear, was 0.5 m), so it doesn't snap back and overshoot.
+- Works the same with left and right pipes. On short-pipe harvesters the trailer may sit up to 0.4 m further out
+  than before.
+
 ## 3.0.1.4-od.60 (2026-11-14): drive through banana transport rails
 *Untested in the game; tested with stubs.*
 
