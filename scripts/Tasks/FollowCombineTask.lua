@@ -19,6 +19,11 @@ FollowCombineTask.CLEAR_EXTRA = 6           -- m beyond the combine's length to 
 FollowCombineTask.CLEAR_MAX_TIME = 15000    -- ms
 FollowCombineTask.CLEAR_BLOCKED_TIME = 3000 -- ms not moving while pulling forward -> back out instead
 FollowCombineTask.GO_AROUND_TIME = 10000    -- ms, PropaineX edit (od.55): stuck at a standing harvester -> drive round it
+-- PropaineX edit (od.62): beside / behind a standing harvester on its pipe side, nothing falling in: after this long,
+-- move along the lane until the trailer is under the pipe (lined up sideways), or go round it (not lined up, or the
+-- whole trailer has passed under the pipe and still nothing)
+FollowCombineTask.NO_GRAIN_TIME = 8000      -- ms
+FollowCombineTask.PIPE_SIDE_MARGIN = 0.3    -- m: the pipe end this far inside the trailer's side counts as over it
 
 FollowCombineTask.MAX_REVERSE_DISTANCE = 20
 FollowCombineTask.MIN_COMBINE_DISTANCE = 25
@@ -746,6 +751,20 @@ end
 -- along the trailer), behind it -> reverse. Stops at that end (CREEP_END_MARGIN); the hold takes over once grain flows.
 FollowCombineTask.CREEP_SPEED = 3       -- km/h
 FollowCombineTask.CREEP_END_MARGIN = 1  -- m from the trailer's end
+FollowCombineTask.CREEP_APPROACH_SPEED = 6 -- km/h, PropaineX edit (od.62): pipe not over the trailer yet (ahead / behind it)
+
+-- PropaineX edit (od.62): the pipe's end lies within the creep trailer's width (PIPE_SIDE_MARGIN in), whatever it is
+-- ahead / behind: moving along the lane can bring the trailer under it. nil when it can't be told.
+function FollowCombineTask:isPipeOverTrailerSideways()
+    local trailer = self:getCreepTrailer()
+    local dischargeNode = AutoDrive.getDischargeNode(self.combine)
+    if trailer == nil or dischargeNode == nil or trailer.size == nil then
+        return nil
+    end
+    local px, py, pz = getWorldTranslation(dischargeNode)
+    local lx = worldToLocal(trailer.components[1].node, px, py, pz)
+    return math.abs(lx) <= (trailer.size.width or 0) / 2 - FollowCombineTask.PIPE_SIDE_MARGIN
+end
 
 function FollowCombineTask:getCreepTrailer()
     local best, bestLength = nil, 0
@@ -779,17 +798,19 @@ function FollowCombineTask:creepUnderPipe(dt)
             self.creepTurned = true
             self.creepForward = not self.creepForward
         else
+            self.creepDone = true -- PropaineX edit (od.62): both ways along the trailer, still nothing: go round
             self.vehicle.ad.specialDrivingModule:stopVehicle()
             self.vehicle.ad.specialDrivingModule:update(dt)
             return
         end
     end
+    -- PropaineX edit (od.62): pipe still off the trailer's ends (we are ahead of / behind it): a little quicker
+    local speed = math.abs(pipeZ) > half + FollowCombineTask.CREEP_END_MARGIN and FollowCombineTask.CREEP_APPROACH_SPEED or FollowCombineTask.CREEP_SPEED
     if self.creepForward then
         local x, y, z = AutoDrive.localToWorld(self.vehicle, 0, 0, 20)
-        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, {x = x, y = y, z = z}, FollowCombineTask.CREEP_SPEED, false, 0.5,
-            FollowCombineTask.CREEP_SPEED, false)
+        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, {x = x, y = y, z = z}, speed, false, 0.5, speed, false)
     else
-        self.vehicle.ad.specialDrivingModule:driveReverse(dt, FollowCombineTask.CREEP_SPEED, 0.5, self.vehicle.ad.trailerModule:canBeHandledInReverse())
+        self.vehicle.ad.specialDrivingModule:driveReverse(dt, speed, 0.5, self.vehicle.ad.trailerModule:canBeHandledInReverse())
     end
 end
 
@@ -947,6 +968,7 @@ function FollowCombineTask:updatePipeLock(dt)
             self.noFlowTime = 0
             self.creepForward = nil
             self.creepTurned = nil
+            self.creepDone = nil -- PropaineX edit (od.62)
         else
             self.noFlowTime = (self.noFlowTime or 0) + dt
         end
@@ -955,17 +977,39 @@ function FollowCombineTask:updatePipeLock(dt)
         -- in and not beside the pipe for GO_AROUND_TIME: drive round it and start the approach over
         local beside = self:isBesidePipeSide()
         local behind = self.chaseSide == AutoDrive.CHASEPOS_REAR and not beside
-        if not flowing and not beside and (self.combineFillPercent or 0) > 0.1
-            and (self.vehicle.lastSpeedReal or 0) <= 0.0004 then
+        local hasGrain = (self.combineFillPercent or 0) > 0.1
+        -- PropaineX edit (od.62): on the pipe side, pipe end over the trailer's width: moving along the lane (forward
+        -- when behind it, back when ahead of it) brings the trailer under it. Not over it (too far out / in): go round.
+        -- (can't tell, e.g. no pipe node: as before od.62, the creep only from within 3 m of the spot)
+        local over = self:isPipeOverTrailerSideways()
+        local pipeMissed = over == false
+        local linedUp = self.chaseSide ~= AutoDrive.CHASEPOS_REAR and over == true
+        local stuckBeside = beside and (pipeMissed or self.creepDone)
+        if not flowing and hasGrain and (self.vehicle.lastSpeedReal or 0) <= 0.0004
+            and (stuckBeside or (not beside and not linedUp)) then
             self.goAroundTime = (self.goAroundTime or 0) + dt
         else
             self.goAroundTime = 0
         end
-        if self.goAroundTime > FollowCombineTask.GO_AROUND_TIME then
+        local goAroundLimit = stuckBeside and FollowCombineTask.NO_GRAIN_TIME or FollowCombineTask.GO_AROUND_TIME
+        if self.goAroundTime > goAroundLimit then
             self.goAroundTime = 0
-            Logging.info("[AD] %s: nothing falling in for %d s at standing %s (not beside its pipe), driving round it to %d m behind and starting over",
-                ADDiag.name(self.vehicle), FollowCombineTask.GO_AROUND_TIME / 1000, ADDiag.name(self.combine), ADUnloaderClear.GO_AROUND_BEHIND)
-            ADUnloaderClear.goAround(self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD], self.combine)
+            local mode = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+            local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
+            local tx, _, tz = AutoDrive.worldToLocal(self.combine, vx, vy, vz, self.combine.ad.ADRootNode)
+            local _, halfL = AutoDrive.getHarvesterHalfSize(self.combine)
+            if tz > -halfL then
+                -- PropaineX edit (od.62): beside / ahead of it: round the HARVESTER (past its front, down its other
+                -- side, behind its tail), never a loop out away from it
+                Logging.info("[AD] %s: nothing falling in for %d s at standing %s (%s), driving round it and coming in again from behind",
+                    ADDiag.name(self.vehicle), goAroundLimit / 1000, ADDiag.name(self.combine),
+                    self.creepDone and "trailer moved past the pipe" or (beside and "pipe not over the trailer" or "not beside its pipe"))
+                ADUnloaderClear.goRoundHarvester(mode, self.combine, tx >= 0 and 1 or -1)
+            else
+                Logging.info("[AD] %s: nothing falling in for %d s at standing %s (not beside its pipe), driving round it to %d m behind and starting over",
+                    ADDiag.name(self.vehicle), goAroundLimit / 1000, ADDiag.name(self.combine), ADUnloaderClear.GO_AROUND_BEHIND)
+                ADUnloaderClear.goAround(mode, self.combine)
+            end
             return
         end
         if behind then
@@ -984,8 +1028,15 @@ function FollowCombineTask:updatePipeLock(dt)
             local vx, _, vz = getWorldTranslation(self.vehicle.components[1].node)
             nearPipe = MathUtil.vector2Length(vx - self.chasePos.x, vz - self.chasePos.z) < 3
         end
+        -- PropaineX edit (od.62): lined up sideways but ahead of / behind the pipe (not within 3 m of the spot):
+        -- after NO_GRAIN_TIME with nothing falling in, the creep backs / pulls the trailer under it too
+        if not nearPipe and linedUp and hasGrain and self.noFlowTime > FollowCombineTask.NO_GRAIN_TIME then
+            nearPipe = true
+        end
         if nearPipe then
-            if (self.combineFillPercent or 0) > 0.1 and self.noFlowTime > FollowCombineTask.NO_FLOW_TIME then
+            -- PropaineX edit (od.62): pipe not over the trailer sideways: creeping along can't help, hold (the
+            -- go-round above takes over)
+            if hasGrain and not pipeMissed and self.noFlowTime > FollowCombineTask.NO_FLOW_TIME then
                 self:creepUnderPipe(dt)
             else
                 sdm:stopVehicle()
@@ -1001,6 +1052,7 @@ function FollowCombineTask:updatePipeLock(dt)
         self.creepAnchor = nil
         self.creepForward = nil
         self.creepTurned = nil
+        self.creepDone = nil -- PropaineX edit (od.62)
         self.noFlowTime = 0
         self.goAroundTime = 0 -- PropaineX edit (od.55)
     end

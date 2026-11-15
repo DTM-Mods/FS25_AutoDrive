@@ -3,6 +3,21 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.62 (2026-11-14, PropaineX): no grain falling in at a standing harvester: reposition, never sit forever
+*Untested in the game; tested with stubs (go-around tests and the unloader simulator pass).*
+
+With the harvester standing, grain in its tank and nothing falling into the trailer:
+- **Ahead of the pipe** (lined up with it, too far forward): after 8 s it backs up until the trailer is under the pipe.
+- **Behind the pipe / behind the harvester in its pipe lane**: after 8 s it pulls forward slowly until the trailer is
+  under the pipe. (Both move at 6 km/h while the pipe is off the trailer's ends, 3 km/h along the trailer.)
+- **Too far out (or in) to the side**, so the pipe end isn't over the trailer, even if it thinks it's at the pipe:
+  after 8 s it drives round the harvester and comes in again. It used to sit there for good.
+- Moved the whole trailer past the pipe and still nothing: drives round the harvester too.
+- **Driving round** goes past the harvester's front, down its other side, round behind its tail, then the normal
+  approach up the pipe lane. Forward only, field only, never a loop out away from the harvester (into the forest at a
+  field edge). If the harvester starts moving meanwhile, it stops and the normal chase takes over.
+- Once grain falls in, it stops and fills as usual; full enough, it leaves to unload.
+
 ## 3.0.1.4-od.61 (2026-11-14, PropaineX): unloaders stop swerving beside the harvester
 *Untested in the game.*
 

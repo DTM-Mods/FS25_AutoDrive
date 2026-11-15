@@ -91,6 +91,17 @@ end
 function MoveClearOfHarvesterTask:update(dt)
     self.elapsed = self.elapsed + dt
     local pfm = self.vehicle.ad.pathFinderModule
+    -- PropaineX edit (od.62): round a STANDING harvester (goRoundHarvester): it starts rolling, so we may be in its
+    -- path ahead of it: stop at once and give up; the normal call / chase takes over
+    if self.abortIfRolls and self.harvester ~= nil and (self.harvester.lastSpeedReal or 0) > 0.0004 then
+        Logging.info("[AD] %s: %s started moving, stopping the drive round it", ADDiag.name(self.vehicle), ADDiag.name(self.harvester))
+        self:abort()
+        self.vehicle.ad.specialDrivingModule:stopVehicle()
+        self.vehicle.ad.specialDrivingModule:update(dt)
+        ADUnloaderClear.onMoveDone(self.vehicle)
+        self:finished()
+        return
+    end
     if self.state == MoveClearOfHarvesterTask.STATE_PATHPLANNING then
         if pfm:hasFinished() then
             local wayPoints = pfm:getPath()
@@ -134,7 +145,12 @@ function MoveClearOfHarvesterTask:update(dt)
             self.vehicle.ad.specialDrivingModule:driveForward(dt)
         end
     else
-        if self.vehicle.ad.drivePathModule:isTargetReached() then
+        if self.vehicle.ad.drivePathModule:isTargetReached() and self.legs ~= nil and #self.legs > 0 then
+            -- PropaineX edit (od.62): next leg of the drive round the harvester
+            local nextLeg = table.remove(self.legs, 1)
+            self.target, self.direction = nextLeg.target, nextLeg.direction
+            self:setUp()
+        elseif self.vehicle.ad.drivePathModule:isTargetReached() then
             -- PropaineX edit (od.55): round a harvester: only done when the whole train has cleared it
             if self.harvester ~= nil and not MoveClearOfHarvesterTask.isClearOf(self.vehicle, self.harvester) then
                 Logging.info("[AD] %s: drove round %s but is not clear of it, waiting for a call", ADDiag.name(self.vehicle), ADDiag.name(self.harvester))

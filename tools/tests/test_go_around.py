@@ -33,6 +33,7 @@ s.execute("""
     ADDiag = {name = function(v) return v.name or "?" end}
     GOAROUND = nil
     ADUnloaderClear = {GO_AROUND_BEHIND = 25, goAround = function(mode, c) GOAROUND = c end,
+        goRoundHarvester = function(mode, c, side) GOAROUND = c; ROUND_SIDE = side end,
         onMoveDone = function() MOVE = "done" end, onMoveFailed = function() MOVE = "failed" end}
 
     COMBINE = {name = "Ropa", lastSpeedReal = 0, ad = {isHarvester = true, ADRootNode = 0}, components = {{node = "c"}},
@@ -84,6 +85,54 @@ check("beside the pipe with crop falling in: stays", L("GOAROUND == nil"))
 # beside the pipe, nothing falling: the creep along the trailer handles it, not the go-round
 s.execute("FLOW = 0; TK = task(truck(-6, 0), AutoDrive.CHASEPOS_LEFT, -6, 0); TK.getCreepTrailer = function() return nil end; run(TK, 30000)")
 check("beside the pipe, nothing falling: no go-round (creep handles it)", L("GOAROUND == nil"))
+
+# od.62: A ahead of the pipe, lined up sideways: after 8 s it creeps (backs) the trailer under the pipe, no go-round
+s.execute("AutoDrive.getDistanceBetween = function() return 999 end")  # before the 8 s: the plain chase (stubbed)
+s.execute("""FLOW = 0; GOAROUND = nil; CREPT = false
+    TK = task(truck(-6, 10), AutoDrive.CHASEPOS_LEFT, -6, 0)
+    TK.isPipeOverTrailerSideways = function() return true end
+    TK.creepUnderPipe = function() CREPT = true end
+    run(TK, 7000)""")
+check("od.62 ahead of the pipe, lined up: nothing before 8 s", L("not CREPT and GOAROUND == nil"))
+s.execute("run(TK, 1500)")
+check("od.62 ahead of the pipe, lined up: after 8 s moves the trailer under it", L("CREPT and GOAROUND == nil"))
+# od.62: behind the harvester in its pipe lane, lined up: pulls forward (creep), not sent round
+s.execute("""FLOW = 0; GOAROUND = nil; CREPT = false
+    TK = task(truck(-6, -20), AutoDrive.CHASEPOS_LEFT, -6, 0)
+    TK.isPipeOverTrailerSideways = function() return true end
+    TK.creepUnderPipe = function() CREPT = true end
+    run(TK, 20000)""")
+check("od.62 behind it in the pipe lane: pulls forward, no go-round", L("CREPT and GOAROUND == nil"))
+# od.62: B level with the pipe but too far out: no creep, round the harvester after 8 s
+s.execute("""FLOW = 0; GOAROUND = nil; CREPT = false; ROUND_SIDE = nil
+    TK = task(truck(-7, 0), AutoDrive.CHASEPOS_LEFT, -6, 0)
+    TK.isPipeOverTrailerSideways = function() return false end
+    TK.creepUnderPipe = function() CREPT = true end
+    run(TK, 7000)""")
+check("od.62 too far out: not before 8 s", L("GOAROUND == nil"))
+s.execute("run(TK, 1500)")
+check("od.62 too far out: round the harvester after 8 s, no creep", L("GOAROUND == COMBINE and not CREPT and ROUND_SIDE == -1"))
+check("od.62 says why", L("string.find(LOG[#LOG], 'pipe not over the trailer', 1, true) ~= nil"))
+# od.62: crept both ways along the trailer and still nothing: round the harvester
+s.execute("""FLOW = 0; GOAROUND = nil
+    TK = task(truck(-6, 0), AutoDrive.CHASEPOS_LEFT, -6, 0)
+    TK.isPipeOverTrailerSideways = function() return true end
+    TK.creepUnderPipe = function(self) self.creepDone = true end
+    run(TK, 12000)""")
+check("od.62 trailer moved past the pipe, still nothing: round the harvester", L("GOAROUND == COMBINE"))
+
+# od.62: the multi-leg drive round: next leg on arrival, gives up when the harvester rolls
+s.execute("""V = truck(0, 30); V.ad.taskModule = {setCurrentTaskFinished = function() FIN = true end}
+    V.ad.pathFinderModule = {reset = function() end, startPathPlanningTo = function(_, t) PLANNED = t end, appendWayPoints = {}, abort = function() end}
+    V.ad.drivePathModule = {isTargetReached = function() return true end, update = function() end}
+    MT = MoveClearOfHarvesterTask:new(V, {x = 0, y = 0, z = 21}, {x = 1, z = 0}, false)
+    MT.harvester = COMBINE; MT.abortIfRolls = true; MT.stayOnField = true
+    MT.legs = {{target = {x = 10, y = 0, z = 0}, direction = {x = 0, z = -1}}, {target = {x = 0, y = 0, z = -31}, direction = {x = 0, z = 1}}}
+    MT.state = MoveClearOfHarvesterTask.STATE_DRIVING; MT.elapsed = 0; FIN = false
+    MT:update(16)""")
+check("od.62 go round: first leg reached -> plans the next", L("PLANNED.x == 10 and #MT.legs == 1 and not FIN"))
+s.execute("COMBINE.lastSpeedReal = 0.002; FIN = false; MOVE = nil; MT:update(16); COMBINE.lastSpeedReal = 0")
+check("od.62 go round: harvester rolls -> stops and gives up", L("FIN and MOVE == 'done'"))
 
 # 3. beside the harvester but on the wrong side / behind its tail: not 'beside the pipe'
 s.execute("TK = task(truck(6, 0), AutoDrive.CHASEPOS_REAR, 0, -51)")

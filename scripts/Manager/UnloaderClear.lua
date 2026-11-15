@@ -423,6 +423,34 @@ function ADUnloaderClear.goAround(mode, combine)
     mode.activeTask.stayOnField = true
 end
 
+-- PropaineX edit (od.62): no grain falling in beside a standing harvester and the truck can't fix it by moving along
+-- its lane: go ROUND THE HARVESTER (forward only), never a loop out away from it (at a field edge that is the forest).
+-- Legs: GO_ROUND_AHEAD m ahead of its front, then GO_ROUND_SIDE m out beside its other side facing back, then
+-- GO_AROUND_BEHIND m behind its tail facing its way. Field only. The harvester starts rolling: it gives up and the
+-- normal chase takes over. No path: it waits for a call and tries again later.
+ADUnloaderClear.GO_ROUND_AHEAD = 15 -- m ahead of the harvester's front
+ADUnloaderClear.GO_ROUND_SIDE = 8   -- m out from its side, on the side away from the truck
+function ADUnloaderClear.goRoundHarvester(mode, combine, side)
+    local node = combine.ad.ADRootNode
+    local halfW, halfL = AutoDrive.getHarvesterHalfSize(combine)
+    local far = -(side or 1)
+    local function leg(lx, lz, dz, dx)
+        local x, _, z = AutoDrive.localToWorld(combine, lx, 0, lz, node)
+        local fx, _, fz = AutoDrive.localDirectionToWorld(combine, dx or 0, 0, dz, node)
+        return {target = {x = x, y = terrainY(x, z), z = z}, direction = {x = fx, z = fz}}
+    end
+    local first = leg(0, halfL + ADUnloaderClear.GO_ROUND_AHEAD, 0, far)
+    ADUnloaderClear.start(mode, first.target.x, first.target.z, first.direction.x, first.direction.z, false)
+    local task = mode.activeTask
+    task.harvester = combine
+    task.stayOnField = true
+    task.abortIfRolls = true
+    task.legs = {
+        leg(far * (halfW + ADUnloaderClear.GO_ROUND_SIDE), 0, -1),
+        leg(0, -(halfL + ADUnloaderClear.GO_AROUND_BEHIND), 1),
+    }
+end
+
 local function getMode(vehicle)
     return vehicle ~= nil and vehicle.ad ~= nil and vehicle.ad.modes ~= nil and vehicle.ad.modes[AutoDrive.MODE_UNLOAD] or nil
 end
