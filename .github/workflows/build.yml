@@ -30,6 +30,8 @@ jobs:
       # AutoDrive Overdrive: tools/build_mod.py bundles the scripts and stamps the full version
       # (3.0.1.4-od.57) into the HUD. Release tags are v<modDesc version>-od.<build>.
       max-files: 0
+      modhub: false                          # a fork; it never goes to ModHub from here
+      auto-release: false                    # releases stay by hand (od build numbers, upstream merges)
       version-suffix: '-od\.[0-9]+'
       build-command: python tools/build_mod.py --version "$BUILD_VERSION" --out dist/FS25_AutoDrive.zip
       test-command: |
