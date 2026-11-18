@@ -625,9 +625,9 @@ end
 
 -- PropaineX edit (od.58): END OF ROW WAIT. A harvester (not a forage harvester) raises its header or switches it off
 -- at the end of a row; a rounded headland corner is harvested with the header down, so that is chased as before.
--- Header up or off (after we have seen it working): the runner stops where it is (no following, no pulling forward,
+-- Header raised (after we have seen it working; od.66: on/off no longer counts): the runner stops where it is (no following, no pulling forward,
 -- no reversing) until every header is lowered and switched on again, then the chase starts over.
--- Not while the harvester is calling for an unload (it stands still then) and at most MAX_TURN_TIME.
+-- At most MAX_TURN_TIME (od.66: no exception for calling for an unload).
 function FollowCombineTask:isHeaderWorking()
     local root = self.combineRootVehicle
     if root == nil then
@@ -641,8 +641,8 @@ function FollowCombineTask:isHeaderWorking()
             if v.getIsLowered ~= nil and (v.getAllowsLowering == nil or v:getAllowsLowering()) then
                 lowered = v:getIsLowered(true)
             end
-            local on = v.getIsTurnedOn == nil or v:getIsTurnedOn()
-            if not (lowered and on) then
+            -- PropaineX edit (od.66): only the header's height counts (user: raised = wait, running or not)
+            if not lowered then
                 working = false
             end
         end
@@ -674,6 +674,10 @@ function FollowCombineTask:updateEndOfRowWait(dt)
         self.headerSeenWorking = true
         if self.endOfRowWait then
             self.endOfRowWait = nil
+            -- PropaineX edit (od.66): forget the turn tracking from before the wait (it stood still meanwhile; od.65 server
+            -- log: the stale turn + its last pivot read as a tight turn at us, it backed up 30 m the moment the header
+            -- went down)
+            self.turnSwing, self.turnQuiet, self.combineTurnRate, self.lastCombineFwd = nil, nil, nil, nil
             Logging.info("[AD] %s: end of row: %s header down and on again, chasing again", ADDiag.name(self.vehicle), ADDiag.name(self.combine))
             if self.state ~= FollowCombineTask.STATE_FINISHED then
                 self.state = FollowCombineTask.STATE_CHASING
@@ -681,12 +685,10 @@ function FollowCombineTask:updateEndOfRowWait(dt)
         end
         return false
     end
-    -- PropaineX edit (od.65): standing with its pipe out and grain in it = waiting to be unloaded, no end-of-row wait
-    local pipeWaiting = (self.combine.lastSpeedReal or 0) <= 0.0004 and (self.combineFillPercent or 0) > 0.1
-        and AutoDrive.isPipeOut ~= nil and AutoDrive.isPipeOut(self.combine)
-    local calling = AutoDrive:getIsCPWaitingForUnload(self.combine) or (self.combineFillPercent or 0) >= 99 or pipeWaiting
+    -- PropaineX edit (od.66): header raised = wait, whatever else: no "it calls for an unload" exception any more (od.65
+    -- server log: header up at the end of the row, released 0.3 s later as "calling", chased into the turn, touched it)
     if not self.endOfRowWait then
-        if not self.headerSeenWorking or calling or self.state == FollowCombineTask.STATE_FINISHED then
+        if not self.headerSeenWorking or self.state == FollowCombineTask.STATE_FINISHED then
             return false
         end
         self.endOfRowWait = true
@@ -695,8 +697,8 @@ function FollowCombineTask:updateEndOfRowWait(dt)
     end
     self.endOfRowWaitTime = self.endOfRowWaitTime + dt
     self.holdReason = "end-of-row wait"
-    if calling or self.endOfRowWaitTime > FollowCombineTask.MAX_TURN_TIME then
-        Logging.info("[AD] %s: end of row: stop waiting for %s (%s)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), calling and "it calls for an unload" or "waited too long")
+    if self.endOfRowWaitTime > FollowCombineTask.MAX_TURN_TIME then
+        Logging.info("[AD] %s: end of row: stop waiting for %s (waited too long)", ADDiag.name(self.vehicle), ADDiag.name(self.combine))
         self.endOfRowWait = nil
         self.headerSeenWorking = nil -- wait again only after it has harvested again
         return false
@@ -876,6 +878,8 @@ FollowCombineTask.BACK_OFF_GAP = 30      -- m: back up until this gap, then forw
 FollowCombineTask.BACK_OFF_START_GAP = 15 -- m: only this close (or closer) is backing off needed
 FollowCombineTask.SEMI_RADIUS = 12        -- m: a combine turning tighter than this can't be followed on the inside
 FollowCombineTask.BACK_OFF_SPEED = 12     -- km/h
+FollowCombineTask.BACK_OFF_MIN_SPEED = 0.5 -- m/s: slower harvester (turning on the spot) = no back-off (od.66)
+FollowCombineTask.LET_PASS_HOLD = 2000   -- ms: a let-it-pass stop holds at least this long (od.66)
 FollowCombineTask.BACK_OFF_BLOCKED = 3000 -- ms not moving while backing off -> stop backing off (blocked)
 
 function FollowCombineTask:updateBackOff(dt)
@@ -927,7 +931,8 @@ function FollowCombineTask:updateBackOff(dt)
         return false
     end
     local v = c.lastSpeedReal * 1000
-    if math.abs(w) < FollowCombineTask.TURN_DEADBAND or v < 0.1 or gap > FollowCombineTask.BACK_OFF_START_GAP then
+    -- PropaineX edit (od.66): not for a harvester crawling round on the spot (was 0.1 m/s): a pivot doesn't sweep beside it
+    if math.abs(w) < FollowCombineTask.TURN_DEADBAND or v < FollowCombineTask.BACK_OFF_MIN_SPEED or gap > FollowCombineTask.BACK_OFF_START_GAP then
         return false
     end
     local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
@@ -1234,7 +1239,16 @@ function FollowCombineTask:updatePipeLock(dt)
     -- fell back, caught up and stopped again, round and round.
     local _, _, czl = AutoDrive.worldToLocal(c, self.chasePos.x, self.chasePos.y, self.chasePos.z, c.ad.ADRootNode)
     local cabAhead = rearZ > halfL and tz > czl + FollowCombineTask.CAB_AHEAD_MARGIN
-    if (cabAhead or (facingAgainst and frontZ > -halfL - FollowCombineTask.LANE_BEHIND)) and combineSpeed > 0.5 then
+    -- PropaineX edit (od.66): once it stops to let it pass, it holds at least LET_PASS_HOLD (od.65 server log: the stop
+    -- flicked on and off 15 times in 9 s, the truck jerked)
+    local letPass = (cabAhead or (facingAgainst and frontZ > -halfL - FollowCombineTask.LANE_BEHIND)) and combineSpeed > 0.5
+    if letPass then
+        self.letPassHold = FollowCombineTask.LET_PASS_HOLD
+    elseif (self.letPassHold or 0) > 0 then
+        self.letPassHold = self.letPassHold - dt
+        letPass = true
+    end
+    if letPass then
         self.holdReason = cabAhead and "cab ahead, let it pass" or "facing against, let it pass"
         if not self.againstLogged then
             self.againstLogged = true
@@ -1408,6 +1422,7 @@ FollowCombineTask.STEER_AWAY = 2        -- m extra out for the steer point when 
 FollowCombineTask.LANE_BEHIND = 4       -- m: lane approach lines up this far behind the tail (front of the truck)
 FollowCombineTask.LANE_TOLERANCE = 1.5  -- m sideways off the pipe lane that still counts as in it
 FollowCombineTask.LANE_MIN_AHEAD = 6    -- m: the lane steer point is never closer ahead than this (full lock swings it in)
+FollowCombineTask.LANE_RELEASE = 3      -- m off the lane before a lined-up truck lines up again (od.66)
 FollowCombineTask.LANE_CROSS_ZONE = 30  -- m behind the tail (truck centre): crossing to the pipe lane here = no catch-up (od.63)
 FollowCombineTask.CAB_AHEAD_MARGIN = 3  -- m past the pipe spot before "cab ahead of the harvester" stops it (od.63)
 FollowCombineTask.LANE_CROSS_MIN = 4   -- km/h: crossing speed floor, so it still crosses behind a slow / standing harvester (od.63)
@@ -1570,7 +1585,18 @@ function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
         return nil
     end
     local frontZ = self:getCabSpanZ()
-    if frontZ > -halfL or math.abs(tx - cxl) <= FollowCombineTask.LANE_TOLERANCE then
+    -- PropaineX edit (od.66): no flipping between lining up and the chase (od.65 server log: 15 swaps in 40 s, the
+    -- truck wiggled). Lined up = within LANE_TOLERANCE; it stays lined up until more than LANE_RELEASE off the lane.
+    local off = math.abs(tx - cxl)
+    if frontZ > -halfL then
+        return nil
+    end
+    if off <= FollowCombineTask.LANE_TOLERANCE then
+        self.laneLined = true
+    elseif off > FollowCombineTask.LANE_RELEASE or math.abs(self.combineTurnRate or 0) >= FollowCombineTask.TURN_DEADBAND then
+        self.laneLined = nil -- off the lane, or the harvester really turns (its lane moves): line up again
+    end
+    if self.laneLined then
         return nil
     end
     -- drive toward the pipe spot (speed), steer at a point in the pipe lane LOOK_AHEAD m ahead of us but never level

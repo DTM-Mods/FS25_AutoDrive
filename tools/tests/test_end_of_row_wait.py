@@ -50,21 +50,17 @@ check(E("TK:updateEndOfRowWait(100)") and E("STOPS") == 1, "did not stop when th
 E("TK.state = FollowCombineTask.STATE_WAIT_FOR_TURN")
 for _ in range(20):
     check(E("TK:updateEndOfRowWait(100)"), "stopped waiting while the header was up")
-# down but still off: keeps waiting
+# od.66: only the height counts. Down (even switched off): chases again, state back to chasing
 E("HEADER.low = true; HEADER.on = false")
-check(E("TK:updateEndOfRowWait(100)"), "chased again with the header down but off")
-# down and on: chases again, state back to chasing
+check(not E("TK:updateEndOfRowWait(100)"), "kept waiting with the header down (switched off)")
 E("HEADER.on = true")
-check(not E("TK:updateEndOfRowWait(100)"), "kept waiting with the header down and on")
 check(E("TK.state == FollowCombineTask.STATE_CHASING"), "state not back to chasing")
-# calling for an unload: no wait
-E("HEADER.low = false; CALLING = true")
-check(not E("TK:updateEndOfRowWait(100)"), "waited while the harvester calls for an unload")
-E("CALLING = false; TK.combineFillPercent = 99")
-check(not E("TK:updateEndOfRowWait(100)"), "waited with a full harvester")
+# od.66: raised = wait, even while it calls for an unload or is full; running but raised waits too
+E("HEADER.low = false; CALLING = true; TK.combineFillPercent = 99")
+check(E("TK:updateEndOfRowWait(100)"), "did not wait with the header up while calling / full")
+E("CALLING = false; TK.combineFillPercent = 50")
+check(E("TK:updateEndOfRowWait(100)"), "stopped waiting with the header up")
 # time limit
-E("TK.combineFillPercent = 50")
-check(E("TK:updateEndOfRowWait(100)"), "no wait after a full harvester got lower")
 check(not E("TK:updateEndOfRowWait(FollowCombineTask.MAX_TURN_TIME)"), "waited past MAX_TURN_TIME")
 check(not E("TK:updateEndOfRowWait(100)"), "waited again without harvesting in between")
 # forage harvester, harvester without a header: off

@@ -3,6 +3,21 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.66 (2026-11-17, PropaineX): truck waits whenever the header is up; no wiggle behind the harvester
+*Untested in the game; unloader simulator as before (the same 2 known turn-away contacts in sweep 14).*
+
+- **Header raised = the truck waits** (user's rule): only the header's height counts now, switched on or off. Nothing
+  ends the wait early any more: od.65 let it go 0.3 s after the header went up because the harvester "called for an
+  unload", so the truck chased it into its turn (server log: 0.0 m from its side, rules fighting). Still at most 60 s.
+- **No wiggle when coming up behind:** it flipped between lining up on the pipe side and chasing whenever it was
+  about 1.5 m off the lane (15 swaps in 40 s in the server log). Once lined up it now keeps chasing until it is more
+  than 3 m off the lane, or the harvester really turns.
+- **No backing up 30 m after a turn:** while it waited at the end of a row its turn tracking stood still; when the
+  header went down, the old turn plus the harvester's last pivot looked like a tight turn at the truck and it backed
+  up 30 m. The tracking now starts fresh after the wait, and a harvester turning on the spot (under 0.5 m/s) never
+  makes it back off.
+- **No jerking at the let-it-pass stop:** it flicked on and off 15 times in 9 s; once it stops it now holds at least 2 s.
+
 ## 3.0.1.4-od.65 (2026-11-17, PropaineX): never parked at a standing harvester
 *Untested in the game.*
 
