@@ -134,8 +134,8 @@ function setupWorld(sc)
   comb.fx, comb.fz = 0, comb.size.length / 2
 
   local side = comb.pipeSide
-  local truck = newObj("truck", 0, 0, 0, 2.6, 7)
-  local trailer = newObj("trailer", 0, 0, 0, 2.6, 12)
+  local truck = newObj("truck", 0, 0, 0, sc.truckW or 2.6, sc.truckL or 7)
+  local trailer = newObj("trailer", 0, 0, 0, sc.trailerW or 2.6, sc.trailerL or 12)
   truck.trailer = trailer
   truck.getAttachedImplements = function() return {{object = trailer}} end
   local sideOffset = sc.sideOffset or 7.8
@@ -450,6 +450,21 @@ for k in ("contact", "revFront", "lost"):
 check("14 sweep: no contact in any run", not sweep["contact"], "%d of %d" % (len(sweep["contact"]), sweep["runs"]))
 check("14 sweep: never reverses into the front", not sweep["revFront"], "%d" % len(sweep["revFront"]))
 check("14 sweep: back under the pipe 90 s after every turn", not sweep["lost"], "%d" % len(sweep["lost"]))
+
+# 15. TRACTORS (od.63): short cart under a forward pipe puts the whole tractor ahead of the harvester's front at the
+# spot itself. It must hold there, not stop / fall back / catch up in a loop ("ahead of" stop). Small tractor and a
+# Case Quadtrac, both pipe sides, from behind and from beside.
+RIGS = {"small tractor": dict(truckW=2.5, truckL=4.8, trailerW=2.9, trailerL=8.5, chaseZ=10),
+        "Case Quadtrac": dict(truckW=3.4, truckL=7.6, trailerW=3.6, trailerL=11, chaseZ=11)}
+for rig, T in RIGS.items():
+    for start, sx, sz in (("behind", 7.5, -30), ("beside", 7.5, 2)):
+        for pipe in (1, -1):
+            r = run(scenario(pipeSide=pipe, speed=6, startSpeed=6, sideOffset=7.5, combW=3.3, combL=13,
+                             startX=sx * pipe, startZ=sz, duration=60000, **T)); show(r)
+            tag = "15 %s from %s, pipe %s" % (rig, start, "L" if pipe > 0 else "R")
+            ahead = sum(1 for l in r.log.values() if "ahead of / facing" in l)
+            check(tag + ": holds at the forward pipe spot", r.lastPipe < 2 and r.sideAtEnd * pipe > 0, res(r))
+            check(tag + ": no 'ahead of it' stop loop", ahead == 0, "%d stops" % ahead)
 
 print("ALL OK" if fails == 0 else "%d FAILED" % fails)
 sys.exit(1 if fails else 0)

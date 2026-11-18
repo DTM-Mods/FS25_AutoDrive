@@ -1109,7 +1109,11 @@ function FollowCombineTask:updatePipeLock(dt)
         sdm:update(dt)
         return
     end
-    self.comingRound = nil
+    -- PropaineX edit (od.63): the wrong-side stop is only forgotten once we are on the pipe side (it used to be dropped
+    -- 4 m behind the tail, before the truck had crossed, so it drove straight back up the wrong side and looped)
+    if tx * cxl > 0 then
+        self.comingRound = nil
+    end
     self.wrongSideLogged = nil
     -- PropaineX edit (od.56): facing AGAINST the harvester (it came round at the end of the row) and not yet behind it:
     -- turning a semi round here crosses its path. Stop and let it pass; once our front is behind its tail, the chase
@@ -1119,7 +1123,11 @@ function FollowCombineTask:updatePipeLock(dt)
     local facingAgainst = hx * cfx + hz * cfz < FollowCombineTask.AGAINST_COS
     -- also: the whole cab ahead of its front (e.g. after pulling ahead out of a tail swing): no turning round toward
     -- a spot behind us, that crosses its path; stand and let it come past
-    local cabAhead = rearZ > halfL
+    -- PropaineX edit (od.63): only when the cab is past where the spot under the pipe puts it. A tractor's short cart
+    -- under a forward pipe puts the whole tractor ahead of the harvester's front at the spot itself: it stopped there,
+    -- fell back, caught up and stopped again, round and round.
+    local _, _, czl = AutoDrive.worldToLocal(c, self.chasePos.x, self.chasePos.y, self.chasePos.z, c.ad.ADRootNode)
+    local cabAhead = rearZ > halfL and tz > czl + FollowCombineTask.CAB_AHEAD_MARGIN
     if (cabAhead or (facingAgainst and frontZ > -halfL - FollowCombineTask.LANE_BEHIND)) and combineSpeed > 0.5 then
         if not self.againstLogged then
             self.againstLogged = true
@@ -1147,6 +1155,12 @@ function FollowCombineTask:updatePipeLock(dt)
         local laneMax = FollowCombineTask.FLAT_OUT
         if self:getGapToCombine() < FollowCombineTask.CLOSE_GAP then
             laneMax = combineSpeed + FollowCombineTask.CLOSE_EXTRA
+        end
+        -- PropaineX edit (od.63): still crossing over behind the tail (not in the pipe lane yet) and close behind it:
+        -- no catching up, at most the harvester's speed. Driving at an angle, it falls back while it crosses, so it
+        -- can't run up level with the tail on the wrong side before it is lined up.
+        if tz > -halfL - FollowCombineTask.LANE_CROSS_ZONE then
+            laneMax = math.max(combineSpeed, FollowCombineTask.LANE_CROSS_MIN)
         end
         sdm:driveToPoint(dt, laneSteer.target, math.min(combineSpeed, laneMax), false, 1, laneMax, true, laneSteer.steer)
         return
@@ -1282,6 +1296,9 @@ FollowCombineTask.STEER_AWAY = 2        -- m extra out for the steer point when 
 FollowCombineTask.LANE_BEHIND = 4       -- m: lane approach lines up this far behind the tail (front of the truck)
 FollowCombineTask.LANE_TOLERANCE = 1.5  -- m sideways off the pipe lane that still counts as in it
 FollowCombineTask.LANE_MIN_AHEAD = 6    -- m: the lane steer point is never closer ahead than this (full lock swings it in)
+FollowCombineTask.LANE_CROSS_ZONE = 30  -- m behind the tail (truck centre): crossing to the pipe lane here = no catch-up (od.63)
+FollowCombineTask.CAB_AHEAD_MARGIN = 3  -- m past the pipe spot before "cab ahead of the harvester" stops it (od.63)
+FollowCombineTask.LANE_CROSS_MIN = 4   -- km/h: crossing speed floor, so it still crosses behind a slow / standing harvester (od.63)
 -- PropaineX edit (od.61): the lane we aim at is always this far outside the steer-away line, so reaching it can't trip it
 FollowCombineTask.KEEP_OUT_AIM_MARGIN = 0.3 -- m
 FollowCombineTask.STEER_GAIN = 2            -- m steered out per m inside the strip (gentle for small, firm for deep)

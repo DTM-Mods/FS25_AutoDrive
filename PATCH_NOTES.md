@@ -3,6 +3,20 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.63 (2026-11-17, PropaineX): tractors stop looping at the pipe; trucks stop going back up the wrong side
+*Untested in the game; tested in the unloader simulator (new tractor and Case Quadtrac runs fail without these fixes).*
+
+- **Tractors** (small tractor and big ones like a Case Quadtrac): with a short cart under a pipe far forward, e.g. a
+  Tiger, the tractor's nose sticks out past the harvester's front at the pipe spot itself. That counted as "ahead of
+  the harvester, stop and let it pass": it stopped, fell back, came up and stopped again, round and round (55-64
+  times a minute in the simulator). Now it only counts as ahead once the tractor is more than 3 m past the pipe spot.
+- **Trucks on the wrong side** (e.g. right side, pipe on the left): the stop that lets the harvester pass used to let
+  go just 4 m behind its tail, before the truck had crossed over, so it drove straight back up the wrong side and
+  stopped again. Now it only stands while it is beside the harvester (or within 4 m behind its tail); once the
+  harvester has driven past, it drives across behind the tail to the pipe side. While it crosses it goes no faster
+  than the harvester (at least 4 km/h), so it drops back as it crosses instead of running up level with it. If it
+  does get up beside it on the wrong side again before it has crossed, it stops at once (it used to drive on for 1 s).
+
 ## 3.0.1.4-od.62 (2026-11-14, PropaineX): no grain falling in at a standing harvester: reposition, never sit forever
 *Untested in the game; tested with stubs (go-around tests and the unloader simulator pass).*
 
