@@ -3,6 +3,18 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.64 (2026-11-17, PropaineX): the unloader never sits behind the pipe
+*Untested in the game.*
+
+- **Sitting short of the pipe:** od.63 test, harvester standing with its pipe out: the truck pulled up behind it on
+  the pipe side, sat short of the spout until the harvester folded its pipe, then looped round. Now, pipe out, grain
+  in the harvester, nothing falling in, truck in the spout's line (within 3 m) with its trailer short of the spout,
+  standing for 2 s: it drives straight up the spout's line (harvester's speed + 5 km/h) until grain falls in. This
+  comes before every stop rule. It ends when grain falls in, the pipe folds, the trailer is past the spout or the
+  truck leaves the spout's line.
+- **Pipe side behind a moving harvester:** the od.63 "no faster than the harvester" limit while crossing behind its
+  tail now only applies before the truck reaches the pipe side; on the pipe side it catches up again.
+
 ## 3.0.1.4-od.63 (2026-11-17, PropaineX): tractors stop looping at the pipe; trucks stop going back up the wrong side
 *Untested in the game; tested in the unloader simulator (new tractor and Case Quadtrac runs fail without these fixes).*
 
