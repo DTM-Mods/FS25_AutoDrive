@@ -1295,7 +1295,13 @@ function FollowCombineTask:updatePipeLock(dt)
     -- straight line: the combine's heading smoothed over LINE_SMOOTH ms; its small wobbles don't reach our wheels
     local fx, _, fz = AutoDrive.localDirectionToWorld(self.combine, 0, 0, 1, self.combine.ad.ADRootNode)
     local k = math.min(1, dt / FollowCombineTask.LINE_SMOOTH)
-    if self.lineDir == nil then
+    -- PropaineX edit (od.69): the line is only smoothed here, so after a waiting / lining-up spell (end of row, the
+    -- harvester turned round) it still held the PREVIOUS row's heading: exactly reversed it never comes round (the
+    -- normalised blend of opposite vectors stays opposite), nearly reversed it swings slowly through sideways. The
+    -- steer point then lay 14 m behind the pipe spot or far out to the side, the truck drove past it and swerved
+    -- ("pointing into", "lane released 3.0 m" every 4-5 s; od.68 recorder, 2026-11-18). More than LINE_SNAP_ANGLE off
+    -- the real heading = take the real heading at once.
+    if self.lineDir == nil or self.lineDir.x * fx + self.lineDir.z * fz < math.cos(math.rad(FollowCombineTask.LINE_SNAP_ANGLE)) then
         self.lineDir = {x = fx, z = fz}
     else
         local lx, lz = self.lineDir.x + (fx - self.lineDir.x) * k, self.lineDir.z + (fz - self.lineDir.z) * k
@@ -1585,6 +1591,13 @@ function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
         return nil
     end
     local frontZ = self:getCabSpanZ()
+    -- PropaineX edit (od.67): line up on the SAME line the chase keeps to. The chase pushes its steer point out of the
+    -- keep-out strip (keepOffHarvester); when the pipe spot lies inside that strip (wide header), lining up on the raw
+    -- spot pulled the truck in, the chase pushed it out past LANE_RELEASE, and round again: it swerved behind the
+    -- harvester all row (od.66 server log: "lining up" every 5-10 s on a straight row).
+    local pipeX = cxl
+    local sideOfPipe = cxl >= 0 and 1 or -1
+    cxl = sideOfPipe * math.max(math.abs(cxl), self:getKeepOutLane(sideOfPipe))
     -- PropaineX edit (od.66): no flipping between lining up and the chase (od.65 server log: 15 swaps in 40 s, the
     -- truck wiggled). Lined up = within LANE_TOLERANCE; it stays lined up until more than LANE_RELEASE off the lane.
     local off = math.abs(tx - cxl)
@@ -1594,6 +1607,14 @@ function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
     if off <= FollowCombineTask.LANE_TOLERANCE then
         self.laneLined = true
     elseif off > FollowCombineTask.LANE_RELEASE or math.abs(self.combineTurnRate or 0) >= FollowCombineTask.TURN_DEADBAND then
+        if self.laneLined then
+            -- PropaineX edit (od.67): say why, so the next server log shows what releases it
+            -- PropaineX edit (od.68): and which way it drifted (in = toward the harvester)
+            Logging.info("[AD] %s: lane released behind %s: %.1f m off %s (pipe spot %.1f m, lane %.1f m), turning %.1f deg/s",
+                ADDiag.name(self.vehicle), ADDiag.name(self.combine), off,
+                math.abs(tx) < math.abs(cxl) and "in" or "out", math.abs(pipeX), math.abs(cxl),
+                math.deg(math.abs(self.combineTurnRate or 0)))
+        end
         self.laneLined = nil -- off the lane, or the harvester really turns (its lane moves): line up again
     end
     if self.laneLined then
@@ -1622,6 +1643,7 @@ FollowCombineTask.PIPE_RUN_SPEED = 5      -- km/h above the harvester's speed on
 FollowCombineTask.LOOK_AHEAD = 12-- m: steering aims this far along the combine's line (longer = straighter, calmer)
 FollowCombineTask.TURN_DEADBAND = 0.07 -- rad/s (4 deg/s): less than this counts as straight (combine wobble)
 FollowCombineTask.LINE_SMOOTH = 3000 -- ms: the straight line follows the combine's heading this slowly
+FollowCombineTask.LINE_SNAP_ANGLE = 45 -- deg: the line further off the combine's heading than this is reset to it (od.69)
 
 FollowCombineTask.FLAT_OUT = 200 -- km/h: no cap of our own (AutoDrive's chase had an unexplained 40); the field speed limit setting caps it
 

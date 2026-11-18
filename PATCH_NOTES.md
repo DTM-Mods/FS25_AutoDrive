@@ -3,6 +3,39 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.69 (2026-11-18, PropaineX): no swerving behind the harvester (cause found with the recorder)
+*Untested in the game; unloader simulator: new test 16 fails on od.68 and passes now (sweep 14 as before, the same 2
+known turn-away contacts).*
+
+- **Swerving behind the harvester, the real cause:** the chase steers at a point ahead along a smoothed copy of the
+  harvester's heading, but that copy was only updated while the chase itself drove. After the end-of-row wait it still
+  held the previous row's heading: reversed (the server recording showed the steer point 14 m BEHIND the pipe spot)
+  or swinging round slowly through sideways (steer point up to 14 m out to the side). The truck drove past that point
+  and swerved toward or away from the harvester ("pointing into", "lane released 3.0 m" every 4-5 s, touching AF11).
+  The heading copy is now reset to the real heading whenever it is more than 45 deg off.
+- **Recorder:** still on (see od.68).
+
+## 3.0.1.4-od.68 (2026-11-18, PropaineX): unloader recorder (test build)
+*Driving unchanged from od.67. Untested in the game.*
+
+- **Unloader recorder:** on the server, while a truck unloads a harvester, 4 rows a second go to
+  `modSettings/FS25_AutoDrive/recorder/rec_<date>_<time>_<part>.csv` (a new part every 10 s, at most 4 h per session):
+  truck, trailers and harvester positions, headings, speeds, the wheels' steering, what the driving code asked for
+  (target, steer point, speed, forward / reverse / stop), the pipe spot and which rule drove. It only records; it is for
+  rebuilding the unloader simulator from real game data. On in this test build, to be switched off before a release.
+- **Log:** "lane released" also says whether the truck drifted in (toward the harvester) or out.
+
+## 3.0.1.4-od.67 (2026-11-18, PropaineX): no swerving behind the harvester on a straight row
+*Untested in the game; unloader simulator as before (the same 2 known turn-away contacts in sweep 14).*
+
+- **Swerving behind the harvester:** on a straight row the truck kept swinging in and out behind it ("lining up on its
+  pipe side" every 5-10 s in the server log, a whole row long). Lining up aimed at the raw spot under the pipe, but the
+  chase keeps the truck a safe distance off the harvester's side (header included). When the pipe spot lies inside that
+  distance, lining up pulled the truck in, the chase pushed it back out until it counted as off the lane, and round
+  again. Lining up now uses the same line the chase keeps to: the pipe spot, never closer than the safe distance.
+- **New log line** when the truck stops counting as lined up: "lane released behind <harvester>: X m off (pipe spot,
+  lane, turning deg/s)", so the next server log shows what released it if it still happens.
+
 ## 3.0.1.4-od.66 (2026-11-17, PropaineX): truck waits whenever the header is up; no wiggle behind the harvester
 *Untested in the game; unloader simulator as before (the same 2 known turn-away contacts in sweep 14).*
 

@@ -466,5 +466,32 @@ for rig, T in RIGS.items():
             check(tag + ": holds at the forward pipe spot", r.lastPipe < 2 and r.sideAtEnd * pipe > 0, res(r))
             check(tag + ": no 'ahead of it' stop loop", ahead == 0, "%d stops" % ahead)
 
+# 16. STALE LINE (od.69, from the od.68 recorder on the server, 2026-11-18): after the end-of-row wait the chase line
+# still held the PREVIOUS row's heading (reversed, or swinging round through sideways). The steer point lay 14 m behind
+# the pipe spot / far out to the side, the truck drove past it and swerved ("pointing into", "lane released 3.0 m"
+# every 4-5 s). The recorded rig: AF11 3.95 x 10.5 m (no header), pipe spot 11.1 m out, 0.9 m behind its centre,
+# Tatra 3.5 x 8 m + Underbelly 3.5 x 10.5 m, harvester 17 km/h, truck coming up from 47 m behind at 25 km/h.
+lua.execute("""
+FollowCombineTask._simSetUp = FollowCombineTask._simSetUp or FollowCombineTask.setUp
+FollowCombineTask.setUp = function(self)
+  FollowCombineTask._simSetUp(self)
+  if SIM_LINE_DEG ~= nil then
+    local a = math.rad(SIM_LINE_DEG)
+    self.lineDir = {x = math.sin(a), z = math.cos(a)}
+  end
+end
+""")
+for deg in (180, 170, 150, 100, 60):
+    lua.globals().SIM_LINE_DEG = deg
+    r = run(scenario(combW=3.95, combL=10.5, sideOffset=11.1, chaseZ=-0.9, truckW=3.5, truckL=8, trailerW=3.5,
+                     trailerL=10.5, speed=17, startSpeed=25, startX=12.8, startZ=-47, duration=40000)); show(r)
+    tag = "16 line left from the previous row at %d deg" % deg
+    rel = sum(1 for l in r.log.values() if "lane released" in l)
+    head = sum(1 for l in r.log.values() if "pointing into" in l)
+    check(tag + ": no swerve (no lane release, no 'pointing into')", rel == 0 and head == 0,
+          "%d releases, %d pointing-into" % (rel, head))
+    check(tag + ": ends under the pipe, never closer than 0.5 m", r.lastPipe < 2 and r.minGap >= 0.5, res(r))
+lua.globals().SIM_LINE_DEG = None
+
 print("ALL OK" if fails == 0 else "%d FAILED" % fails)
 sys.exit(1 if fails else 0)
