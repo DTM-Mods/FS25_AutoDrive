@@ -76,6 +76,9 @@ function FollowCombineTask:update(dt)
 
     self:updateStates(dt)
 
+    -- PropaineX edit (od.65): holdReason = which rule drove / held the truck this tick (read by the LogSeek mod)
+    self.holdReason = "chase"
+
     -- PropaineX edit (od.58): END OF ROW. Before everything else (pipe lock included): header up or off = end of the
     -- row, stand where we are until it is down and on again.
     if self:updateEndOfRowWait(dt) then
@@ -678,7 +681,10 @@ function FollowCombineTask:updateEndOfRowWait(dt)
         end
         return false
     end
-    local calling = AutoDrive:getIsCPWaitingForUnload(self.combine) or (self.combineFillPercent or 0) >= 99
+    -- PropaineX edit (od.65): standing with its pipe out and grain in it = waiting to be unloaded, no end-of-row wait
+    local pipeWaiting = (self.combine.lastSpeedReal or 0) <= 0.0004 and (self.combineFillPercent or 0) > 0.1
+        and AutoDrive.isPipeOut ~= nil and AutoDrive.isPipeOut(self.combine)
+    local calling = AutoDrive:getIsCPWaitingForUnload(self.combine) or (self.combineFillPercent or 0) >= 99 or pipeWaiting
     if not self.endOfRowWait then
         if not self.headerSeenWorking or calling or self.state == FollowCombineTask.STATE_FINISHED then
             return false
@@ -688,6 +694,7 @@ function FollowCombineTask:updateEndOfRowWait(dt)
         Logging.info("[AD] %s: end of row: %s header up, standing here until it is harvesting again", ADDiag.name(self.vehicle), ADDiag.name(self.combine))
     end
     self.endOfRowWaitTime = self.endOfRowWaitTime + dt
+    self.holdReason = "end-of-row wait"
     if calling or self.endOfRowWaitTime > FollowCombineTask.MAX_TURN_TIME then
         Logging.info("[AD] %s: end of row: stop waiting for %s (%s)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), calling and "it calls for an unload" or "waited too long")
         self.endOfRowWait = nil
@@ -788,6 +795,7 @@ function FollowCombineTask:creepUnderPipe(dt)
     local _, _, pipeZ = worldToLocal(trailer.components[1].node, px, py, pz)
     local half = (trailer.size.length or 0) / 2 - FollowCombineTask.CREEP_END_MARGIN
     self.creepAnchor = true
+    self.holdReason = string.format("creep %s (pipeZ %.1f)", self.creepForward == false and "back" or "forward", pipeZ)
     if self.creepForward == nil then
         self.creepForward = pipeZ > 0
         FollowCombineTask.debugMsg(self.vehicle, "FollowCombineTask:creepUnderPipe - nothing going in, creeping %s", self.creepForward and "forward" or "back")
@@ -810,6 +818,18 @@ function FollowCombineTask:creepUnderPipe(dt)
         local x, y, z = AutoDrive.localToWorld(self.vehicle, 0, 0, 20)
         self.vehicle.ad.specialDrivingModule:driveToPoint(dt, {x = x, y = y, z = z}, speed, false, 0.5, speed, false)
     else
+        -- PropaineX edit (od.65): backing up would put it in front of the harvester. The reverse guard would hold it
+        -- "until it has passed", which a standing harvester never does (server log, od.64 test: 28 min). Go round it now.
+        if ADUnloaderClear.reverseIntoFront(self.vehicle, false) then
+            local c = self.combine
+            local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
+            local tx = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
+            Logging.info("[AD] %s: can't back up under %s's pipe (that is in front of it), driving round it and coming in from behind",
+                ADDiag.name(self.vehicle), ADDiag.name(c))
+            self.holdReason = "creep back blocked: go round"
+            ADUnloaderClear.goRoundHarvester(self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD], c, tx >= 0 and 1 or -1)
+            return
+        end
         self.vehicle.ad.specialDrivingModule:driveReverse(dt, speed, 0.5, self.vehicle.ad.trailerModule:canBeHandledInReverse())
     end
 end
@@ -950,23 +970,52 @@ end
 -- the pipe side with its trailer short of the spout and standing for PIPE_RUN_WAIT: drive straight up the pipe lane
 -- (the spout's line) until grain falls in. Overrides every stop rule below. Ends when grain falls in, the pipe goes in,
 -- the trailer's rear is past the spout or the truck leaves the pipe side.
+
 function FollowCombineTask:updatePipeRun(dt)
     local c = self.combine
     local node = AutoDrive.getDischargeNode(c)
     local flowing = c.getDischargeState ~= nil and c:getDischargeState() == Dischargeable.DISCHARGE_STATE_OBJECT
     local pipeSide = AutoDrive.getPipeSide(c)
     if node == nil or flowing or not AutoDrive.isPipeOut(c) or (self.combineFillPercent or 0) <= 0.1 or pipeSide == 0 then
-        self.pipeRun, self.pipeRunWait = nil, 0
+        self.pipeRun, self.pipeRunWait, self.pipeStall = nil, 0, 0
         return false
     end
     local sx, sy, sz = getWorldTranslation(node)
     local spoutX, _, spoutZ = AutoDrive.worldToLocal(c, sx, sy, sz, c.ad.ADRootNode)
     local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
-    local tx = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
-    local frontZ, rearZ = self:getCabSpanZ()
-    local trailerRearZ = rearZ - FollowCombineTask.PIPE_RUN_TRAILER
+    local tx, _, tz = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
+    -- PropaineX edit (od.65): catch-all. Harvester standing, pipe out, grain in it, nothing falling in and the truck
+    -- standing still for PIPE_STALL_TIME, whatever rule stopped it (e.g. parked ahead of the spout): drive round the
+    -- harvester and come in again from behind; the pipe run above then takes it up under the spout.
+    if c.lastSpeedReal <= 0.0004 and (self.vehicle.lastSpeedReal or 0) * 3600 < 1 then
+        self.pipeStall = (self.pipeStall or 0) + dt
+    else
+        self.pipeStall = 0
+    end
+    if self.pipeStall > FollowCombineTask.PIPE_STALL_TIME then
+        self.pipeStall, self.pipeRun, self.pipeRunWait = 0, nil, 0
+        self.holdReason = "catch-all: go round"
+        local mode = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+        local _, halfL = AutoDrive.getHarvesterHalfSize(c)
+        if tz > -halfL then
+            Logging.info("[AD] %s: standing %d s at standing %s, nothing falling in, driving round it and coming in from behind",
+                ADDiag.name(self.vehicle), FollowCombineTask.PIPE_STALL_TIME / 1000, ADDiag.name(c))
+            ADUnloaderClear.goRoundHarvester(mode, c, tx >= 0 and 1 or -1)
+        else
+            Logging.info("[AD] %s: standing %d s behind standing %s, nothing falling in, going round to start over",
+                ADDiag.name(self.vehicle), FollowCombineTask.PIPE_STALL_TIME / 1000, ADDiag.name(c))
+            ADUnloaderClear.goAround(mode, c)
+        end
+        return true
+    end
+    local frontZ = self:getCabSpanZ()
     local onPipeSide = tx * pipeSide > 0 and math.abs(tx - spoutX) <= FollowCombineTask.PIPE_RUN_LANE
-    local shortOfSpout = trailerRearZ < spoutZ and frontZ > spoutZ - FollowCombineTask.PIPE_RUN_REACH
+    -- PropaineX edit (od.65): the REAL trailer, not a guessed length (od.64 assumed 14 m behind the cab: with a
+    -- Phoenix + belly-dump trailer it thought the trailer was short of the spout and drove it on past it). Run only
+    -- while the spout is ahead of the trailer's middle; stops once the spout is over the middle.
+    local trailer = self:getCreepTrailer()
+    local _, _, pipeZ = worldToLocal(trailer.components[1].node, sx, sy, sz)
+    local shortOfSpout = pipeZ > 0 and frontZ > spoutZ - FollowCombineTask.PIPE_RUN_REACH
     if not (onPipeSide and shortOfSpout and self:isParallel(FollowCombineTask.PIPE_RUN_ANGLE)) then
         self.pipeRun, self.pipeRunWait = nil, 0
         return false
@@ -987,6 +1036,7 @@ function FollowCombineTask:updatePipeRun(dt)
     local combineSpeed = c.lastSpeedReal * 3600
     local target = AutoDrive.createWayPointRelativeToVehicle(c, spoutX, spoutZ + FollowCombineTask.LOOK_AHEAD)
     local speed = combineSpeed + FollowCombineTask.PIPE_RUN_SPEED
+    self.holdReason = "pipe run"
     sdm:driveToPoint(dt, target, speed, false, 1, speed, false, target)
     sdm.isBlocked = false
     if sdm.stoppedTimer ~= nil then
@@ -1066,6 +1116,7 @@ function FollowCombineTask:updatePipeLock(dt)
         end
         if behind then
             -- hold still (no chasing a spot behind it) until the timer above sends it round
+            self.holdReason = "standing harvester: behind it, hold"
             self.creepAnchor = nil
             sdm:stopVehicle()
             sdm:update(dt)
@@ -1091,6 +1142,7 @@ function FollowCombineTask:updatePipeLock(dt)
             if hasGrain and not pipeMissed and self.noFlowTime > FollowCombineTask.NO_FLOW_TIME then
                 self:creepUnderPipe(dt)
             else
+                self.holdReason = "standing harvester: at pipe, hold"
                 sdm:stopVehicle()
                 sdm:update(dt)
             end
@@ -1127,6 +1179,7 @@ function FollowCombineTask:updatePipeLock(dt)
     -- straight up until the gap to the combine is BACK_OFF_GAP, then forward at once (user: the only chase reverse)
     self:updateTurnRate(dt) -- PropaineX edit (od.56)
     if self:updateBackOff(dt) then
+        self.holdReason = "back off"
         return
     end
     -- on the wrong side of the combine: never straight across it. Drop back behind its tail on our current side, then
@@ -1153,6 +1206,7 @@ function FollowCombineTask:updatePipeLock(dt)
     local frontZ, rearZ = self:getCabSpanZ()
     if self.wrongSideTime > 1000 or (self.comingRound and tx * cxl < 0 and frontZ > -halfL - FollowCombineTask.LANE_BEHIND) then
         self.comingRound = true
+        self.holdReason = "wrong-side stop"
         if not self.wrongSideLogged then
             self.wrongSideLogged = true
             Logging.info("[AD] %s: on the wrong side of %s, stopping to let it pass, then coming up its pipe side", ADDiag.name(self.vehicle), ADDiag.name(c))
@@ -1181,6 +1235,7 @@ function FollowCombineTask:updatePipeLock(dt)
     local _, _, czl = AutoDrive.worldToLocal(c, self.chasePos.x, self.chasePos.y, self.chasePos.z, c.ad.ADRootNode)
     local cabAhead = rearZ > halfL and tz > czl + FollowCombineTask.CAB_AHEAD_MARGIN
     if (cabAhead or (facingAgainst and frontZ > -halfL - FollowCombineTask.LANE_BEHIND)) and combineSpeed > 0.5 then
+        self.holdReason = cabAhead and "cab ahead, let it pass" or "facing against, let it pass"
         if not self.againstLogged then
             self.againstLogged = true
             Logging.info("[AD] %s: ahead of / facing %s, stopping to let it pass", ADDiag.name(self.vehicle), ADDiag.name(c))
@@ -1195,6 +1250,7 @@ function FollowCombineTask:updatePipeLock(dt)
     local laneSteer = self:getLaneApproach(tx, tz, cxl, halfW, halfL)
     if laneSteer ~= nil then
         if self:cabHeadsIntoHarvester() then
+            self.holdReason = "pointing into harvester"
             if not self.headInLogged then
                 self.headInLogged = true
                 Logging.info("[AD] %s: pointing into %s, stopping", ADDiag.name(self.vehicle), ADDiag.name(c))
@@ -1216,6 +1272,7 @@ function FollowCombineTask:updatePipeLock(dt)
         if tz > -halfL - FollowCombineTask.LANE_CROSS_ZONE and tx * cxl <= 0 then
             laneMax = math.max(combineSpeed, FollowCombineTask.LANE_CROSS_MIN)
         end
+        self.holdReason = string.format("lane approach (max %.1f)", laneMax)
         sdm:driveToPoint(dt, laneSteer.target, math.min(combineSpeed, laneMax), false, 1, laneMax, true, laneSteer.steer)
         return
     end
@@ -1244,6 +1301,7 @@ function FollowCombineTask:updatePipeLock(dt)
     local hx, _, hz = AutoDrive.localDirectionToWorld(self.vehicle, 0, 0, 1)
     if aheadZ < -1 and hx * self.lineDir.x + hz * self.lineDir.z > 0 then
         maxSpeed = combineSpeed * 0.5
+        self.holdReason = "ease-off ahead of spot"
     end
     -- PropaineX edit (od.56): never steer into the harvester (keep-out gap)
     target, steer = self:keepOffHarvester(target), self:keepOffHarvester(steer, true)
@@ -1529,10 +1587,10 @@ function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
     return {target = self.chasePos, steer = {x = sx, y = y, z = sz}}
 end
 
-FollowCombineTask.PIPE_RUN_WAIT = 2000    -- ms standing short of the pipe before the pipe run starts (od.64)
+FollowCombineTask.PIPE_STALL_TIME = 6000  -- ms standing still at a standing harvester, nothing falling in -> go round (od.65)
+FollowCombineTask.PIPE_RUN_WAIT = 2000   -- ms standing short of the pipe before the pipe run starts (od.64)
 FollowCombineTask.PIPE_RUN_LANE = 3       -- m sideways from the spout's line that still counts as in the pipe lane (od.64)
 FollowCombineTask.PIPE_RUN_REACH = 30     -- m: cab front no farther than this behind the spout (od.64)
-FollowCombineTask.PIPE_RUN_TRAILER = 14   -- m: trailer behind the cab's rear (semi); its rear must be short of the spout (od.64)
 FollowCombineTask.PIPE_RUN_ANGLE = 30     -- deg: lined up with the harvester within this (od.64)
 FollowCombineTask.PIPE_RUN_SPEED = 5      -- km/h above the harvester's speed on the pipe run (od.64)
 FollowCombineTask.LOOK_AHEAD = 12-- m: steering aims this far along the combine's line (longer = straighter, calmer)

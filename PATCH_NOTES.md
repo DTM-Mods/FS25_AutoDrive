@@ -3,6 +3,26 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.65 (2026-11-17, PropaineX): never parked at a standing harvester
+*Untested in the game.*
+
+- od.64 test: harvester standing with its pipe out, truck parked ahead of the spout, doing nothing. Now: harvester
+  standing, pipe out, grain in it, nothing falling in and the truck standing still for 6 s, whatever stopped it: it
+  drives round the harvester and comes in again from behind, and the od.64 pipe run takes it up under the spout.
+- **Pipe run used a guessed trailer length** (14 m behind the cab). Server log of the od.64 test: with the Phoenix and
+  its belly-dump trailer it thought the trailer was still short of the spout and drove it past; then the creep tried to
+  back up and the "never reverse into the front of the harvester" rule held it "until it has passed", which a standing
+  harvester never does. The pipe run now uses the real trailer and stops once the spout is over its middle.
+- **Can't back up under the pipe:** when backing up to the pipe would put the truck in front of a standing harvester,
+  it now drives round the harvester at once and comes in from behind, instead of waiting for it to pass.
+- Why it sat: parked ahead of the spout at a standing harvester, two rules held it with no time limit: "ahead of the
+  pipe spot, ease off to half the harvester's speed" (half of zero = stand still), and the creep along the trailer,
+  which waited for good when the truck didn't actually move. The 6 s catch-all comes before both.
+- Each unloader now keeps a note of which rule is driving or holding it (`holdReason`, e.g. "ease-off ahead of
+  spot", "creep back", "wrong-side stop"). Nothing is logged by AutoDrive itself; the separate FS25_LogSeek mod reads it.
+- End-of-row wait: a harvester standing with its pipe out and grain in it now counts as calling for an unload, so the
+  truck no longer stands up to 60 s waiting for its header to go down.
+
 ## 3.0.1.4-od.64 (2026-11-17, PropaineX): the unloader never sits behind the pipe
 *Untested in the game.*
 
