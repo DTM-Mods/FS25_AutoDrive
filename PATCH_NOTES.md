@@ -3,6 +3,13 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.70 (2026-11-18, PropaineX): curtains open at the pickup point
+*Untested in the game.*
+
+- **Curtains at loading:** a truck that reaches its pickup point now opens the curtains of its curtain-side trailers
+  (LoadAtDestinationTask). Before, AutoDrive closed every curtain trailer after loading but only opened the ones with
+  UniversalAutoload's autoload active, so the others arrived shut. Closing after loading is unchanged.
+
 ## 3.0.1.4-od.69 (2026-11-18, PropaineX): no swerving behind the harvester (cause found with the recorder)
 *Untested in the game; unloader simulator: new test 16 fails on od.68 and passes now (sweep 14 as before, the same 2
 known turn-away contacts).*

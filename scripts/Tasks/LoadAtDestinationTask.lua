@@ -72,6 +72,10 @@ function LoadAtDestinationTask:update(dt)
             --Check if we have actually loaded / tried to load
             AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_VEHICLEINFO, "LoadAtDestinationTask:update isTargetReached")
             AutoDrive.setTrailerCoverOpen(self.vehicle, self.trailers, true)
+            -- PropaineX edit (od.70): open the curtains at the pickup point. closeAllCurtains closes every curtain
+            -- trailer after loading, but the open in TrailerModule only covered trailers with autoload active, so
+            -- the rest arrived shut and stayed shut.
+            AutoDrive.openAllCurtains(self.trailers, false)
 
             if (self.vehicle.ad.stateModule:getCanRestartHelper() and self.vehicle.ad.stateModule:getMode() == AutoDrive.MODE_PICKUPANDDELIVER) then
                 AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_VEHICLEINFO, "LoadAtDestinationTask:update stopAutoDrive")

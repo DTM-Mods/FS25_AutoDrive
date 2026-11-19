@@ -355,6 +355,9 @@ https://iwan1803.de/urls/tip
 
 #### Willi (Supporter & Tester)
 
+### Curtains open at the pickup point
+A truck that reaches its pickup point opens the curtains of its curtain-side trailers before loading (od.70). AutoDrive already closed them after loading, but only opened them on trailers with Universal Autoload's autoload active, so the others arrived shut. Code: `scripts/Tasks/LoadAtDestinationTask.lua`.
+
 ## Placeable Crossings and Reversing (separate mods)
 Direct Download: https://github.com/Williwillswisse/AD_XandT-intersections/releases/latest/download/FS25_AutoDrive_XT_Intersection.zip <br/>
 Direct Download: https://github.com/Williwillswisse/AD_xCrossing/releases/latest/download/FS25_AutoDrive_xCrossing.zip <br/>
