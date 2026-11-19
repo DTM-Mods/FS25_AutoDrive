@@ -30,8 +30,21 @@ jobs:
           REPO: ${{ github.repository }}
           WEBHOOK: ${{ secrets.DISCORD_UPSTREAM_WEBHOOK }}
         run: |
+          # the shared emoji helper (DTM-Mods/.github ci/discord_emojis.py); without it the post has no emojis
+          curl -fsSL --retry 2 -o "$RUNNER_TEMP/discord_emojis.py" \
+            https://raw.githubusercontent.com/DTM-Mods/.github/main/ci/discord_emojis.py \
+            || echo "::warning::discord_emojis.py not downloaded, posting without emojis"
           python3 - <<'EOF'
-          import json, os, time, urllib.error, urllib.parse, urllib.request
+          import json, os, sys, time, urllib.error, urllib.parse, urllib.request
+          sys.path.insert(0, os.environ["RUNNER_TEMP"])
+          try:
+              import discord_emojis as emo
+          except Exception:
+              emo = None
+
+          def E(kind):
+              """The DTM Discord's custom emoji for this kind of post (Unicode if it has none), and a space."""
+              return emo.get(kind) + " " if emo else ""
 
           def api(path, data=None, method=None):
               req = urllib.request.Request("https://api.github.com/" + path,
@@ -98,7 +111,7 @@ jobs:
           payload = {
               "username": "Upstream Watch",
               "allowed_mentions": {"parse": []},
-              "content": f"Opened a pull request to merge **{mod} {tag}** into our fork.",
+              "content": E("github") + f"Opened a pull request to merge **{mod} {tag}** into our fork.",
               "embeds": [{
                   "title": f"#{pr['number']} {title}", "url": pr["html_url"],
                   "description": f"{missing} upstream commit{'s' if missing != 1 else ''} to merge. {state}",
