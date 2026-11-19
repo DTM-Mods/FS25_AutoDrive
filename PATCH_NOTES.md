@@ -3,6 +3,14 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.71 (2026-11-18, PropaineX): curtains open for everyone on a dedicated server
+*Untested in the game.*
+
+- **Curtains on a dedicated server:** od.70 opened the curtains at the pickup point, but only on the machine AutoDrive
+  runs on (the animation was started without being sent to the players). In single player that is you, so it worked;
+  on a dedicated server the curtains opened on the server and the players still saw them shut. Opening the curtains is
+  now sent to every player (AutoDrive.openCurtain). Closing after loading is unchanged.
+
 ## 3.0.1.4-od.70 (2026-11-18, PropaineX): curtains open at the pickup point
 *Untested in the game.*
 

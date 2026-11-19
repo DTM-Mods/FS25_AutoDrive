@@ -639,6 +639,8 @@ function AutoDrive.closeAllCurtains(trailers, onlyUAL)
 end
 
 function AutoDrive.openCurtain(vehicle)
+    -- PropaineX edit (od.71): the animation is sent to every player (noEventSend false). With true it only ran where
+    -- AutoDrive runs, so on a dedicated server the curtains opened on the server and stayed shut for the players.
     local leftDone, rightDone = false, false
     local spec = vehicle.spec_trailer
     if spec and AutoDrive.isCurtainClosed(vehicle) then
@@ -648,13 +650,13 @@ function AutoDrive.openCurtain(vehicle)
                     if not leftDone and string.find(tipSide.animation.name, "Left") then
                         leftDone = true
                         if not vehicle:getIsAnimationPlaying(tipSide.animation.name) then
-                            vehicle:playAnimation(tipSide.animation.name, tipSide.animation.speedScale, vehicle:getAnimationTime(tipSide.animation.name), true)
+                            vehicle:playAnimation(tipSide.animation.name, tipSide.animation.speedScale, vehicle:getAnimationTime(tipSide.animation.name), false)
                         end
                     end
                     if not rightDone and string.find(tipSide.animation.name, "Right") then
                         rightDone = true
                         if not vehicle:getIsAnimationPlaying(tipSide.animation.name) then
-                            vehicle:playAnimation(tipSide.animation.name, tipSide.animation.speedScale, vehicle:getAnimationTime(tipSide.animation.name), true)
+                            vehicle:playAnimation(tipSide.animation.name, tipSide.animation.speedScale, vehicle:getAnimationTime(tipSide.animation.name), false)
                         end
                     end
                 end
