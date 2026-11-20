@@ -3,6 +3,18 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.73 (2026-11-20, PropaineX): curtains forced open and shut, synced on a dedicated server
+*Untested in the game.*
+
+- **Closing sent to every player:** closing the curtains ran on the server only (noEventSend true), so on a dedicated
+  server players saw them stay open and the state drifted. Closing is now sent to everyone, like opening since od.71.
+- **Forced close after leaving:** the close was tried once when the truck left, and skipped if a curtain was still
+  moving. Now a watcher keeps closing every open side until all are shut (up to 20 s, AutoDrive.CURTAIN_WATCH_TIME).
+- **Forced open per side:** opening only ran when every side was shut; now each side that is not fully open opens.
+- **Tip point:** trucks also force their curtains open on arriving at the unload point and shut when they leave.
+- Code: `scripts/Utils/AutoDriveUtilFuncs.lua` (closeCurtain, openCurtain, closeAllCurtains, updateCurtainWatch),
+  `scripts/AutoDrive.lua` (update), `scripts/Tasks/UnloadAtDestinationTask.lua`.
+
 ## 3.0.1.4-od.72 (2026-11-20): no touching the tail when the harvester turns away
 *Untested in the game; unloader simulator: sweep 14 now has no contact (od.64 to od.71: 2 of 60).*
 

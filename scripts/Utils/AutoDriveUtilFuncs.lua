@@ -612,55 +612,73 @@ function AutoDrive.isLadderFolded(vehicle)
     return ret
 end
 
-function AutoDrive.closeCurtain(vehicle)
-    local leftDone, rightDone = false, false
+-- PropaineX edit (od.73): curtains are forced per side and every move is sent to all players (noEventSend false),
+-- so a dedicated server and its players see the same state. Before: closing ran on the server only, was tried once
+-- (skipped if the curtain was still moving), and opening only ran when every side was shut.
+AutoDrive.CURTAIN_WATCH_TIME = 20000 -- ms the close is retried after a truck leaves
+AutoDrive.curtainWatch = {}
+
+-- calls fn(name, animation) once per curtain animation of the trailer
+local function forEachCurtain(vehicle, fn)
     local spec = vehicle.spec_trailer
-    if spec and not AutoDrive.isCurtainClosed(vehicle) then
-        for _, tipSide in pairs(spec.tipSides) do
-            if tipSide and tipSide.manualTipToggle and tipSide.animation and tipSide.animation.name then
-                if vehicle.getIsAnimationPlaying and vehicle.playAnimation then
-                    if not vehicle:getIsAnimationPlaying(tipSide.animation.name) then
-                        vehicle:playAnimation(tipSide.animation.name, tipSide.animation.closeSpeedScale, vehicle:getAnimationTime(tipSide.animation.name), true)
-                    end
-                end
+    if spec == nil or spec.tipSides == nil or vehicle.playAnimation == nil or vehicle.getIsAnimationPlaying == nil then
+        return
+    end
+    local seen = {}
+    for _, tipSide in pairs(spec.tipSides) do
+        if tipSide and tipSide.manualTipToggle and tipSide.animation and tipSide.animation.name then
+            local name = tipSide.animation.name
+            if not seen[name] and tipSide.animation.closeSpeedScale ~= 0 and vehicle.getAnimationDuration and vehicle:getAnimationDuration(name) > 1 then
+                seen[name] = true
+                fn(name, tipSide.animation)
             end
         end
     end
+end
+
+function AutoDrive.closeCurtain(vehicle)
+    forEachCurtain(vehicle, function(name, anim)
+        if vehicle:getAnimationTime(name) > 0.01 and not vehicle:getIsAnimationPlaying(name) then
+            vehicle:playAnimation(name, anim.closeSpeedScale, vehicle:getAnimationTime(name), false)
+        end
+    end)
 end
 
 function AutoDrive.closeAllCurtains(trailers, onlyUAL)
     if trailers and #trailers > 0 then
         for _, trailer in ipairs(trailers) do
-            -- if (not onlyUAL) or (onlyUAL and AutoDrive:hasAL(trailer)) then
-                AutoDrive.closeCurtain(trailer)
-            -- end
+            AutoDrive.closeCurtain(trailer)
+            -- keep retrying until shut (a curtain still opening is skipped above)
+            if not AutoDrive.isCurtainClosed(trailer) then
+                AutoDrive.curtainWatch[trailer] = AutoDrive.CURTAIN_WATCH_TIME
+            end
         end
     end
 end
 
 function AutoDrive.openCurtain(vehicle)
-    -- PropaineX edit (od.71): the animation is sent to every player (noEventSend false). With true it only ran where
-    -- AutoDrive runs, so on a dedicated server the curtains opened on the server and stayed shut for the players.
-    local leftDone, rightDone = false, false
-    local spec = vehicle.spec_trailer
-    if spec and AutoDrive.isCurtainClosed(vehicle) then
-        for _, tipSide in pairs(spec.tipSides) do
-            if tipSide and tipSide.manualTipToggle and tipSide.animation and tipSide.animation.name then
-                if vehicle.getIsAnimationPlaying and vehicle.playAnimation then
-                    if not leftDone and string.find(tipSide.animation.name, "Left") then
-                        leftDone = true
-                        if not vehicle:getIsAnimationPlaying(tipSide.animation.name) then
-                            vehicle:playAnimation(tipSide.animation.name, tipSide.animation.speedScale, vehicle:getAnimationTime(tipSide.animation.name), false)
-                        end
-                    end
-                    if not rightDone and string.find(tipSide.animation.name, "Right") then
-                        rightDone = true
-                        if not vehicle:getIsAnimationPlaying(tipSide.animation.name) then
-                            vehicle:playAnimation(tipSide.animation.name, tipSide.animation.speedScale, vehicle:getAnimationTime(tipSide.animation.name), false)
-                        end
-                    end
-                end
-            end
+    -- a truck at a load/tip point no longer counts as leaving
+    AutoDrive.curtainWatch[vehicle] = nil
+    forEachCurtain(vehicle, function(name, anim)
+        if vehicle:getAnimationTime(name) < 0.99 and not vehicle:getIsAnimationPlaying(name) then
+            vehicle:playAnimation(name, anim.speedScale, vehicle:getAnimationTime(name), false)
+        end
+    end)
+end
+
+function AutoDrive.updateCurtainWatch(dt)
+    if g_server == nil or next(AutoDrive.curtainWatch) == nil then
+        return
+    end
+    for trailer, timeLeft in pairs(AutoDrive.curtainWatch) do
+        timeLeft = timeLeft - dt
+        if trailer.isDeleted or timeLeft <= 0 or trailer.spec_trailer == nil then
+            AutoDrive.curtainWatch[trailer] = nil
+        elseif AutoDrive.isCurtainClosed(trailer) then
+            AutoDrive.curtainWatch[trailer] = nil
+        else
+            AutoDrive.closeCurtain(trailer)
+            AutoDrive.curtainWatch[trailer] = timeLeft
         end
     end
 end

@@ -718,6 +718,9 @@ function AutoDrive:update(dt)
 		end
 	end
 
+	-- PropaineX edit (od.73): keep closing curtains of trucks that left a load/tip point until they are shut
+	AutoDrive.updateCurtainWatch(dt)
+
 	if AutoDrive.hideMouseCursorOnNextTick == true and not g_inGameMenu.isOpen then
 		AutoDrive.hideMouseCursorOnNextTick = nil
 		g_inputBinding:setShowMouseCursor(false)

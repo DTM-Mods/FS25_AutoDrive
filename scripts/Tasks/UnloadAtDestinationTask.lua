@@ -107,6 +107,10 @@ function UnloadAtDestinationTask:update(dt)
             if not self.vehicle.ad.trailerModule:isActiveAtTrigger() then
                 --AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_PATHINFO, "UnloadAtDestinationTask:update isTargetReached isActiveAtTrigger")
                 AutoDrive.setTrailerCoverOpen(self.vehicle, self.trailers, true)
+                -- PropaineX edit (od.73): force the curtains open at the tip point too (closed again in finished)
+                if not self.isContinued then
+                    AutoDrive.openAllCurtains(self.trailers, false)
+                end
                 local fillLevel = AutoDrive.getAllFillLevels(self.trailers)
                 if
                     fillLevel < 0.1
