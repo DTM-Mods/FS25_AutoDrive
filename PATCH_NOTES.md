@@ -3,6 +3,15 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.74 (2026-11-20, PropaineX): only the back curtains are forced
+*Untested in the game.*
+
+- **Back curtains only:** on a trailer with front and back curtain sections (Krone Profiliner: left/right front and
+  left/right back), AutoDrive now forces only the two back sections open and shut. The front sections stay the way
+  the player set them, and an open front section no longer counts as "curtains not closed". Trailers without
+  front/back sections behave as in od.73.
+- Code: `scripts/Utils/AutoDriveUtilFuncs.lua` (forEachCurtain, isCurtainClosed).
+
 ## 3.0.1.4-od.73 (2026-11-20, PropaineX): curtains forced open and shut, synced on a dedicated server
 *Untested in the game.*
 

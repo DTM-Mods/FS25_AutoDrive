@@ -619,19 +619,31 @@ AutoDrive.CURTAIN_WATCH_TIME = 20000 -- ms the close is retried after a truck le
 AutoDrive.curtainWatch = {}
 
 -- calls fn(name, animation) once per curtain animation of the trailer
+-- PropaineX edit (od.74): a trailer with front and back curtain sections (Krone Profiliner: coverAnimationLeftFront/
+-- LeftBack/RightFront/RightBack) only has its BACK sections forced; the front ones are left as the player set them.
 local function forEachCurtain(vehicle, fn)
     local spec = vehicle.spec_trailer
     if spec == nil or spec.tipSides == nil or vehicle.playAnimation == nil or vehicle.getIsAnimationPlaying == nil then
         return
     end
     local seen = {}
+    local curtains = {}
+    local hasBack = false
     for _, tipSide in pairs(spec.tipSides) do
         if tipSide and tipSide.manualTipToggle and tipSide.animation and tipSide.animation.name then
             local name = tipSide.animation.name
             if not seen[name] and tipSide.animation.closeSpeedScale ~= 0 and vehicle.getAnimationDuration and vehicle:getAnimationDuration(name) > 1 then
                 seen[name] = true
-                fn(name, tipSide.animation)
+                table.insert(curtains, {name = name, anim = tipSide.animation})
+                if string.find(string.lower(name), "back", 1, true) then
+                    hasBack = true
+                end
             end
+        end
+    end
+    for _, c in ipairs(curtains) do
+        if not hasBack or string.find(string.lower(c.name), "back", 1, true) then
+            fn(c.name, c.anim)
         end
     end
 end
@@ -694,19 +706,12 @@ function AutoDrive.openAllCurtains(trailers, onlyUAL)
 end
 
 function AutoDrive.isCurtainClosed(vehicle)
-    local leftDone, rightDone = false, false
+    -- PropaineX edit (od.74): checks the same curtains that are forced (back only on front/back trailers),
+    -- so an open front curtain never holds a truck back
     local ret = true
-    local spec = vehicle.spec_trailer
-    if spec then
-        for _, tipSide in pairs(spec.tipSides) do
-            if tipSide and tipSide.manualTipToggle and tipSide.animation and tipSide.animation.name then
-                if tipSide.animation.closeSpeedScale ~= 0 and vehicle.getAnimationDuration and vehicle:getAnimationDuration(tipSide.animation.name) > 1 then
-                    local animationTime = vehicle:getAnimationTime(tipSide.animation.name)
-                    ret = ret and animationTime <= 0.01
-                end
-            end
-        end
-    end
+    forEachCurtain(vehicle, function(name, anim)
+        ret = ret and vehicle:getAnimationTime(name) <= 0.01
+    end)
     return ret
 end
 

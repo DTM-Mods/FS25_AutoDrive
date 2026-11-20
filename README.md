@@ -355,8 +355,8 @@ https://iwan1803.de/urls/tip
 
 #### Willi (Supporter & Tester)
 
-### Curtains open at the pickup point
-A truck that reaches its pickup point opens the curtains of its curtain-side trailers before loading (od.70). AutoDrive already closed them after loading, but only opened them on trailers with Universal Autoload's autoload active, so the others arrived shut. Since od.71 the opening is sent to every player, so it also shows on a dedicated server. Code: `scripts/Tasks/LoadAtDestinationTask.lua`, `AutoDrive.openCurtain` in `scripts/Utils/AutoDriveUtilFuncs.lua`.
+### Curtains open at the pickup and tip point
+A truck that reaches its pickup point opens the curtains of its curtain-side trailers before loading (od.70). AutoDrive already closed them after loading, but only opened them on trailers with Universal Autoload's autoload active, so the others arrived shut. Since od.71 the opening is sent to every player, so it also shows on a dedicated server. Since od.73 the curtains are also forced open at the tip point and kept closing after the truck leaves until they are shut. Since od.74 a trailer with front and back curtain sections (Krone Profiliner) only has its back sections forced; the front ones stay as the player set them. Code: `scripts/Tasks/LoadAtDestinationTask.lua`, `AutoDrive.openCurtain` in `scripts/Utils/AutoDriveUtilFuncs.lua`.
 
 ## Placeable Crossings and Reversing (separate mods)
 Direct Download: https://github.com/Williwillswisse/AD_XandT-intersections/releases/latest/download/FS25_AutoDrive_XT_Intersection.zip <br/>
