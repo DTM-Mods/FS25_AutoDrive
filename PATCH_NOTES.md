@@ -3,6 +3,15 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.72 (2026-11-20): no touching the tail when the harvester turns away
+*Untested in the game; unloader simulator: sweep 14 now has no contact (od.64 to od.71: 2 of 60).*
+
+- **Catching up behind the tail:** od.64 let a truck that had crossed to the pipe side catch up again, so it pulls up
+  alongside. But "crossed" counted from the harvester's centre line: a truck still behind the tail, inside the
+  harvester's width, sped up too, and when the harvester turned away its tail swung into the truck (sweep 14: start
+  behind on the wrong side, 8 deg/s turn away, gap -1.25 m). The crossing speed limit now holds until the truck is
+  1 m out beyond the harvester's side (LANE_CROSS_CLEAR); from there it catches up as in od.64.
+
 ## 3.0.1.4-od.71 (2026-11-18, PropaineX): curtains open for everyone on a dedicated server
 *Untested in the game.*
 

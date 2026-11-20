@@ -1283,7 +1283,9 @@ function FollowCombineTask:updatePipeLock(dt)
         -- can't run up level with the tail on the wrong side before it is lined up.
         -- PropaineX edit (od.64): only while still on the wrong side / not across yet. On the pipe side it catches up as
         -- before (od.63 capped it there too: it hung back behind the tail and never pulled up alongside)
-        if tz > -halfL - FollowCombineTask.LANE_CROSS_ZONE and tx * cxl <= 0 then
+        -- od.72: across, but still within the harvester's width (not out beside its tail yet): capped too. Catching up
+        -- there ran it into the tail when the harvester turned away (unloader simulator, sweep 14: gap -1.25 m)
+        if tz > -halfL - FollowCombineTask.LANE_CROSS_ZONE and (tx * cxl <= 0 or math.abs(tx) < halfW + FollowCombineTask.LANE_CROSS_CLEAR) then
             laneMax = math.max(combineSpeed, FollowCombineTask.LANE_CROSS_MIN)
         end
         self.holdReason = string.format("lane approach (max %.1f)", laneMax)
@@ -1432,6 +1434,7 @@ FollowCombineTask.LANE_RELEASE = 3      -- m off the lane before a lined-up truc
 FollowCombineTask.LANE_CROSS_ZONE = 30  -- m behind the tail (truck centre): crossing to the pipe lane here = no catch-up (od.63)
 FollowCombineTask.CAB_AHEAD_MARGIN = 3  -- m past the pipe spot before "cab ahead of the harvester" stops it (od.63)
 FollowCombineTask.LANE_CROSS_MIN = 4   -- km/h: crossing speed floor, so it still crosses behind a slow / standing harvester (od.63)
+FollowCombineTask.LANE_CROSS_CLEAR = 1 -- m beyond the harvester's half width: until then it still counts as crossing (od.72)
 -- PropaineX edit (od.61): the lane we aim at is always this far outside the steer-away line, so reaching it can't trip it
 FollowCombineTask.KEEP_OUT_AIM_MARGIN = 0.3 -- m
 FollowCombineTask.STEER_GAIN = 2            -- m steered out per m inside the strip (gentle for small, firm for deep)
