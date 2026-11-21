@@ -150,8 +150,6 @@ function CombineUnloaderMode:monitorTasks(dt)
         local taskName = task ~= nil and (task.taskType or (task.getStateName ~= nil and "task state " .. tostring(task:getStateName())) or "task") or "no task"
         local why = self.failedPathFinder >= 5 and string.format("%d failed path searches", self.failedPathFinder)
             or "stood still 15 s, driving blocked"
-        Logging.info("[AD] %s: stuck (%s, %s, unloader state %s), backing out up to %d m", ADDiag.name(self.vehicle), why,
-            taskName, tostring(self:getStateName()), ReverseFromBadLocationTask.MAX_DISTANCE)
         self.vehicle.ad.specialDrivingModule:releaseVehicle()
         self.vehicle.ad.taskModule:abortAllTasks()
         self.activeTask = ReverseFromBadLocationTask:new(self.vehicle)
@@ -324,7 +322,6 @@ function CombineUnloaderMode:getNextTask()
         self:setToWaitForCall()
     elseif self.state == self.STATE_DRIVE_TO_UNLOAD and self.harvestFinished then
         -- PropaineX edit (od.54): harvester finished its job: unloaded, now AutoDrive off (no more wages)
-        Logging.info("[AD] %s: unloaded after the harvester finished, AutoDrive off", ADDiag.name(self.vehicle))
         nextTask = StopAndDisableADTask:new(self.vehicle, ADTaskModule.DONT_PROPAGATE)
     elseif self.state == self.STATE_DRIVE_TO_UNLOAD then
         CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:getNextTask - STATE_DRIVE_TO_UNLOAD")
@@ -424,8 +421,6 @@ function CombineUnloaderMode:onPathTimeout()
         end
     end
     local harvesterName = self.combine ~= nil and ADDiag.name(self.combine) or "?"
-    Logging.info("[AD] %s: no path to %s within %d s, %s", ADDiag.name(self.vehicle), harvesterName,
-        CombineUnloaderMode.PATH_TIMEOUT / 1000, other and "handing the job to the next unloader" or "moving aside to plan again")
     -- let go of the harvester (a queued follower takes over); the harvest manager sends the closest free unloader
     ADHarvestManager:unregisterAsUnloader(self.vehicle)
     if other then
@@ -462,15 +457,12 @@ function CombineUnloaderMode:onHarvesterFinished(harvester)
     self.harvestFinished = true
     if self.state == self.STATE_DRIVE_TO_UNLOAD and self.vehicle.ad.taskModule:getActiveTask() ~= nil then
         -- already on the way to unload: let it finish, AutoDrive goes off after (getNextTask)
-        Logging.info("[AD] %s: %s finished, unloading this load, then AutoDrive off", ADDiag.name(self.vehicle), ADDiag.name(harvester))
         return
     end
     self.vehicle.ad.taskModule:abortAllTasks()
     local trailers, _ = AutoDrive.getAllUnits(self.vehicle)
     local fillLevel, _, _, _ = AutoDrive.getAllFillLevels(trailers)
     if fillLevel > 0.1 then
-        Logging.info("[AD] %s: %s finished, unloading %.0f l, then AutoDrive off", ADDiag.name(self.vehicle),
-            ADDiag.name(harvester), fillLevel)
         local x, y, z = getWorldTranslation(self.vehicle.components[1].node)
         local distanceToStart = 0
         local firstMarker = self.vehicle.ad.stateModule:getFirstMarker()
@@ -488,7 +480,6 @@ function CombineUnloaderMode:onHarvesterFinished(harvester)
             self.state = self.STATE_DRIVE_TO_UNLOAD
         end
     else
-        Logging.info("[AD] %s: %s finished, trailer empty, AutoDrive off", ADDiag.name(self.vehicle), ADDiag.name(harvester))
         self.vehicle.ad.taskModule:addTask(StopAndDisableADTask:new(self.vehicle, ADTaskModule.DONT_PROPAGATE))
     end
 end

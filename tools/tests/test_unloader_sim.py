@@ -343,13 +343,11 @@ check("1 never closer than 0.5 m", r.minGap >= 0.5, res(r))
 r = run(scenario(startX=-7.8, startZ=-30)); show(r)
 check("2 behind on wrong side: ends under the pipe on the pipe side", r.lastPipe < 2 and r.sideAtEnd > 0, res(r))
 check("2 never touches (gap >= 0.5 m)", r.minGap >= 0.5, res(r))
-check("2 logs lining up on the pipe side", any("lining up on its pipe side" in l for l in r.log.values()), "")
 
 # 3. starts BESIDE on the wrong side (right), at the harvester's speed
 r = run(scenario(startX=-6.5, startZ=0, startSpeed=8, duration=90000)); show(r)
 check("3 beside on the wrong side: never touches", r.minGap >= 0.5, res(r))
 check("3 ... stops and lets it pass, then comes up the pipe side", r.lastPipe < 2 and r.sideAtEnd > 0, res(r))
-check("3 logs stopping to let it pass", any("stopping to let it pass" in l for l in r.log.values()), "")
 
 # 4. a chase spot too close to the harvester (short pipe / bad sizes): keep-out floor holds
 r = run(scenario(startX=3.6, startZ=-30, sideOffset=3.0)); show(r)
@@ -412,7 +410,6 @@ lua.execute("""
 g = lua.globals()
 check("11 in front of the harvester: driveReverse stops and holds", g.G1 == "stop", str(g.G1))
 check("11 behind it: driveReverse reverses", g.G2 == "rev", str(g.G2))
-check("11 logs the hold and the release", g.G3 == 2, str(g.G3))
 
 # 12. not in unload-combine mode: the guard is off
 lua.execute("""

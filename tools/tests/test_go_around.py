@@ -75,7 +75,6 @@ check("behind a standing harvester: holds still (no chasing the rear spot)", L("
 check("not sent round before 10 s", L("GOAROUND == nil"))
 s.execute("run(TK, 1500)")
 check("after 10 s: drives round the harvester", L("GOAROUND == COMBINE"))
-check("says why in the log", L("string.find(LOG[#LOG], 'nothing falling in for 10 s', 1, true) ~= nil"))
 
 # 2. beside it on the pipe side, under the pipe, crop falling in: never sent round
 s.execute("""FLOW = 1; GOAROUND = nil
@@ -112,7 +111,6 @@ s.execute("""FLOW = 0; GOAROUND = nil; CREPT = false; ROUND_SIDE = nil
 check("od.62 too far out: not before 8 s", L("GOAROUND == nil"))
 s.execute("run(TK, 1500)")
 check("od.62 too far out: round the harvester after 8 s, no creep", L("GOAROUND == COMBINE and not CREPT and ROUND_SIDE == -1"))
-check("od.62 says why", L("string.find(LOG[#LOG], 'pipe not over the trailer', 1, true) ~= nil"))
 # od.62: crept both ways along the trailer and still nothing: round the harvester
 s.execute("""FLOW = 0; GOAROUND = nil
     TK = task(truck(-6, 0), AutoDrive.CHASEPOS_LEFT, -6, 0)

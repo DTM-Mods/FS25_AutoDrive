@@ -153,7 +153,6 @@ function EmptyHarvesterTask:update(dt)
                     if self.noWayAroundCrop and not self.vehicle.ad.noWayAroundCropLogged then
                         self.vehicle.ad.noWayAroundCropLogged = true
                         local reasonText = g_i18n ~= nil and g_i18n:getText("AD_task_catch_no_way_around_crop") or "AD_task_catch_no_way_around_crop"
-                        Logging.info("[AD] %s, unloading %s: %s (avoid fruit is on, not driving through the crop)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reasonText)
                     end
                     self.vehicle.ad.pathFinderModule:reset()
                     self.vehicle.ad.pathFinderModule:startPathPlanningToPipe(self.combine, false)

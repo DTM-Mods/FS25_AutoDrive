@@ -187,9 +187,7 @@ function ADSpecialDrivingModule:driveReverse(dt, maxSpeed, maxAcceleration, guid
         intoFront, frontCombine = ADUnloaderClear.reverseIntoFront(self.vehicle, self.frontHold)
     end
     if intoFront and not self.frontHold then
-        Logging.info("[AD] %s: reversing would put it in front of %s, stopping until it has passed", ADDiag.name(self.vehicle), ADDiag.name(frontCombine))
     elseif not intoFront and self.frontHold then
-        Logging.info("[AD] %s: clear of the front of the harvester, may reverse again", ADDiag.name(self.vehicle))
     end
     self.frontHold = intoFront
     if intoFront then

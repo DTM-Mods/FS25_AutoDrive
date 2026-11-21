@@ -346,8 +346,6 @@ function ADUnloaderEscape.yield(mode, harvester)
     local harvesters = ADUnloaderClear.getHarvesters(vehicle)
     local fruits = ADUnloaderClear.getFruits(harvesters)
     local x, z, dirX, dirZ = ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
-    Logging.info("[AD] %s: in the way of standing %s, getting out of its way first%s", ADDiag.name(vehicle),
-        harvester ~= nil and ADDiag.name(harvester) or "?", x == nil and " (no clear spot, straight on)" or "")
     mode.escapeHarvesterTime = 0
     mode.yieldAt = g_time or 0
     ADUnloaderClear.start(mode, x, z, dirX, dirZ, true)

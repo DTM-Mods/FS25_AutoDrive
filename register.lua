@@ -142,7 +142,6 @@ source(Utils.getFilename("scripts/Modules/DrivePathModule.lua", g_currentModDire
 source(Utils.getFilename("scripts/Modules/CollisionDetectionModule.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Modules/SpecialDrivingModule.lua", g_currentModDirectory))
 -- PropaineX edit (od.68): unloader recorder
-source(Utils.getFilename("scripts/Utils/ADRecorder.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Modules/TaskModule.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Modules/TrailerModule.lua", g_currentModDirectory))
 source(Utils.getFilename("scripts/Modules/PathFinderModule.lua", g_currentModDirectory))

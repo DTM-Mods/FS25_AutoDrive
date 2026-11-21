@@ -3,6 +3,19 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.75 (2026-11-21, PropaineX): release clean-up, test diagnostics removed
+*No change to how anything drives. All checks and tests pass.*
+
+- **Unloader recorder removed:** the test recorder (od.68) that wrote CSV files of every unloader run to
+  `modSettings/FS25_AutoDrive/recorder/` is gone (`scripts/Utils/ADRecorder.lua` deleted, no longer loaded).
+- **holdReason tags removed:** the per-tick "which rule drove the truck" tags (od.65), only read by the LogSeek test
+  mod, are gone.
+- **Unloader test logging removed:** 44 `[AD] <truck>: ...` lines that narrated the unloader's moves for bug hunting
+  (lane released, end of row, let it pass, pointing into, backing up, harvester finished ...) no longer go to
+  log.txt, along with their log-once flags. AutoDrive's own log lines and the error and warning messages players see
+  (also written to the log) stay.
+- Tests: the checks that only looked for those log lines were removed; the behaviour checks stay.
+
 ## 3.0.1.4-od.74 (2026-11-20, PropaineX): only the back curtains are forced
 *Untested in the game.*
 

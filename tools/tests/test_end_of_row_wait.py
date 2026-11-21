@@ -68,6 +68,5 @@ E("HEADER.low = true; TK = make(true); TK:updateEndOfRowWait(100); HEADER.low = 
 check(not E("TK:updateEndOfRowWait(100)"), "forage harvester waited")
 E("ROOT.getChildVehicles = function(self) return {self} end; TK = make(false); TK:updateEndOfRowWait(100)")
 check(not E("TK:updateEndOfRowWait(100)"), "waited without a header")
-check(any("header up, standing here" in str(l) for l in E("LOG").values()), "start not logged")
 print("OK: end of row (header up or off -> stand still, header down and on -> chase again; not before it harvested, "
-      "not while calling for an unload or full, 60 s max, not forage harvesters or without a header; logged)")
+      "not while calling for an unload or full, 60 s max, not forage harvesters or without a header)")

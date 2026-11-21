@@ -293,7 +293,6 @@ function CatchCombinePipeTask:waitForCrop()
     if not self.vehicle.ad.noWayAroundCropLogged then
         self.vehicle.ad.noWayAroundCropLogged = true
         local reasonText = g_i18n ~= nil and g_i18n:getText(self.delayReason) or self.delayReason
-        Logging.info("[AD] %s, catching up with %s: %s (avoid fruit is on, not driving through the crop)", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reasonText)
     end
 end
 

@@ -147,14 +147,13 @@ def info():
 s.execute("TASK:update(5000); TASK:update(16)")          # plans, finds nothing: crop
 assert s.eval("TASK:getStateName()") == "STATE_DELAY_PATHPLANNING"
 assert info() == "$l10n_AD_task_catch_up_with_combine; - $l10n_AD_task_catch_no_way_around_crop; (5 s)", info()
-assert s.eval("UNLOADER.ad.catchReplans") is None and s.eval("#LOG") == 1
-assert s.eval("LOG[1]") == "[AD] Truck, catching up with Combine: No way around the crop to the combine, waiting (avoid fruit is on, not driving through the crop)", s.eval("LOG[1]")
+assert s.eval("UNLOADER.ad.catchReplans") is None
 s.execute("STOPPED = 0; TASK:update(3000)")
 assert s.eval("STOPPED") == 1 and info().endswith("(2 s)") and s.eval("PLANS") == 1, info()
 s.execute("TASK:update(3000); TASK:update(1500)")        # wait over, a second's check, plans again
 assert s.eval("TASK:getStateName()") == "STATE_PATHPLANNING" and s.eval("PLANS") == 2
 s.execute("TASK:update(16)")                             # still nothing: waits again, not logged again
-assert info().endswith("$l10n_AD_task_catch_no_way_around_crop; (5 s)") and s.eval("#LOG") == 1
+assert info().endswith("$l10n_AD_task_catch_no_way_around_crop; (5 s)")
 # 10 s without a way to the combine (the crop waits count too): PATH_TIMEOUT stops the search and lets the mode hand
 # the job to the next unloader or move aside and plan again (3.6.0.4), once
 s.execute("TASK:update(6000)")
@@ -169,11 +168,9 @@ assert s.eval("TIMEOUTS") == 1
 s.execute("PATH, CROP, LOG, PLANS = {}, true, {}, 0; TASK = EmptyHarvesterTask:new(UNLOADER, COMBINE); TASK:setUp(); TASK:update(16)")
 assert s.eval("PLANS") == 2 and s.eval("PFM.delayTime") == 10000
 assert info() == "$l10n_AD_task_unloading_combine; - $l10n_AD_task_catch_no_way_around_crop; (10 s)", info()
-assert s.eval("LOG[1]") == "[AD] Truck, unloading Combine: No way around the crop to the combine, waiting (avoid fruit is on, not driving through the crop)"
 s.execute("PFM.delayTime = 0")
 assert info().startswith("$l10n_AD_task_unloading_combine; - $l10n_AD_task_pathfinding;"), info()
 s.execute("TASK:update(16)")
-assert s.eval("#LOG") == 1
 
 # the unloader does not count it as stuck (that would make it reverse out)
 mode = t.read(os.path.join(t.MOD, "scripts", "Modes", "CombineUnloaderMode.lua"))

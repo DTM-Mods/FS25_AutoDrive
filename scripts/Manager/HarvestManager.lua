@@ -161,7 +161,6 @@ function ADHarvestManager:onAIJobStopped(job, aiMessage)
             and harvester.ad.stateModule:getFirstMarker() == marker then
             local vehicle = harvester.isTrailedHarvester and harvester.trailingVehicle or harvester
             if vehicle ~= nil and vehicle.getIsAIActive ~= nil and vehicle:getIsAIActive() and vehicle:getRootVehicle() ~= root then
-                Logging.info("[AD] %s finished its job; unloaders stay on for %s", ADDiag.name(finished), ADDiag.name(harvester))
                 return
             end
         end
@@ -178,7 +177,6 @@ function ADHarvestManager:onAIJobStopped(job, aiMessage)
             end
         end
     end
-    Logging.info("[AD] %s finished its job: %d unloader(s) switching AutoDrive off", ADDiag.name(finished), count)
 end
 
 function ADHarvestManager:update(dt)

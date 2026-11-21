@@ -369,7 +369,6 @@ function ADUnloaderClear.monitor(mode, dt)
     mode.clearUnsafeTime = 0
     local tx, tz, dirX, dirZ = ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
     if planning then
-        Logging.info("[AD] %s: in a harvester's way (%s) while planning a route, moving out of the way first", ADDiag.name(vehicle), danger)
         ADUnloaderClear.start(mode, tx, tz, dirX, dirZ, true)
         mode.combine = nil
         mode.followingUnloader = nil

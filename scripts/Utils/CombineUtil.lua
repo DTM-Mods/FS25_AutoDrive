@@ -51,8 +51,6 @@ function AutoDrive.isSidewaysHarvester(combine)
         local cx, _, cz = localDirectionToWorld(combine.components[1].node, 0, 0, 1)
         combine.adSideways = math.abs(vx * cx + vz * cz) < 0.7071 -- cos 45 deg
         if combine.adSideways then
-            Logging.info("[AD] %s: harvester module mounted sideways on %s (Nexat), using the module's heading",
-                tostring(combine.getName ~= nil and combine:getName() or "?"), tostring(carrier.getName ~= nil and carrier:getName() or "?"))
         end
     end
     return combine.adSideways
