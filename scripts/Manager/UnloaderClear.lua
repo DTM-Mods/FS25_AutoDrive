@@ -129,6 +129,71 @@ function ADUnloaderClear.getHeadland(harvesters)
     return math.max(ADUnloaderClear.HEADLAND_MIN, 2 * width)
 end
 
+-- od.77: approach safety runs BEFORE driving or handing over to the chase. Unlike the idle
+-- monitor it has no speed gate, delay or cooldown. Test the whole train now, then sweep the
+-- next part of the route (not just its endpoints, which can straddle the danger strip).
+ADUnloaderClear.APPROACH_LOOK = 15 -- m along the route, at least
+function ADUnloaderClear.getApproachDanger(vehicle, harvesters, wayPoints, index)
+    local boxes = ADUnloaderEscape.getUnitBoxes(vehicle)
+    local sweeps = {}
+    if wayPoints ~= nil then
+        local x, y, z = getWorldTranslation(vehicle.components[1].node)
+        local speed = (vehicle.lastSpeedReal or 0) * 1000 -- m/s
+        local remaining = math.max(ADUnloaderClear.APPROACH_LOOK, speed * 2 + speed * speed / 4)
+        local halfWidth = (vehicle.size.width or 3) / 2 + 1
+        local halfLength = (vehicle.size.length or 6) / 2
+        for i = math.max(index or 1, 1), #wayPoints do
+            local point = wayPoints[i]
+            local dx, dz = point.x - x, point.z - z
+            local distance = MathUtil.vector2Length(dx, dz)
+            if distance > 0.01 then
+                local travel = math.min(distance, remaining)
+                dx, dz = dx / distance, dz / distance
+                table.insert(sweeps, ADUnloaderEscape.makeBox(x + dx * travel / 2, y,
+                    z + dz * travel / 2, dx, dz, halfWidth, travel / 2 + halfLength))
+                remaining = remaining - travel
+                if remaining <= 0 then break end
+            end
+            x, z = point.x, point.z
+        end
+    end
+    for _, entry in ipairs(harvesters) do
+        local ahead = ADUnloaderClear.getAheadBox(entry, ADUnloaderClear.AHEAD_MARGIN)
+        for _, box in ipairs(boxes) do
+            if AutoDrive.boxesIntersect(ahead, box) then return entry, "in front" end
+        end
+        for _, box in ipairs(sweeps) do
+            if AutoDrive.boxesIntersect(ahead, box) then return entry, "route crosses front" end
+        end
+    end
+    return nil
+end
+
+function ADUnloaderClear.clearApproach(task, dt, checkRoute)
+    if g_server == nil then return false end
+    local vehicle = task.vehicle
+    local harvesters = ADUnloaderClear.getHarvesters(vehicle)
+    if #harvesters == 0 then return false end
+    local drive = vehicle.ad.drivePathModule
+    local points = checkRoute and drive.wayPoints or nil
+    local entry, reason = ADUnloaderClear.getApproachDanger(vehicle, harvesters, points, drive.currentWayPoint)
+    if entry == nil then return false end
+    local mode = vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+    -- Brake this frame: the queued move task starts on the next task-module update.
+    vehicle.ad.specialDrivingModule:stopVehicle()
+    vehicle.ad.specialDrivingModule:update(dt)
+    local fruits = ADUnloaderClear.getFruits(harvesters)
+    local x, z, dirX, dirZ = ADUnloaderClear.findSafeSpot(vehicle, harvesters, fruits)
+    if x == nil then
+        -- No blind straight-ahead fallback into the header. Retry the search next update.
+        return true
+    end
+    Logging.info("[AD] %s: moving clear of harvester approach (%s)", ADDiag.name(vehicle), reason)
+    ADUnloaderClear.start(mode, x, z, dirX, dirZ, false)
+    mode.combine, mode.followingUnloader, mode.targetUnloader = nil, nil, nil
+    return true
+end
+
 -- standing crop in the box (corners as ADUnloaderEscape.makeBox: 1 and 2 one end, 4 the other side)
 function ADUnloaderClear.hasCrop(box, fruits)
     local c1, c2, c4 = box[1], box[2], box[4]

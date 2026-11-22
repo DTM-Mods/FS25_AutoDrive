@@ -104,6 +104,13 @@ function CatchCombinePipeTask:update(dt)
         self:resetAllTimers()
     end
 
+    -- od.77: get out of the way before ANY driving or direct-chase handover. Planning and
+    -- deliberate waits must not leave a truck parked in front of the harvester either.
+    if ADUnloaderClear ~= nil and ADUnloaderClear.clearApproach(self, dt,
+        self.state == CatchCombinePipeTask.STATE_DRIVING) then
+        return
+    end
+
     -- PropaineX edit (3.7.1.4): chase straight away (see shouldChaseDirectly); finishing hands over to FollowCombineTask
     if (self.state == CatchCombinePipeTask.STATE_DELAY_PATHPLANNING or self.state == CatchCombinePipeTask.STATE_PATHPLANNING
         or self.state == CatchCombinePipeTask.STATE_DRIVING) and self:shouldChaseDirectly() then
@@ -297,6 +304,9 @@ function CatchCombinePipeTask:waitForCrop()
 end
 
 function CatchCombinePipeTask:abort()
+    if self.state == CatchCombinePipeTask.STATE_PATHPLANNING then
+        self.vehicle.ad.pathFinderModule:abort()
+    end
 end
 
 function CatchCombinePipeTask:finished(propagate)
@@ -354,11 +364,8 @@ function CatchCombinePipeTask:startNewPathFinding()
 end
 
 function CatchCombinePipeTask:getExcludedVehiclesForCollisionCheck()
-    local excludedVehicles = {}
-    if self.state == CatchCombinePipeTask.STATE_DRIVING then
-        table.insert(excludedVehicles, self.combine:getRootVehicle())
-    end
-    return excludedVehicles
+    -- od.77: approaching the pipe is not unloading alongside it. Keep the harvester an obstacle.
+    return {}
 end
 
 function CatchCombinePipeTask:setStateNames()

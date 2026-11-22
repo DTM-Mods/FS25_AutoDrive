@@ -34,6 +34,7 @@ end
 
 function CombineUnloaderMode:reset()
     self.state = self.STATE_INIT
+    self.odWrongSide = nil -- od.77: persist across approach tasks, not across stopped/restarted jobs
     self.harvestFinished = false -- od.54
     self.activeTask = nil
     ADHarvestManager:unregisterAsUnloader(self.vehicle)

@@ -3,6 +3,45 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.77 (2026-11-21, PropaineX): clear the harvester's approach; finish the wrong-side and corner fixes
+*Untested in the game. Source changes only; not packaged or installed.*
+
+- **Catching up:** before driving or switching into chasing, check the truck and every trailer against the
+  harvester's front strip (50 m ahead, working width plus 5 m on each side). Also check the next 15 m of the
+  route, or further at higher speeds to allow for braking. A crossing route switches to the existing move-aside
+  task and then waits for a fresh call. This check also runs during approach planning, waits and reversing.
+- **Approach collisions:** the assigned harvester now counts as an obstacle during catch-up.
+- **Waiting in front during the pipe chase:** the wrong-side and let-it-pass holds use the same move-aside
+  check, so they do not deliberately park a truck in the harvester's front strip.
+- **No blind escape:** approach clearance disables the straight-ahead fallback. If no safe destination exists,
+  brake and retry the search; if no route can be found, return to the normal waiting/call cycle.
+- **Wrong-side loop:** retain od.76's remembered side and 4 km/h minimum crossing speed. The 12 m rear clearance
+  can no longer be overridden by the steering look-ahead. If too close to cross, use the existing route behind
+  the harvester instead of steering a U-turn at its tail. Clear the remembered side when changing harvesters or
+  resetting the unloader mode.
+- **Corner back-off:** retain the 15 m limit behind the harvester and latch it until the chase resumes, so drifting
+  inside the limit does not start another reverse. Outside-turn handling stays as before.
+- **Diagnostics:** od.76's temporary console prints now use AutoDrive's optional combine debug channel.
+- Code: `scripts/Manager/UnloaderClear.lua`, `scripts/Tasks/CatchCombinePipeTask.lua`,
+  `scripts/Tasks/FollowCombineTask.lua`, `scripts/Tasks/MoveClearOfHarvesterTask.lua`,
+  `scripts/Modes/CombineUnloaderMode.lua`.
+
+## 3.0.1.4-od.76 (2026-11-21, PropaineX): unloader stops looping on the wrong side; 15 m back-off at a corner
+*Untested in the game. TEST BUILD: temporary `[OD76 diag]` lines in log.txt, remove before release.*
+
+- **Wrong side loop (beet harvester):** the truck came up the side without the pipe, reached the back of the
+  harvester, backed off, and came straight back up the same side, over and over. Two causes:
+  - The od.59 "pushed out on the side without the pipe" note was cleared every frame (`updateStates`), so it never
+    worked. It now lasts until the truck is in the pipe lane.
+  - Backing off ended the chase task, and the new task forgot the side. The unloader now remembers "backed off on
+    the wrong side of this harvester" until grain goes in. The next chase crosses to the pipe side 12 m behind the
+    tail (clear of it) instead of 4 m.
+- **Crossing behind a standing harvester:** the follow speed while crossing to the pipe side is at least 4 km/h
+  (it could be 0 and the truck stood until it backed off).
+- **Corner turn, truck behind the harvester:** backs up 15 m, then stands until the turn is over (it used to back up
+  the whole turn). Outside of the turn: unchanged.
+- Code: `scripts/Tasks/FollowCombineTask.lua`.
+
 ## 3.0.1.4-od.75 (2026-11-21, PropaineX): release clean-up, test diagnostics removed
 *No change to how anything drives. All checks and tests pass.*
 

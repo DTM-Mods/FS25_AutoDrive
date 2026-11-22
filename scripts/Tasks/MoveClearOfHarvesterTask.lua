@@ -47,7 +47,12 @@ end
 
 function MoveClearOfHarvesterTask:setUp()
     if self.target == nil then
-        self:startStraight()
+        if self.straightFallback then
+            self:startStraight()
+        else
+            ADUnloaderClear.onMoveFailed(self.vehicle)
+            self:finished()
+        end
         return
     end
     self.state = MoveClearOfHarvesterTask.STATE_PATHPLANNING

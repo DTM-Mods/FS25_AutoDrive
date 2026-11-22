@@ -31,6 +31,48 @@ FollowCombineTask.MAX_REVERSE_TIME = 30000
 FollowCombineTask.MAX_TURN_TIME = 60000
 FollowCombineTask.MAX_STUCK_TIME = 60000
 FollowCombineTask.WAIT_BEFORE_FINISH_TIME = 8000
+-- PropaineX edit (od.76): behind a harvester that turns the corner: back up this far, then stand until the turn is over
+FollowCombineTask.TURN_BACK_DISTANCE = 15 -- m
+-- PropaineX edit (od.76): backed off on the side WITHOUT the pipe: the unloader mode remembers it (a new chase task
+-- used to forget and come straight back up the same side, round and round: beet harvester, 2026-11-21). The next
+-- approach crosses to the pipe side this far behind the tail (clear of it) instead of LANE_BEHIND.
+FollowCombineTask.WRONG_SIDE_LANE_BEHIND = 12 -- m
+
+-- od.77: wrong-side details belong to AutoDrive's optional combine debug channel.
+function FollowCombineTask:diag(fmt, ...)
+    AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_COMBINEINFO, fmt, ...)
+end
+
+-- PropaineX edit (od.76): which side of the harvester the truck is on (1 / -1) and the pipe side (1 / -1 / 0)
+function FollowCombineTask:getSides()
+    local c = self.combine
+    local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
+    local tx, _, tz = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
+    return AutoDrive.sign(tx), AutoDrive.getPipeSide(c), tx, tz
+end
+
+-- PropaineX edit (od.76): grain going in (under the pipe): the remembered wrong side is forgotten
+function FollowCombineTask:forgetWrongSide()
+    local mode = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+    if mode ~= nil and mode.odWrongSide ~= nil then
+        mode.odWrongSide = nil
+        self.rememberedWrong = nil
+        self:diag("under the pipe, wrong side forgotten")
+    end
+end
+
+-- PropaineX edit (od.76): backing off: on the side without the pipe -> remember it in the unloader mode
+function FollowCombineTask:rememberWrongSide()
+    local mode = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+    if mode == nil or not self.combine.ad.isHarvester then
+        return
+    end
+    local side, pipeSide = self:getSides()
+    if pipeSide ~= 0 and side ~= 0 and side ~= pipeSide then
+        mode.odWrongSide = {combine = self.combine, side = side}
+        self:diag("remembered wrong side %d (pipe side %d)", side, pipeSide)
+    end
+end
 
 function FollowCombineTask:new(vehicle, combine)
     local o = FollowCombineTask:create()
@@ -63,6 +105,17 @@ function FollowCombineTask:setUp()
     FollowCombineTask.debugMsg(self.vehicle, "FollowCombineTask setUp")
     self.lastChaseSide = self.chaseSide
     self.pushedOutSide = nil -- PropaineX edit (od.59)
+    -- PropaineX edit (od.76): backed off on the wrong side of this harvester last time: carry it over
+    local mode = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+    local wrong = mode ~= nil and mode.odWrongSide or nil
+    self.rememberedWrong = nil
+    if wrong ~= nil and wrong.combine == self.combine then
+        self.pushedOutSide = wrong.side
+        self.rememberedWrong = true
+        self:diag("new chase, wrong side %d remembered: crossing behind the tail", wrong.side)
+    elseif wrong ~= nil then
+        mode.odWrongSide = nil -- a different harvester must not inherit the old job's side
+    end
     self.trailers, _ = AutoDrive.getAllUnits(self.vehicle)
     self.activeUnloading = AutoDrive.getSetting("activeUnloading", self.combineRootVehicle)
     AutoDrive.setTrailerCoverOpen(self.vehicle, self.trailers, true)
@@ -92,6 +145,14 @@ function FollowCombineTask:update(dt)
 
     if self.lastState ~= self.state then
         FollowCombineTask.debugMsg(self.vehicle, "FollowCombineTask:update %s -> %s", tostring(self:getStateName(self.lastState)), tostring(self:getStateName()))
+        -- PropaineX edit (od.76): backing off -> note why and remember a wrong side
+        if self.state == FollowCombineTask.STATE_REVERSING or self.state == FollowCombineTask.STATE_REVERSING_FROM_CHOPPER then
+            local side, pipeSide, tx, tz = self:getSides()
+            self:diag("backing off from %s: stuck %.0f ms, angle wrong %.0f ms, side %d pipe %d, at x %.1f z %.1f",
+                tostring(self:getStateName(self.lastState)), self.stuckTimer.elapsedTime or 0, self.angleWrongTimer.elapsedTime or 0,
+                side, pipeSide, tx, tz)
+            self:rememberWrongSide()
+        end
         self.lastState = self.state
         self:resetAllTimers()
     end
@@ -134,6 +195,8 @@ function FollowCombineTask:update(dt)
     if self.state == FollowCombineTask.STATE_CHASING then
         self.chaseTimer:timer(true, 4000, dt)
         self.clearedThisTurn = nil -- PropaineX edit (3.8.4.4)
+        self.turnBackStart = nil -- PropaineX edit (od.76)
+        self.turnBackDone = nil -- od.77: latch the 15 m limit until this turn ends
 
         if self.combine.ad.isChopper then
             if self.filled and self.chaseSide ~= nil and self.chaseSide ~= AutoDrive.CHASEPOS_REAR then
@@ -175,6 +238,7 @@ function FollowCombineTask:update(dt)
         -- full) -> creep to the chase point, which follows the next free part of the trailer; flow again -> hold.
         local flowing = self.combine.getDischargeState ~= nil and self.combine:getDischargeState() == Dischargeable.DISCHARGE_STATE_OBJECT
         if flowing then
+            self:forgetWrongSide() -- PropaineX edit (od.76)
             self.noFlowTime = 0
             self.creepForward = nil
             self.creepTurned = nil
@@ -289,7 +353,10 @@ function FollowCombineTask:update(dt)
                     self:startClearForward(string.format("close beside the turning combine (%.0f m)", self.distanceToCombine))
                     return
                 end
-                if self:isOutsideOfTurn() or self.chaseSide == AutoDrive.CHASEPOS_REAR then
+                if self.chaseSide == AutoDrive.CHASEPOS_REAR and not self:isOutsideOfTurn() then
+                    -- PropaineX edit (od.76): behind it: back up TURN_BACK_DISTANCE m, then stand until the turn is over
+                    self:updateTurnBack(dt)
+                elseif self:isOutsideOfTurn() or self.chaseSide == AutoDrive.CHASEPOS_REAR then
                     self:reverse(dt)
                 else
                     self.vehicle.ad.specialDrivingModule:stopVehicle() -- 3.8.5.4: inside of the turn: stand
@@ -578,7 +645,8 @@ function FollowCombineTask:updateStates(dt)
     self.angleToCombine = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:getAngleToCombine()
 
     self.lastChaseSide = self.chaseSide
-    self.pushedOutSide = nil -- PropaineX edit (od.59)
+    -- PropaineX edit (od.76): pushedOutSide is NOT reset here any more. This runs every frame, so the od.59 "pushed
+    -- out on the side without the pipe" note never lasted; it is forgotten in the pipe lane (chase) instead.
 
     self.distanceToCombine = MathUtil.vector2Length(x - cx, z - cz)
 
@@ -601,6 +669,23 @@ end
 
 function FollowCombineTask:reverse(dt)
     self.vehicle.ad.specialDrivingModule:driveReverse(dt, 15, 1, self.vehicle.ad.trailerModule:canBeHandledInReverse())
+end
+
+-- od.77: reaching the limit is latched: drifting back inside 15 m must not restart reversing.
+function FollowCombineTask:updateTurnBack(dt)
+    local vx, _, vz = getWorldTranslation(self.vehicle.components[1].node)
+    if self.turnBackStart == nil then
+        self.turnBackStart = {x = vx, z = vz}
+    end
+    if MathUtil.vector2Length(vx - self.turnBackStart.x, vz - self.turnBackStart.z) >= FollowCombineTask.TURN_BACK_DISTANCE then
+        self.turnBackDone = true
+    end
+    if self.turnBackDone then
+        self.vehicle.ad.specialDrivingModule:stopVehicle()
+        self.vehicle.ad.specialDrivingModule:update(dt)
+    else
+        self:reverse(dt)
+    end
 end
 
 -- PropaineX edit (3.8.5.4): while the combine is flagged as turning (lane change or corner, can't tell yet) and we
@@ -1048,6 +1133,7 @@ function FollowCombineTask:updatePipeLock(dt)
         -- combine stands: hold still under the pipe while grain goes in; nothing going in -> creep along the trailer
         local flowing = self.combine.getDischargeState ~= nil and self.combine:getDischargeState() == Dischargeable.DISCHARGE_STATE_OBJECT
         if flowing then
+            self:forgetWrongSide() -- PropaineX edit (od.76)
             self.noFlowTime = 0
             self.creepForward = nil
             self.creepTurned = nil
@@ -1179,6 +1265,7 @@ function FollowCombineTask:updatePipeLock(dt)
     local frontZ, rearZ = self:getCabSpanZ()
     if self.wrongSideTime > 1000 or (self.comingRound and tx * cxl < 0 and frontZ > -halfL - FollowCombineTask.LANE_BEHIND) then
         self.comingRound = true
+        if ADUnloaderClear.clearApproach(self, dt, false) then return end
         sdm:stopVehicle()
         sdm:update(dt)
         return
@@ -1211,19 +1298,29 @@ function FollowCombineTask:updatePipeLock(dt)
         letPass = true
     end
     if letPass then
+        -- od.77: waiting beside the working strip is fine; waiting IN it is not.
+        if ADUnloaderClear.clearApproach(self, dt, false) then return end
         sdm:stopVehicle()
         sdm:update(dt)
         return
     end
     -- PropaineX edit (od.56): behind its tail and not yet in the pipe-side lane: line up in the lane BEHIND the tail
     -- first, then straight up it (no lazy arc that cuts round the tail onto the other side)
+    if self.rememberedWrong and tx * cxl < 0 and frontZ > -halfL - FollowCombineTask.WRONG_SIDE_LANE_BEHIND then
+        -- od.77: too close to cross at the remembered clearance. A point behind the
+        -- cab would make it turn round at the tail: route behind the harvester instead.
+        ADUnloaderClear.goAround(self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD], self.combine)
+        return
+    end
     local laneSteer = self:getLaneApproach(tx, tz, cxl, halfW, halfL)
     if laneSteer ~= nil then
         if self:cabHeadsIntoHarvester() then
+            self:diag("crossing: nose into the harvester, stopped (x %.1f z %.1f, lane x %.1f)", tx, tz, cxl) -- od.76 diag
             sdm:stopVehicle()
             sdm:update(dt)
             return
         end
+        self:diag("crossing behind the tail to the pipe side (x %.1f z %.1f, lane x %.1f)", tx, tz, cxl) -- od.76 diag
         local laneMax = FollowCombineTask.FLAT_OUT
         if self:getGapToCombine() < FollowCombineTask.CLOSE_GAP then
             laneMax = combineSpeed + FollowCombineTask.CLOSE_EXTRA
@@ -1238,7 +1335,12 @@ function FollowCombineTask:updatePipeLock(dt)
         if tz > -halfL - FollowCombineTask.LANE_CROSS_ZONE and (tx * cxl <= 0 or math.abs(tx) < halfW + FollowCombineTask.LANE_CROSS_CLEAR) then
             laneMax = math.max(combineSpeed, FollowCombineTask.LANE_CROSS_MIN)
         end
-        sdm:driveToPoint(dt, laneSteer.target, math.min(combineSpeed, laneMax), false, 1, laneMax, true, laneSteer.steer)
+        -- PropaineX edit (od.76): crossing to the pipe side behind a standing harvester: never a follow speed of 0
+        local followSpeed = math.min(combineSpeed, laneMax)
+        if tx * cxl <= 0 then
+            followSpeed = math.max(followSpeed, FollowCombineTask.LANE_CROSS_MIN)
+        end
+        sdm:driveToPoint(dt, laneSteer.target, followSpeed, false, 1, laneMax, true, laneSteer.steer)
         return
     end
     local target = self:predictChasePos(dt)
@@ -1550,7 +1652,17 @@ function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
     -- (a lane point to stop at left it standing just off the lane)
     local c = self.combine
     local _, y, _ = getWorldTranslation(self.vehicle.components[1].node)
-    local steerZ = math.max(tz + FollowCombineTask.LANE_MIN_AHEAD, math.min(tz + FollowCombineTask.LOOK_AHEAD, -halfL - FollowCombineTask.LANE_BEHIND))
+    -- PropaineX edit (od.76): backed off on this wrong side before: line up further back, clear of the tail
+    local laneBehind = FollowCombineTask.LANE_BEHIND
+    if self.rememberedWrong and tx * cxl < 0 then
+        laneBehind = FollowCombineTask.WRONG_SIDE_LANE_BEHIND
+    end
+    local steerZ = math.max(tz + FollowCombineTask.LANE_MIN_AHEAD, math.min(tz + FollowCombineTask.LOOK_AHEAD, -halfL - laneBehind))
+    if self.rememberedWrong and tx * cxl < 0 then
+        -- od.77: the minimum-forward clamp used to override the 12 m clearance just
+        -- when close to the tail. Never aim the crossing inside that clearance.
+        steerZ = math.min(steerZ, -halfL - laneBehind)
+    end
     local sx, _, sz = AutoDrive.localToWorld(c, cxl, 0, steerZ, c.ad.ADRootNode)
     return {target = self.chasePos, steer = {x = sx, y = y, z = sz}}
 end
