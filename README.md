@@ -265,6 +265,13 @@ After 3 seconds in the way it drives with the pathfinder to the nearest spot on 
 During catch-up, a separate front-strip check runs before driving or handing over to the pipe chase, without the idle monitor's speed gate, three-second delay or cooldown. It checks all trailer footprints and sweeps the next 15 m of the actual route (further at higher speeds to allow for braking), including crossings between waypoints. A hazard cancels the approach and starts the same move-aside task, with harvester collisions enabled and the blind straight-ahead fallback disabled. After moving clear it waits for a fresh call. With no safe destination it brakes and retries the search. The pipe chase's wrong-side and let-it-pass holds also move aside when they would stop in this front strip; waiting beside the strip stays unchanged.
 
 ### Staying under the pipe
+For bunker harvesters, pipe-side detection uses the deployed outlet in the harvester's direction of travel.
+The measured side survives folding and does not change when AutoDrive selects a rear-follow waypoint.
+Rear waiting targets stay on the pipe side when clear, or behind the centre when that lane is blocked.
+Before the outlet has established a side, the pipe chase waits instead of choosing left or right; the existing
+front-strip clearance still takes priority. Truck centres within the harvester's half-width plus 0.25 m count
+as centre/crossing. The optional combine debug channel reports side changes and local coordinates.
+
 When a combine unloader chases a combine that unloads on the move, it pushes harder to get back under the pipe. Within 1 m of its place it drives exactly the combine's speed, no faster; further back it aims for the combine's speed + 1 km/h + 3 km/h for every metre beyond that (within 20 m; AutoDrive used 1.4 km/h per metre under 7 m and 2 km/h per metre under 20 m, so it crept up slowly and the combine kept getting away). Once past its place it drops below the combine's speed and slides back instead of overshooting. Field speed stays its top speed. Only the pipe chase uses this (`chaseCatchUp` argument of `ADSpecialDrivingModule:driveToPoint`, passed by `FollowCombineTask:followChasePoint`; numbers `CATCH_UP_GAIN`, `CATCH_UP_LEAD`, `UNDER_PIPE_DISTANCE`); bale unloading, reversing from a bad location and the escape to the field edge drive as before.
 
 ### Driving like a semi while chasing

@@ -136,6 +136,7 @@ function AutoDrive.validateCachedPipeData(combine)
         combine.ad.pipeRoot = nil
         combine.ad.storedPipeSide = nil
         combine.ad.storedPipeLength = nil
+        combine.ad.travelPipeSide = nil
     end
 end
 
@@ -177,6 +178,25 @@ end
 -- ret: -1 right, 1 left, 0 behind
 -- not for sugarcane harvesters, choppers!!!
 function AutoDrive.getPipeSide(combine)
+    -- od.78: a bunker harvester's side belongs to its travel frame, not a chase
+    -- waypoint or an articulated pipe component. Only learn from a deployed outlet.
+    if combine.ad ~= nil and combine.ad.isHarvester then
+        local spec = combine.spec_pipe
+        local settled = spec == nil or spec.currentState ~= 0
+        if settled and AutoDrive.isPipeOut(combine) then
+            local node = AutoDrive.getDischargeNode(combine)
+            if node ~= nil then
+                local x, y, z = getWorldTranslation(node)
+                local lx = AutoDrive.worldToLocal(combine, x, y, z, combine.ad.ADRootNode)
+                local halfW = AutoDrive.getHarvesterHalfSize(combine)
+                if math.abs(lx) > halfW + 0.25 then
+                    combine.ad.travelPipeSide = AutoDrive.sign(lx)
+                end
+            end
+        end
+        -- Folding and a centred outlet are not evidence of a side change.
+        return combine.ad.travelPipeSide or 0
+    end
     if combine.ad ~= nil and combine.ad.storedPipeSide ~= nil then
         return combine.ad.storedPipeSide
     end

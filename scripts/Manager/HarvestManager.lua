@@ -360,10 +360,12 @@ function ADHarvestManager.isHarvesterActive(harvester)
                 local leftBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).leftSensor:pollInfo()
                 local leftFrontBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).leftFrontSensor:pollInfo()
                 chasingRear = leftBlocked or leftFrontBlocked
-            else
+            elseif pipeSide == AutoDrive.CHASEPOS_RIGHT then
                 local rightBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).rightSensor:pollInfo()
                 local rightBlockedBlocked = AutoDrive.getCombineSensors(harvester, harvester:getRootVehicle()).rightFrontSensor:pollInfo()
                 chasingRear = rightBlocked or rightBlockedBlocked
+            else
+                chasingRear = true -- unknown pipe side is not evidence for the right lane
             end
 
             if fillPercent > 0.9 or (fillPercent > 0.7 and chasingRear) then

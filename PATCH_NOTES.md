@@ -3,6 +3,23 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.78 (2026-11-21, PropaineX): distinguish the physical pipe side from the approach target
+*Untested in the game. Offline checks passed.*
+
+- Identify a bunker harvester's pipe side from the deployed outlet in its direction of travel. Keep that
+  measurement while the pipe folds; ignore an outlet within the harvester's half-width plus 0.25 m.
+- Judge the truck's side in that same frame, regardless of which way the truck faces. Its centre inside
+  the harvester's half-width plus 0.25 m counts as centre/crossing rather than confidently left or right.
+- A temporary rear-follow target no longer defines the physical pipe side or the wrong-side stop check.
+- Rear waiting targets use the pipe side when clear, or the centre when blocked or unknown. They no longer
+  choose the opposite side just because it is free. An unknown side cannot become a side-approach target.
+- Until a deployed outlet has established the side, the pipe chase waits instead of guessing. It still
+  moves aside if that wait would obstruct the harvester's front strip. First-use automatic pipe opening
+  and recovery from this wait need testing with Courseplay and the Ropa on the server.
+- Optional combine debug reports changes in measured truck side, pipe side and chase side with local
+  coordinates. Offline rotation, folding, rear-target and approach-safety regressions pass; real driving
+  remains untested.
+
 ## 3.0.1.4-od.77 (2026-11-21, PropaineX): clear the harvester's approach; finish the wrong-side and corner fixes
 *Untested in the game. Source changes only; not packaged or installed.*
 

@@ -48,7 +48,11 @@ function FollowCombineTask:getSides()
     local c = self.combine
     local vx, vy, vz = getWorldTranslation(self.vehicle.components[1].node)
     local tx, _, tz = AutoDrive.worldToLocal(c, vx, vy, vz, c.ad.ADRootNode)
-    return AutoDrive.sign(tx), AutoDrive.getPipeSide(c), tx, tz
+    -- Inside the body's lateral span is a centre/crossing position, not a
+    -- confident left/right classification. Heading of the truck is irrelevant.
+    local halfW = AutoDrive.getHarvesterHalfSize(c)
+    local side = math.abs(tx) > halfW + 0.25 and AutoDrive.sign(tx) or 0
+    return side, AutoDrive.getPipeSide(c), tx, tz
 end
 
 -- PropaineX edit (od.76): grain going in (under the pipe): the remembered wrong side is forgotten
@@ -647,6 +651,15 @@ function FollowCombineTask:updateStates(dt)
     self.lastChaseSide = self.chaseSide
     -- PropaineX edit (od.76): pushedOutSide is NOT reset here any more. This runs every frame, so the od.59 "pushed
     -- out on the side without the pipe" note never lasted; it is forgotten in the pipe lane (chase) instead.
+    if self.combine.ad.isHarvester then
+        local side, pipeSide, tx, tz = self:getSides()
+        if side ~= self.reportedTruckSide or pipeSide ~= self.reportedPipeSide
+            or self.chaseSide ~= self.reportedChaseSide then
+            self:diag("side check: truck %d, pipe %d, local x %.1f z %.1f, chase %s (left=1 right=-1 centre/unknown=0)",
+                side, pipeSide, tx, tz, tostring(self.chaseSide))
+            self.reportedTruckSide, self.reportedPipeSide, self.reportedChaseSide = side, pipeSide, self.chaseSide
+        end
+    end
 
     self.distanceToCombine = MathUtil.vector2Length(x - cx, z - cz)
 
@@ -1125,6 +1138,14 @@ function FollowCombineTask:updatePipeLock(dt)
         self:finished()
         return
     end
+    -- od.78: no left/right guess while a previously unseen pipe is folding.
+    -- Preserve the front-strip move-aside rule before waiting for a known side.
+    if self:getPipeSide() == nil then
+        if ADUnloaderClear.clearApproach(self, dt, false) then return end
+        sdm:stopVehicle()
+        sdm:update(dt)
+        return
+    end
     if self:updatePipeRun(dt) then
         return
     end
@@ -1249,11 +1270,13 @@ function FollowCombineTask:updatePipeLock(dt)
     local cxl = AutoDrive.worldToLocal(c, self.chasePos.x, self.chasePos.y, self.chasePos.z, c.ad.ADRootNode)
     local halfW, halfL = AutoDrive.getHarvesterHalfSize(c) -- PropaineX edit (3.10.0.0): Nexat: whole rig, not just the module
     -- 3.9.1.4: only when actually BESIDE it on the other side; from behind its tail it just comes up the pipe side
-    local clearlyWrong = tx * cxl < 0 and math.abs(tx) > halfW and tz > -halfL and math.abs(self.combineTurnRate or 0) < 0.05
+    local pipeSide = self:getPipeSide()
+    local wrongSide = pipeSide ~= nil and tx * pipeSide < 0
+    local clearlyWrong = wrongSide and math.abs(tx) > halfW + 0.25 and tz > -halfL and math.abs(self.combineTurnRate or 0) < 0.05
     self.wrongSideTime = clearlyWrong and (self.wrongSideTime or 0) + dt or 0
     -- PropaineX edit (od.59): already pushed out once on this (no-pipe) side: no second try up the same line, stop at
     -- once and let it pass, then the lane approach brings it up the pipe side. Forgotten once under the pipe.
-    if self.pushedOutSide ~= nil and tx * cxl > 0 and math.abs(tx - cxl) <= FollowCombineTask.LANE_TOLERANCE then
+    if self.chaseSide ~= AutoDrive.CHASEPOS_REAR and self.pushedOutSide ~= nil and pipeSide ~= nil and tx * pipeSide > 0 and math.abs(tx - cxl) <= FollowCombineTask.LANE_TOLERANCE then
         self.pushedOutSide = nil
     end
     if clearlyWrong and self.pushedOutSide ~= nil and tx * self.pushedOutSide > 0 then
@@ -1263,7 +1286,7 @@ function FollowCombineTask:updatePipeLock(dt)
     -- which swung the semi round in an arc into the harvester). Once our front is behind its tail, the lane approach
     -- below brings it up the pipe side. (A standing harvester: the go-around above takes over after GO_AROUND_TIME.)
     local frontZ, rearZ = self:getCabSpanZ()
-    if self.wrongSideTime > 1000 or (self.comingRound and tx * cxl < 0 and frontZ > -halfL - FollowCombineTask.LANE_BEHIND) then
+    if self.wrongSideTime > 1000 or (self.comingRound and wrongSide and frontZ > -halfL - FollowCombineTask.LANE_BEHIND) then
         self.comingRound = true
         if ADUnloaderClear.clearApproach(self, dt, false) then return end
         sdm:stopVehicle()
@@ -1272,7 +1295,7 @@ function FollowCombineTask:updatePipeLock(dt)
     end
     -- PropaineX edit (od.63): the wrong-side stop is only forgotten once we are on the pipe side (it used to be dropped
     -- 4 m behind the tail, before the truck had crossed, so it drove straight back up the wrong side and looped)
-    if tx * cxl > 0 then
+    if pipeSide ~= nil and tx * pipeSide > 0 then
         self.comingRound = nil
     end
     -- PropaineX edit (od.56): facing AGAINST the harvester (it came round at the end of the row) and not yet behind it:
@@ -1502,8 +1525,12 @@ function FollowCombineTask:getOwnHalfWidth()
     return w / 2
 end
 
--- PropaineX edit (od.59): the harvester's pipe side (1 / -1, from the spot under the pipe), nil when unknown or behind
+-- od.78: the physical outlet remains authoritative even when following a rear waypoint.
 function FollowCombineTask:getPipeSide()
+    if self.combine.ad.isHarvester then
+        local side = AutoDrive.getPipeSide(self.combine)
+        return side ~= 0 and side or nil
+    end
     if self.chasePos == nil or self.chaseSide == AutoDrive.CHASEPOS_REAR then
         return nil
     end

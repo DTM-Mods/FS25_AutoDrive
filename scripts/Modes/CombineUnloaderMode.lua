@@ -887,6 +887,17 @@ end
 function CombineUnloaderMode:getRearChaseOffsetX(leftBlocked, rightBlocked)
     local rearChaseOffset = (self.combine.size.width / 2 + self.vehicle.size.width / 2) + 1
 
+    -- od.78: a rear waiting position must not send a bunker unloader up the
+    -- non-pipe side. If that lane is blocked or unknown, wait behind the centre.
+    if self.combine.ad.isHarvester then
+        local side = AutoDrive.getPipeSide(self.combine)
+        if (side == AutoDrive.CHASEPOS_LEFT and not leftBlocked)
+            or (side == AutoDrive.CHASEPOS_RIGHT and not rightBlocked) then
+            return side * rearChaseOffset
+        end
+        return 0
+    end
+
     if self.combine.ad.isAutoAimingChopper and not self.combine.ad.isSugarcaneHarvester then
         return 0
     elseif rightBlocked and leftBlocked then
@@ -1042,7 +1053,7 @@ function CombineUnloaderMode:getPipeChasePosition(planningPhase)
             angleToSideChaseSide = self:getAngleToChasePos(sideChasePos)
         end
 
-        if
+        if self.pipeSide ~= 0 and (
             (
                 (
                     (self.pipeSide == AutoDrive.CHASEPOS_LEFT and not leftBlocked) 
@@ -1061,6 +1072,7 @@ function CombineUnloaderMode:getPipeChasePosition(planningPhase)
             (
                 (planningPhase == true) and (self.combine.ad.noMovementTimer.elapsedTime > 1000)
             )
+         )
          then
             -- Take into account a right sided harvester, e.g. potato harvester.
             chaseNode = sideChasePos
