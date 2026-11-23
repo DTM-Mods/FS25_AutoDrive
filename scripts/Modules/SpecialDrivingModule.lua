@@ -244,7 +244,8 @@ ADSpecialDrivingModule.TRAILER_TURN_RADIUS = 12   -- m
 -- real fold now, and no speed cap (forward, a semi's trailer follows)
 ADSpecialDrivingModule.JACKKNIFE_ANGLE = 75       -- deg
 ADSpecialDrivingModule.JACKKNIFE_RELEASE = 60     -- deg
-ADSpecialDrivingModule.STRAIGHTEN_SPEED = 8       -- km/h
+-- od.79: obsolete speed cap; preserved for rollback.
+-- ADSpecialDrivingModule.STRAIGHTEN_SPEED = 8       -- km/h
 ADSpecialDrivingModule.MIN_TRAILER_LENGTH = 4     -- m: shorter attachments (weights, small tools) don't count
 
 -- angle (deg, 0..180) between the cab and the first trailer hitched to it, nil without one
@@ -339,12 +340,15 @@ function ADSpecialDrivingModule:driveToPoint(dt, point, maxFollowSpeed, checkDyn
     local lx, lz = AutoDrive.getDriveDirection(self.vehicle, sp.x, sp.y, sp.z)
     if chaseCatchUp then
         -- PropaineX edit (3.5.0.4): drive like a semi (see limitTrailerSteering)
-        local straightenSpeed
         local steerDistance = steerPoint ~= nil and MathUtil.vector2Length(x - sp.x, z - sp.z) or self.distanceToChasePos
+        --[=[ od.79: limitTrailerSteering always returns nil for its old speed cap. Preserved for rollback.
+        local straightenSpeed
         lx, lz, straightenSpeed = self:limitTrailerSteering(lx, lz, steerDistance)
         if straightenSpeed ~= nil then
             speed = math.min(speed, straightenSpeed)
         end
+        --]=]
+        lx, lz = self:limitTrailerSteering(lx, lz, steerDistance)
     end
 
     if checkDynamicCollision and (self.vehicle.ad.collisionDetectionModule:hasDetectedObstable(dt) or self.vehicle.ad.sensors.frontSensor:pollInfo()) then

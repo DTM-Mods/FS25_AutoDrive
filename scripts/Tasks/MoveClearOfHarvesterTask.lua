@@ -34,9 +34,10 @@ end
 
 -- the path finder found nothing (in time): drive straight when allowed, else give up as before
 function MoveClearOfHarvesterTask:onNoPath()
-    if self.harvester ~= nil then
-        -- PropaineX edit (od.55)
-    end
+    -- od.79: empty former logging branch; preserved for rollback.
+    -- if self.harvester ~= nil then
+    --     -- PropaineX edit (od.55)
+    -- end
     if self.straightFallback then
         self:startStraight()
     else

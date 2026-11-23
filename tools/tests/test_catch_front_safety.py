@@ -46,7 +46,7 @@ function obj(x,z,h,w,l)
     return v
 end
 """)
-for name in ("Utils/UtilFuncs.lua", "Utils/CollisionDetectionUtils.lua", "Utils/AutoDriveTON.lua",
+for name in ("Manager/HarvesterTurn.lua", "Utils/UtilFuncs.lua", "Utils/CollisionDetectionUtils.lua", "Utils/AutoDriveTON.lua",
              "Tasks/AbstractTask.lua", "Modules/TaskModule.lua", "Manager/UnloaderEscape.lua",
              "Manager/UnloaderClear.lua", "Tasks/MoveClearOfHarvesterTask.lua",
              "Tasks/CatchCombinePipeTask.lua", "Tasks/FollowCombineTask.lua"):

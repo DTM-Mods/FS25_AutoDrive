@@ -104,6 +104,7 @@ function PathFinderModule:new(vehicle)
 end
 
 function PathFinderModule:reset()
+    self.rendezvousZones = nil -- od.79: task-local stationary-harvester constraints
     PathFinderModule.debugMsg(self.vehicle, "PFM:reset start")
     self.mask = AutoDrive.collisionMaskTerrain
     self.steps = 0
@@ -367,6 +368,7 @@ function PathFinderModule:startPathPlanningToVehicle(targetVehicle, targetDistan
 end
 
 function PathFinderModule:startPathPlanningTo(targetPoint, targetVector)
+    self.rendezvousZones = nil
     PathFinderModule.debugMsg(self.vehicle, "PathFinderModule:startPathPlanningTo self.minTurnRadius %.1f"
         , self.minTurnRadius
     )
@@ -598,6 +600,7 @@ function PathFinderModule:autoRestart()
 end
 
 function PathFinderModule:abort()
+    self.rendezvousZones = nil
     PathFinderModule.debugMsg(self.vehicle, "PFM:abort start")
     self.isFinished = true
     self.dubinsDone = true
@@ -1204,6 +1207,10 @@ end
 
 function PathFinderModule:checkGridCell(cell)
     local worldPos = self:gridLocationToWorldLocation(cell)
+    if self.rendezvousZones ~= nil and ADUnloaderClear.rendezvousBlocked(self.rendezvousZones, worldPos.x, worldPos.z) then
+        cell.isRestricted = true
+        return
+    end
     --Try going through the checks in a way that fast checks happen before slower ones which might then be skipped
 
     cell.isOnField = AutoDrive.checkIsOnField(worldPos.x, 0, worldPos.z)
@@ -2532,6 +2539,13 @@ function PathFinderModule:drawDebugNewPF()
 end
 
 function PathFinderModule:isDriveableAstar(cell)
+    if self.rendezvousZones ~= nil then
+        local approachPos = self:gridLocationToWorldLocation(cell)
+        if ADUnloaderClear.rendezvousBlocked(self.rendezvousZones, approachPos.x, approachPos.z) then
+            cell.isRestricted = true
+            return false
+        end
+    end
     cell.isRestricted = false
     cell.incoming = cell.from_node
     cell.hasCollision = false
@@ -2906,6 +2920,10 @@ function PathFinderModule:appendWayPointsNew()
 end
 
 function PathFinderModule:isDriveableDubins(cell)
+    if self.rendezvousZones ~= nil and ADUnloaderClear.rendezvousBlocked(self.rendezvousZones, cell.worldPos.x, cell.worldPos.z) then
+        cell.isRestricted = true
+        return false
+    end
     cell.isRestricted = false
     cell.hasCollision = false
     PathFinderModule.debugMsg(self.vehicle, "PFM:isDriveableDubins start xz %d,%d "

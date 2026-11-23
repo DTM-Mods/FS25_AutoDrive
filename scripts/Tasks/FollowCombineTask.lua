@@ -93,6 +93,7 @@ function FollowCombineTask:new(vehicle, combine)
     o.waitForPassByTimer = AutoDriveTON:new()
     o.chaseTimer = AutoDriveTON:new()
     o.startedChasing = false
+    o.taskType = "FollowCombineTask"
     o.reverseTimer = AutoDriveTON:new()
     o.waitTimer = AutoDriveTON:new()
     o.chasePos, o.chaseSide = vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:getPipeChasePosition()
@@ -131,7 +132,25 @@ function FollowCombineTask:update(dt)
         return
     end
 
+    if ADHarvesterTurn.update(self, dt) then return end
+    if self.chopperRealign then
+        self:requestChopperApproach("line up after turn", dt)
+        return
+    end
     self:updateStates(dt)
+    if self.combine.ad.isChopper then
+        -- od.80: shared hold + constrained approach own ALL chopper transitions.
+        -- Old turn/pass-by/reverse branches remain below for rollback, but may
+        -- not issue commands over this controller.
+        if self.filled then
+            self:finished()
+        elseif self.state ~= FollowCombineTask.STATE_CHASING then
+            self:requestChopperApproach("re-align instead of old turn/reverse handling", dt)
+        else
+            self:followChasePoint(dt)
+        end
+        return
+    end
 
 
     -- PropaineX edit (od.58): END OF ROW. Before everything else (pipe lock included): header up or off = end of the
@@ -232,11 +251,13 @@ function FollowCombineTask:update(dt)
             self.creepAnchor = nil -- PropaineX edit (3.8.2.4)
         end
         -- PropaineX edit (3.8.2.4): after creeping along the trailer we are at the pipe, however far from the chase point
+        --[=[ od.79: only consumed by the superseded hold/creep branches below. Preserved for rollback.
         local nearPipe = self.standingCall or self.creepAnchor
         if not nearPipe and self.chasePos ~= nil then
             local vx, _, vz = getWorldTranslation(self.vehicle.components[1].node)
             nearPipe = MathUtil.vector2Length(vx - self.chasePos.x, vz - self.chasePos.z) < 3
         end
+        --]=]
         -- PropaineX edit (3.8.2.4): hold still only while grain goes in (or there is nothing to take / no room). Grain
         -- in the combine, room in the trailer, but nothing going in for NO_FLOW_TIME (the part under the pipe is heaped
         -- full) -> creep to the chase point, which follows the next free part of the trailer; flow again -> hold.
@@ -249,6 +270,7 @@ function FollowCombineTask:update(dt)
         else
             self.noFlowTime = (self.noFlowTime or 0) + dt
         end
+        --[=[ od.79: These active-unloading bunker hold/creep branches are bypassed by the pipe-lock early return above. Preserved for rollback.
         local reposition = (self.combineFillPercent or 0) > 0.1 and not self.filled and self.noFlowTime > FollowCombineTask.NO_FLOW_TIME
         if self.activeUnloading and self.combine.ad.isHarvester and nearPipe and reposition and self.combine.lastSpeedReal <= 0.0004 then
             self.stuckTimer:timer(false)
@@ -263,6 +285,7 @@ function FollowCombineTask:update(dt)
             self.vehicle.ad.specialDrivingModule:update(dt)
             return
         end
+        --]=]
 
         local wrongChopperHeading = self.combine.ad.isChopper and (self.angleToCombineHeading > 90 and self.distanceToCombine < 30)
 
@@ -704,6 +727,7 @@ end
 -- PropaineX edit (3.8.5.4): while the combine is flagged as turning (lane change or corner, can't tell yet) and we
 -- chase from the side, aim TURN_HOLD_BACK m behind its tail on our side instead of under the pipe: its rear-wheel steering
 -- swings the tail out, and from behind the tail it can't reach us. Back under the pipe when the flag clears.
+--[=[ od.79: Unused turn drop-back helper; followChasePoint no longer calls it. Preserved for rollback.
 FollowCombineTask.TURN_HOLD_BACK = 3 -- m between the combine's tail and our front
 
 function FollowCombineTask:getTurnHoldBackPos()
@@ -717,6 +741,7 @@ function FollowCombineTask:getTurnHoldBackPos()
     local x, y, z = AutoDrive.localToWorld(self.combine, sideX, 0, back, self.combine.ad.ADRootNode)
     return {x = x, y = cy, z = z}
 end
+--]=]
 
 -- PropaineX edit (od.58): END OF ROW WAIT. A harvester (not a forage harvester) raises its header or switches it off
 -- at the end of a row; a rounded headland corner is harvested with the header down, so that is chased as before.
@@ -772,7 +797,7 @@ function FollowCombineTask:updateEndOfRowWait(dt)
             -- PropaineX edit (od.66): forget the turn tracking from before the wait (it stood still meanwhile; od.65 server
             -- log: the stale turn + its last pivot read as a tight turn at us, it backed up 30 m the moment the header
             -- went down)
-            self.turnSwing, self.turnQuiet, self.combineTurnRate, self.lastCombineFwd = nil, nil, nil, nil
+            ADHarvesterTurn.resume(self)
             if self.state ~= FollowCombineTask.STATE_FINISHED then
                 self.state = FollowCombineTask.STATE_CHASING
             end
@@ -792,14 +817,59 @@ function FollowCombineTask:updateEndOfRowWait(dt)
     if self.endOfRowWaitTime > FollowCombineTask.MAX_TURN_TIME then
         self.endOfRowWait = nil
         self.headerSeenWorking = nil -- wait again only after it has harvested again
+        ADHarvesterTurn.resume(self)
         return false
     end
-    self.vehicle.ad.specialDrivingModule:stopVehicle()
-    self.vehicle.ad.specialDrivingModule:update(dt)
+    ADHarvesterTurn.hold(self, dt)
     return true
 end
 
+function FollowCombineTask:onHarvesterTurnResume()
+    if self.combine.ad.isChopper then self.chopperRealign = true end
+end
+
+function FollowCombineTask:requestChopperApproach(reason, dt)
+    local vehicle = self.vehicle
+    vehicle.ad.specialDrivingModule:stopVehicle()
+    vehicle.ad.specialDrivingModule:update(dt or 0)
+    local mode = vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
+    vehicle.ad.taskModule:abortAllTasks()
+    local task = CatchCombinePipeTask:new(vehicle, self.combine)
+    task.chopperRecovery = true
+    task.workingField = self.workingField
+    mode.state = mode.STATE_DRIVE_TO_COMBINE
+    mode.activeTask = task
+    vehicle.ad.taskModule:addTask(task)
+    AutoDrive.debugPrint(vehicle, AutoDrive.DC_COMBINEINFO, "Chopper approach: %s", reason)
+end
+
 function FollowCombineTask:followChasePoint(dt)
+    local chopperSteer
+    if self.combine.ad.isChopper then
+        self.workingField = self.workingField or ADUnloaderClear.captureWorkingField(self.combine)
+        local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
+        local zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
+        ADUnloaderClear.setRendezvousField(zones, self.vehicle, self.combine, self.workingField)
+        chopperSteer = self:getChopperSteerPoint()
+        if self.workingField == nil or not ADUnloaderClear.trainOnField(self.vehicle, self.workingField)
+            or not ADUnloaderClear.rendezvousPathSafe(zones, {chopperSteer}, {x=x,z=z}, 1, 8) then
+            self:requestChopperApproach("field or harvester clearance", dt)
+            return
+        end
+        local stationary = math.abs(self.combine.lastSpeedReal or 0) < 0.00014
+        self.chopperBlocked = math.abs(self.vehicle.lastSpeedReal or 0) < 0.0002
+            and not ADHarvesterTurn.receiving(self) and (self.chopperBlocked or 0)+dt or 0
+        if self.chopperBlocked >= 8000 then
+            self:requestChopperApproach("following obstructed; keep assignment", dt)
+            return
+        end
+        self.chopperNoFlow = stationary and not ADHarvesterTurn.receiving(self)
+            and (self.chopperNoFlow or 0)+dt or 0
+        if self.chopperNoFlow >= 1500 and ADHarvesterTurn.needsTrailer(self.combine) then
+            self:requestChopperApproach("stationary chopper needs trailer", dt)
+            return
+        end
+    end
     -- PropaineX edit (3.8.6.4): no dropping back in turns any more (getTurnHoldBackPos unused): it keeps chasing under
     -- the pipe; dropping back steered it at a spot behind it and veered it off
     if self:shouldWaitForChasePos(dt) then
@@ -818,9 +888,32 @@ function FollowCombineTask:followChasePoint(dt)
         end
         -- PropaineX edit: stronger catch-up to stay under the pipe (chaseCatchUp)
         -- PropaineX edit (od.56): never steer into the harvester (keep-out gap)
-        local steer = self.combine.ad.isHarvester and not self.combine.ad.isChopper and self:keepOffHarvester(self.chasePos, true) or nil
-        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed, false, acc, totalSpeedLimit, true, steer)
+        -- od.79 preserved: choppers skipped keep-out steering and dynamic collision checks.
+        -- local steer = self.combine.ad.isHarvester and not self.combine.ad.isChopper and self:keepOffHarvester(self.chasePos, true) or nil
+        -- self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed, false, acc, totalSpeedLimit, true, steer)
+        local steer = chopperSteer or self:keepOffHarvester(self.chasePos, true)
+        self.vehicle.ad.specialDrivingModule:driveToPoint(dt, self.chasePos, combineSpeed,
+            self.combine.ad.isChopper == true, acc, totalSpeedLimit, true, steer)
     end
+end
+
+function FollowCombineTask:getChopperSteerPoint()
+    local _, halfL = AutoDrive.getHarvesterHalfSize(self.combine)
+    local p = self.chasePos
+    local _, _, targetZ = AutoDrive.worldToLocal(self.combine, p.x, p.y or 0, p.z, self.combine.ad.ADRootNode)
+    if targetZ < -halfL-1 then
+        local behind = true
+        for _, box in ipairs(ADUnloaderEscape.getUnitBoxes(self.vehicle)) do
+            for _, corner in ipairs(box) do
+                local _, _, z = AutoDrive.worldToLocal(self.combine, corner.x, corner.y or 0, corner.z, self.combine.ad.ADRootNode)
+                if z > -halfL-1 then behind = false end
+            end
+        end
+        -- A rear-discharge machine must keep its rear lane. The bunker side-lane
+        -- correction is needed only when a part of the train is beside its body.
+        if behind then return p end
+    end
+    return self:keepOffHarvester(p, true)
 end
 
 -- PropaineX edit (3.7.0.4): a "turn" (CP manoeuvre, AI turn or near the field edge) only counts once the combine has
@@ -1667,8 +1760,9 @@ function FollowCombineTask:getLaneApproach(tx, tz, cxl, halfW, halfL)
     if off <= FollowCombineTask.LANE_TOLERANCE then
         self.laneLined = true
     elseif off > FollowCombineTask.LANE_RELEASE or math.abs(self.combineTurnRate or 0) >= FollowCombineTask.TURN_DEADBAND then
-        if self.laneLined then
-        end
+        -- od.79: empty former logging branch; preserved for rollback.
+        -- if self.laneLined then
+        -- end
         self.laneLined = nil -- off the lane, or the harvester really turns (its lane moves): line up again
     end
     if self.laneLined then
@@ -1869,7 +1963,8 @@ end
 
 function FollowCombineTask:getExcludedVehiclesForCollisionCheck()
     local excludedVehicles = {}
-    if self.state == FollowCombineTask.STATE_CHASING or self.state == FollowCombineTask.STATE_WAIT_FOR_TURN then
+    -- od.80: a chopper remains a collision obstacle while following or holding.
+    if not self.combine.ad.isChopper and (self.state == FollowCombineTask.STATE_CHASING or self.state == FollowCombineTask.STATE_WAIT_FOR_TURN) then
         -- PropaineX edit (3.8.4.4): not while pulling forward: the combine in front counts as blocked (-> back up)
         table.insert(excludedVehicles, self.combine:getRootVehicle())
     end
@@ -1914,6 +2009,7 @@ end
 
 function FollowCombineTask:getI18nInfo()
     local text = "$l10n_AD_task_chasing_combine;"
+    if self.harvesterTurnHold then return text .. " - $l10n_AD_task_wait_for_combine_turn;" end
     if self.state == FollowCombineTask.STATE_CHASING then
         if not self:isCaughtCurrentChaseSide() then
             text = text .. " - " .. "$l10n_AD_task_catching_chase_side;" .. ": "

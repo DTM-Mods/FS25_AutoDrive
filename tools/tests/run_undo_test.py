@@ -18,6 +18,7 @@ def read(path):
 def make_runtime(is_server):
     lua = LuaRuntime(unpack_returned_tuples=True)
     lua.execute(read(os.path.join(HERE, "stubs.lua")))
+    lua.execute(read(os.path.join(MOD, "scripts", "Manager", "HarvesterTurn.lua")))
     if is_server:
         lua.execute("""BROADCAST_POINTS = {}; BROADCAST_NOTICES = {}
         g_server = {broadcastEvent = function(self, ev, sendLocal)

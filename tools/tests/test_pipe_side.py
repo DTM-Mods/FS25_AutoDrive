@@ -33,7 +33,7 @@ function fixture(h,side)
                    {__index=FollowCombineTask})
 end
 """)
-for name in ("Utils/CombineUtil.lua", "Modes/CombineUnloaderMode.lua", "Tasks/FollowCombineTask.lua"):
+for name in ("Manager/HarvesterTurn.lua", "Utils/CombineUtil.lua", "Modes/CombineUnloaderMode.lua", "Tasks/FollowCombineTask.lua"):
     lua.execute((ROOT / "scripts" / name).read_text(encoding="utf-8"))
 lua.execute("""
 AutoDrive.isPipeOut=function(c) return c.out end

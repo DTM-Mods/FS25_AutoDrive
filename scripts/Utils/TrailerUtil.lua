@@ -606,11 +606,51 @@ function AutoDrive.getDistanceToUnloadPosition(vehicle)
     return distance
 end
 
+-- od.79: Pipe.objectsInTriggers is populated for compatible fill units before
+-- cover/actual-discharge checks. Do not depend on an assignment, AI state or flow.
+function AutoDrive.getHarvesterCoverTargets()
+    local targets = {}
+    if g_server == nil or g_currentMission == nil then
+        return targets
+    end
+    local system = g_currentMission.vehicleSystem
+    for _, harvester in pairs(system ~= nil and system.vehicles or {}) do
+        if harvester.spec_combine ~= nil and harvester.spec_pipe ~= nil then
+            for trailer, count in pairs(harvester.spec_pipe.objectsInTriggers or {}) do
+                if count > 0 then
+                    targets[trailer] = true
+                end
+            end
+        end
+    end
+    return targets
+end
+
+function AutoDrive.applyTrailerCoverState(trailer, open)
+    local cover = trailer.spec_cover
+    if cover ~= nil and cover.state ~= nil then
+        local targetState = open and (cover.covers ~= nil and #cover.covers or 1) or 0
+        if cover.state ~= targetState and trailer:getIsNextCoverStateAllowed(targetState) then
+            trailer:setCoverState(targetState, false)
+        end
+    end
+end
+
+function AutoDrive.updateHarvesterCovers()
+    -- Also covers manually driven/parked vehicles and harvesters outside AD's lists.
+    -- Retry while an animation temporarily prevents the requested cover state.
+    for trailer in pairs(AutoDrive.getHarvesterCoverTargets()) do
+        AutoDrive.applyTrailerCoverState(trailer, true)
+    end
+end
+
 function AutoDrive.setTrailerCoverOpen(vehicle, trailers, open)
     if trailers == nil then
         return
     end
-    if (AutoDrive.getSetting("autoTrailerCover", vehicle) ~= true) then
+    local inRange = AutoDrive.getHarvesterCoverTargets()
+    local automatic = AutoDrive.getSetting("autoTrailerCover", vehicle) == true
+    if not automatic and next(inRange) == nil then
         return
     end
     -- PropaineX edit (3.9.1.4): unloading combines in the field: open only within COVER_COMBINE_RANGE of the combine
@@ -623,17 +663,9 @@ function AutoDrive.setTrailerCoverOpen(vehicle, trailers, open)
     end
 
     for _, trailer in pairs(trailers) do
-        local targetState = 0
-        if open then
-            targetState = 1
-        end
-        if trailer.spec_cover ~= nil and trailer.spec_cover.state ~= nil then
-            if trailer.spec_cover.covers ~= nil then
-                targetState = targetState * #trailer.spec_cover.covers
-            end
-            if trailer.spec_cover.state ~= targetState and trailer:getIsNextCoverStateAllowed(targetState) then
-                trailer:setCoverState(targetState, false)
-            end
+        -- Proximity overrides every AD close request and the automatic-cover setting.
+        if inRange[trailer] or automatic then
+            AutoDrive.applyTrailerCoverState(trailer, inRange[trailer] or open)
         end
     end
 end

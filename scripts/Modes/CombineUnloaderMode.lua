@@ -123,6 +123,16 @@ function CombineUnloaderMode:monitorTasks(dt)
     if g_server ~= nil then
         self:keepCoverOpen(dt)
     end
+    -- od.79: this task owns its obstruction/retry handling and keeps the chopper
+    -- assignment. Generic idle clearance/escape must not replace it mid-search.
+    local approach = self.vehicle.ad.taskModule:getActiveTask()
+    if approach == nil and self.state == self.STATE_DRIVE_TO_COMBINE then approach = self.activeTask end
+    -- od.79 preserved: all stationary catches skipped monitors, even normal approaches.
+    -- if approach ~= nil and approach.taskType == "CatchCombinePipeTask"
+    --     and approach.isStationaryChopper ~= nil and approach:isStationaryChopper() then
+    local ownsChopperControl = approach ~= nil and (approach.harvesterTurnHold or approach.chopperRecovery
+        or (approach.combine ~= nil and approach.combine.ad.isChopper
+            and (approach.requestChopperRecovery ~= nil or approach.requestChopperApproach ~= nil)))
     if self.combine ~= nil and (self.state == self.STATE_DRIVE_TO_START or self.state == self.STATE_DRIVE_TO_UNLOAD or self.state == self.STATE_EXIT_FIELD) then
         if AutoDrive.getDistanceBetween(self.vehicle, self.combine) > 25 then
             CombineUnloaderMode.debugMsg(self.vehicle, "CombineUnloaderMode:monitorTasks -> unregisterAsUnloader")
@@ -133,6 +143,10 @@ function CombineUnloaderMode:monitorTasks(dt)
     end
     if self.combine ~= nil and self.state == self.STATE_ACTIVE_UNLOAD_COMBINE then
         self:leaveBreadCrumbs()
+    end
+    if ownsChopperControl then
+        self.failedPathFinder = 0 -- retries belong to the controller, not generic reverse/escape
+        return
     end
     --We are stuck
     local isStuck = self.failedPathFinder >= 5 or ((self.vehicle.ad.specialDrivingModule:shouldStopMotor() or self.vehicle.ad.specialDrivingModule.stoppedTimer:done()) and self.vehicle.ad.specialDrivingModule.isBlocked)

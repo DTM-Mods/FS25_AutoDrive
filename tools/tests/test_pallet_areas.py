@@ -77,12 +77,18 @@ s.execute("""
 """)
 assert any("no pallet trigger found; Shop" in l for l in s.eval("LOG").values())
 
-# wiring: server update, sourced
+# od.79: retained module tests above can still exercise the original implementation;
+# the game must no longer load or update the dormant feature.
 ad = read("scripts", "AutoDrive.lua")
 server = ad[ad.index("if g_server ~= nil then\n\t\tADHarvestManager:update(dt)"):]
 server = server[:server.index("\tend\n")]
-assert "ADPalletAreas:update(dt)" in server
-assert read("register.lua").count("scripts/Manager/PalletAreas.lua") == 1
+# Original wiring assertions preserved for rollback:
+# assert "ADPalletAreas:update(dt)" in server
+# assert read("register.lua").count("scripts/Manager/PalletAreas.lua") == 1
+active_server = "\n".join(line for line in server.splitlines() if not line.lstrip().startswith("--"))
+active_register = "\n".join(line for line in read("register.lua").splitlines() if not line.lstrip().startswith("--"))
+assert "ADPalletAreas:update(dt)" not in active_server
+assert "scripts/Manager/PalletAreas.lua" not in active_register
 
 print("OK: taller pallet areas off (factor 1: triggers untouched, nothing logged); with a factor (only pallet triggers, 3x height, out of and back into physics, once each, stations "
       "placed later, every 10 s, failure leaves them as they are, report when none found, server update, logged)")
