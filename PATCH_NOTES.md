@@ -3,6 +3,58 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
+## 3.0.1.4-od.83 (2026-11-24, PropaineX): restore commented unloader sections
+*Untested in the game. Full offline suite, Lua 5.1 syntax and static checks passed. Packaged and uploaded to the FTP server (/FTPness).*
+
+- Restore the stopped-forage-harvester approach for normal catches, as well as requested recovery.
+  Waiting-truck separation and the current turn hold still run before approach driving.
+- Restore the older active-unloading hold/creep branches and their near-pipe calculation.
+  The existing pipe-lock controller still takes priority when active.
+- Restore the turn drop-back helper and field-edge helper. These functions had no callers before
+  being commented out; restoring their definitions does not add new movement commands.
+- Keep the field-contained planner, cover handling and other unrelated changes.
+
+## 3.0.1.4-od.82 (2026-11-23, PropaineX): make approach planning agree with route validation
+*Untested in the game. Offline regression and syntax checks passed.*
+
+- Correct a route-planning mismatch that could leave a called truck at its waiting point repeatedly
+  finding an approach that the final safety check refused to drive. Check the connecting segments
+  during search, rather than allowing good endpoints to hide an invalid cut between them.
+- Apply the same checks to the start connection, final connection to the loading target, Dubins paths,
+  the legacy grid planner and smoothing shortcuts. Search can choose a detour before returning its route.
+- Include the planner's starting offset and a full turning diameter in the fixed waiting-point entry
+  allowance. Retries retain the original area; neighbouring fields and exits after entry remain restricted.
+- Distinguish an empty planner result from rejection of a found route. Log the rejected coordinate and
+  whether the check failed at the field entrance, a field re-exit or harvester clearance.
+- Offline reproduction uses the actual field41 map polygon and logged waiting coordinates, production
+  A* search and production smoothing. On a sweep of 36 headings/radii/harvester layouts in an empty,
+  flat test world, shipped od.81 failed or returned rejected routes in 27 cases; these changes pass all36.
+  This verifies the planning mismatch, not the exact live terrain/obstacle state or driving physics.
+- Retain waiting-point queueing, the cover rule and turn hold. Preserve prior checks in comments.
+
+## 3.0.1.4-od.81 (2026-11-23, PropaineX): answer calls from the waiting point; separate queued trucks
+*Untested in the game. Offline regression checks cover entry and waiting traffic; game physics still require testing.*
+
+- Answer a forage harvester's call from an off-field waiting point. Allow an entrance corridor from the
+  starting position to its working field; retries retain that corridor rather than expanding off across the map.
+- Keep neighbouring fields out of that entrance. Validate the route against leaving again after entry;
+  enforce the working-field restriction once the entire truck and trailer are inside.
+- Prevent a nearby off-field waiting truck from skipping entry planning through the close-approach shortcut.
+- Do not apply the combine's full-tank refusal to forage harvesters: a full-buffer or zero-storage
+  chopper still needs the called trailer, so that truck keeps its assignment and plans its approach.
+- Returning empty trucks can queue behind an occupied waiting point and register for calls there,
+  instead of every truck trying to park its cab on the same coordinate.
+- Let one waiting truck yield slowly to a called truck, checking the entire aligned train, nearby
+  trucks and solid objects before each short movement. The called truck holds during separation.
+- For physically interlocked trucks, respect the existing **Drive clear when blocked** setting:
+  when enabled, temporarily release one waiting truck's vehicle collisions along the checked lane,
+  then restore collisions once clear. No field-edge escape or job cancellation is used for this yield.
+  With the option off, movement must increase clearance without releasing collisions. Folded trains
+  or blocked forward/reverse lanes hold and log the reason rather than force an unsafe movement.
+- Keep yielding trucks registered but defer new assignments until separation finishes. Include truck
+  node IDs and coordinates in approach diagnostics to distinguish trucks with identical names.
+- Retain the turn hold and proximity cover rule. Preserve superseded field guards in comments.
+
 ## 3.0.1.4-od.80 (2026-11-23, PropaineX): hold through chopper turns; keep recovery on the working field
 *Untested in the game. Offline checks passed.*
 

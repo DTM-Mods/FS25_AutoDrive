@@ -44,8 +44,8 @@ setup();TASK:abort();assert(PF.rendezvousZones==nil)
 setup();MODE.keepCoverOpen=function() end
 CombineUnloaderMode.monitorTasks(MODE,16);assert(MODE.combine==C)
 -- Every planner enforces the constraint BEFORE other engine work.
-local fake={rendezvousZones=PF.rendezvousZones,
- gridLocationToWorldLocation=function() return {x=0,z=15} end}
+local fake=setmetatable({vehicle=V,rendezvousZones=PF.rendezvousZones,
+ gridLocationToWorldLocation=function() return {x=0,z=15} end},{__index=PathFinderModule})
 local cell={};PathFinderModule.checkGridCell(fake,cell);assert(cell.isRestricted)
 assert(not PathFinderModule.isDriveableAstar(fake,{}))
 assert(not PathFinderModule.isDriveableDubins(fake,{worldPos={x=0,z=15}}))

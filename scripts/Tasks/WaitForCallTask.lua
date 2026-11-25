@@ -12,11 +12,13 @@ function WaitForCallTask:setUp()
 end
 
 function WaitForCallTask:update(dt)
+    if ADUnloaderClear ~= nil and ADUnloaderClear.updateWaitingTruck(self,dt) then return end
     self.vehicle.ad.specialDrivingModule:stopVehicle()
     self.vehicle.ad.specialDrivingModule:update(dt)
 end
 
 function WaitForCallTask:abort()
+    self.queueYield = nil
 end
 
 function WaitForCallTask:finished()

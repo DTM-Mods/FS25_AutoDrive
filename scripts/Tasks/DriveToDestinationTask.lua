@@ -28,6 +28,12 @@ function DriveToDestinationTask:setUp()
 end
 
 function DriveToDestinationTask:update(dt)
+    if ADUnloaderClear ~= nil and ADUnloaderClear.queueAtWaitingPoint(self) then
+        self.vehicle.ad.specialDrivingModule:stopVehicle()
+        self.vehicle.ad.specialDrivingModule:update(dt)
+        self:finished()
+        return
+    end
     if self.state == DriveToDestinationTask.STATE_PATHPLANNING then
         if self.vehicle.ad.pathFinderModule:hasFinished() then
             self.wayPoints = self.vehicle.ad.pathFinderModule:getPath()

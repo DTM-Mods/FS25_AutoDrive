@@ -28,6 +28,223 @@ ADUnloaderClear.FAIL_COOLDOWN = 60000   -- ms
 ADUnloaderClear.MOVE_COOLDOWN = 15000   -- ms after a move before the next check
 ADUnloaderClear.MAX_SPEED = 2           -- km/h: only checked while standing
 
+-- od.81: waiting-marker traffic is separate from field/headland clearance.
+-- A returning truck queues behind an occupied marker and remains callable there.
+function ADUnloaderClear.waitingMode(vehicle)
+    local ad = vehicle ~= nil and vehicle.ad or nil
+    if ad == nil or ad.stateModule == nil or not ad.stateModule:isActive()
+        or ad.stateModule:getMode() ~= AutoDrive.MODE_UNLOAD then return nil end
+    return ad.modes ~= nil and ad.modes[AutoDrive.MODE_UNLOAD] or nil
+end
+
+function ADUnloaderClear.waitingNeighbours(vehicle)
+    local neighbours = {}
+    if ADUnloaderClear.waitingMode(vehicle) == nil then return neighbours end
+    local marker = vehicle.ad.stateModule:getFirstMarker()
+    for _, other in pairs(AutoDrive.getAllVehicles()) do
+        local mode = other ~= vehicle and ADUnloaderClear.waitingMode(other) or nil
+        if mode ~= nil and other.ad.stateModule:getFirstMarker() == marker
+            and AutoDrive.getDistanceBetween(vehicle, other) < 80 then
+            table.insert(neighbours, {vehicle=other,mode=mode})
+        end
+    end
+    return neighbours
+end
+
+function ADUnloaderClear.trainsClose(a, b, margin)
+    for _, box in ipairs(ADUnloaderEscape.getUnitBoxes(a)) do
+        for _, other in ipairs(ADUnloaderEscape.getUnitBoxes(b)) do
+            if AutoDrive.boxesIntersect(ADUnloaderEscape.growBox(box, margin), other) then return true end
+        end
+    end
+    return false
+end
+
+function ADUnloaderClear.queueAtWaitingPoint(task)
+    local mode = ADUnloaderClear.waitingMode(task.vehicle)
+    if mode == nil or mode.state ~= mode.STATE_DRIVE_TO_START then return false end
+    local marker = task.vehicle.ad.stateModule:getFirstMarker()
+    if marker == nil or task.destinationID ~= marker.id then return false end
+    local target = ADGraphManager:getWayPointById(task.destinationID)
+    if target == nil then return false end
+    local x, _, z = getWorldTranslation(task.vehicle.components[1].node)
+    if MathUtil.vector2Length(x-target.x,z-target.z) > 80 then return false end
+    for _, entry in ipairs(ADUnloaderClear.waitingNeighbours(task.vehicle)) do
+        if entry.mode.state == entry.mode.STATE_WAIT_TO_BE_CALLED
+            and ADUnloaderClear.trainsClose(task.vehicle, entry.vehicle, 10) then
+            -- Arrive at the back of the queue instead of forcing every cab onto
+            -- the same coordinate. Normal mode transition registers this truck.
+            return true
+        end
+    end
+    return false
+end
+
+-- Signed rectangle clearance (SAT): negative means penetration. During a short
+-- straight separation no pair may get closer, and at least one must improve.
+function ADUnloaderClear.boxClearance(a, b)
+    local clearance = -math.huge
+    for _, box in ipairs({a,b}) do
+        for _, edge in ipairs({2,4}) do
+            local dx, dz = box[edge].x-box[1].x, box[edge].z-box[1].z
+            local length = math.max(MathUtil.vector2Length(dx,dz),0.001)
+            local nx, nz = -dz/length, dx/length
+            local amin,amax,bmin,bmax = math.huge,-math.huge,math.huge,-math.huge
+            for i=1,4 do
+                local pa,pb = a[i].x*nx+a[i].z*nz,b[i].x*nx+b[i].z*nz
+                amin,amax,bmin,bmax = math.min(amin,pa),math.max(amax,pa),math.min(bmin,pb),math.max(bmax,pb)
+            end
+            clearance = math.max(clearance, bmin-amax, amin-bmax)
+        end
+    end
+    return clearance
+end
+
+function ADUnloaderClear.separationSafe(vehicle, blocker, direction, releaseOverlap)
+    local dx, _, dz = AutoDrive.localDirectionToWorld(vehicle, 0,0,direction)
+    local mine, theirs = ADUnloaderEscape.getUnitBoxes(vehicle), ADUnloaderEscape.getUnitBoxes(blocker)
+    local improved = false
+    -- Only straight, aligned trains: a folded trailer needs a planned manoeuvre.
+    for _, unit in ipairs(AutoDrive.getAllImplements(vehicle,true)) do
+        local ux, _, uz = AutoDrive.localDirectionToWorld(unit,0,0,direction)
+        if ux*dx+uz*dz < 0.985 then return false end
+    end
+    for _, box in ipairs(mine) do
+        local previous = {}
+        for k, other in ipairs(theirs) do previous[k] = ADUnloaderClear.boxClearance(box,other) end
+        for step=1,6 do
+            local moved = {}
+            for i,p in ipairs(box) do moved[i]={x=p.x+dx*step/2,y=p.y,z=p.z+dz*step/2} end
+            for k,other in ipairs(releaseOverlap and {} or theirs) do
+                local nextGap = ADUnloaderClear.boxClearance(moved,other)
+                if nextGap < 2.5 and nextGap < previous[k]-0.01 then return false end
+                improved = improved or (previous[k] < 2.5 and nextGap > previous[k]+0.05)
+                -- Parallel overlapping trailers can keep the same SAT depth
+                -- while sliding lengthwise out. Their centres must separate.
+                if previous[k] < 2.5 then
+                    local ax,az,bx,bz = 0,0,0,0
+                    for i=1,4 do ax,az,bx,bz=ax+box[i].x/4,az+box[i].z/4,bx+other[i].x/4,bz+other[i].z/4 end
+                    local before = (ax-bx)^2+(az-bz)^2
+                    local after = (ax+dx*step/2-bx)^2+(az+dz*step/2-bz)^2
+                    if after < before-0.01 then return false end
+                    improved = improved or after > before+0.01
+                end
+                previous[k] = nextGap
+            end
+            -- Check all other vehicles, including a third truck in the queue.
+            if AutoDrive.checkForVehiclesInBox(ADUnloaderEscape.growBox(moved,0.3), {vehicle,blocker}) then return false end
+            -- Engine terrain/object mask, same as the path planner. Ignore only
+            -- this train and the blocker whose clearance was checked above.
+            if overlapBox ~= nil then
+                local cx,cy,cz = 0,0,0
+                for _,p in ipairs(moved) do cx,cy,cz=cx+p.x/4,cy+p.y/4,cz+p.z/4 end
+                local width = MathUtil.vector2Length(box[2].x-box[1].x,box[2].z-box[1].z)/2+0.3
+                local length = MathUtil.vector2Length(box[4].x-box[1].x,box[4].z-box[1].z)/2+0.3
+                local probe = {blocked=false}
+                function probe:hit(node)
+                    local object = g_currentMission:getNodeObject(node)
+                    local root = object ~= nil and object.getRootVehicle ~= nil and object:getRootVehicle() or object
+                    if root ~= vehicle and root ~= blocker and not AutoDrive.isPassThroughCollision(node,vehicle,object) then self.blocked=true end
+                    return true
+                end
+                -- Bounding-box y is already ground+2 in AutoDrive's native boxes.
+                overlapBox(cx,cy,cz,0,math.atan2(dx,dz),0,width,1.8,length,"hit",probe,
+                    AutoDrive.collisionMaskTerrain,true,true,true,true)
+                if probe.blocked then return false end
+            end
+        end
+    end
+    return releaseOverlap or improved
+end
+
+function ADUnloaderClear.updateWaitingTruck(task, dt)
+    local vehicle, sdm = task.vehicle, task.vehicle.ad.specialDrivingModule
+    local blocker
+    for _, entry in ipairs(ADUnloaderClear.waitingNeighbours(vehicle)) do
+        local other, mode = entry.vehicle, entry.mode
+        local assigned = mode.combine ~= nil and mode.state == mode.STATE_DRIVE_TO_COMBINE
+        local otherIdle = mode.state == mode.STATE_WAIT_TO_BE_CALLED
+        local mineId,otherId = vehicle.components[1].node,other.components[1].node
+        if (assigned or (otherIdle and type(mineId)=="number" and type(otherId)=="number" and mineId>otherId))
+            and math.abs(other.lastSpeedReal or 0) < 0.0003 and ADUnloaderClear.trainsClose(vehicle,other,2.5) then
+            blocker = other
+            break
+        end
+    end
+    if blocker == nil then
+        task.queueYield=nil
+        if ADUnloaderEscape.isGhosted(vehicle)
+            and not ADUnloaderEscape.isTouchingOtherVehicle(vehicle,ADUnloaderEscape.CLEAR_MARGIN) then
+            ADUnloaderEscape.setGhost(vehicle,false)
+        end
+        return false
+    end
+    local q = task.queueYield
+    if q == nil or q.blocker ~= blocker then
+        q = {blocker=blocker,elapsed=0};task.queueYield=q
+    end
+    q.elapsed = q.elapsed+dt
+    if q.elapsed < 1000 then sdm:stopVehicle();sdm:update(dt);return true end
+    -- Revalidate actual poses before every short step; keep the idle registration.
+    local direction = q.direction
+    if direction == nil or not ADUnloaderClear.separationSafe(vehicle,blocker,direction,q.releaseOverlap) then
+        direction = ADUnloaderClear.separationSafe(vehicle,blocker,-1) and -1
+            or (ADUnloaderClear.separationSafe(vehicle,blocker,1) and 1 or nil)
+    end
+    -- A physically interlocked pair may have no collision-on escape. Respect
+    -- the existing "Drive clear when blocked" option, but release just ONE
+    -- waiting truck along a checked short lane, never send both to a field edge.
+    if direction == nil and ADUnloaderEscape.isEnabled(vehicle) then
+        local vx,_,vz = getWorldTranslation(vehicle.components[1].node)
+        local bx,_,bz = getWorldTranslation(blocker.components[1].node)
+        local dx,_,dz = AutoDrive.localDirectionToWorld(vehicle,0,0,1)
+        local away = (vx-bx)*dx+(vz-bz)*dz >= 0 and 1 or -1
+        if ADUnloaderClear.separationSafe(vehicle,blocker,away,true) then
+            direction,q.releaseOverlap = away,true
+            ADUnloaderEscape.setGhost(vehicle,true)
+        end
+    end
+    q.direction = direction
+    if direction == nil then
+        if not q.blockedLogged then
+            Logging.info("[AD] waiting truck node %s cannot yield to node %s: no clear aligned forward/reverse sweep",
+                tostring(vehicle.components[1].node),tostring(blocker.components[1].node))
+            q.blockedLogged=true
+        end
+        sdm:stopVehicle();sdm:update(dt);return true
+    end
+    if not q.logged then
+        Logging.info("[AD] waiting truck node %s yielding to node %s, direction %d",
+            tostring(vehicle.components[1].node),tostring(blocker.components[1].node),direction)
+        q.logged=true
+    end
+    local x,y,z = AutoDrive.localToWorld(vehicle,0,0,direction*5)
+    if direction > 0 then
+        sdm:driveToPoint(dt,{x=x,y=y,z=z},3,false,0.5,3)
+    else
+        -- Generic reverse sensors include the present overlap and would deadlock.
+        -- The swept whole-train/object test above replaces that sensor here only.
+        sdm:releaseVehicle()
+        if vehicle.startMotor ~= nil and not vehicle:getIsMotorStarted() and vehicle:getCanMotorRun() then vehicle:startMotor() end
+        vehicle.ad.trailerModule:handleTrailerReversing(true)
+        AutoDrive.driveInDirection(vehicle,dt,30,0.5,0.2,20,true,false,0,1,3,1)
+    end
+    return true
+end
+
+function ADUnloaderClear.holdForWaitingTruck(task, dt)
+    if ADUnloaderClear.waitingMode(task.vehicle) == nil then return false end
+    for _, entry in ipairs(ADUnloaderClear.waitingNeighbours(task.vehicle)) do
+        if entry.mode.state == entry.mode.STATE_WAIT_TO_BE_CALLED
+            and ADUnloaderClear.trainsClose(task.vehicle,entry.vehicle,2.5) then
+            task.vehicle.ad.specialDrivingModule:stopVehicle()
+            task.vehicle.ad.specialDrivingModule:update(dt)
+            return true
+        end
+    end
+    return false
+end
+
 local function terrainY(x, z)
     if getTerrainHeightAtWorldPos ~= nil and g_currentMission ~= nil and g_currentMission.terrainRootNode ~= nil then
         return getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x, 0, z)
@@ -198,6 +415,82 @@ function ADUnloaderClear.setRendezvousField(zones, vehicle, combine, field)
     zones.halfWidth, zones.halfLength = radius, radius
 end
 
+-- od.81: answering a call starts at the waiting marker, often OFF the field.
+-- Permit one bounded entry corridor, then latch the complete train onto its field.
+-- Keep this context on the task so retries cannot gradually walk the corridor away.
+function ADUnloaderClear.prepareRendezvous(task, zones)
+    local vehicle, field = task.vehicle, task.workingField
+    zones.entry = nil
+    ADUnloaderClear.setRendezvousField(zones, vehicle, task.combine, field)
+    if field == nil then return end
+    if ADUnloaderClear.trainOnField(vehicle, field) then
+        task.enteredWorkingField = true
+        task.fieldEntry = nil
+    elseif not task.enteredWorkingField and task.fieldEntry == nil then
+        local x, _, z = getWorldTranslation(vehicle.components[1].node)
+        local cx, _, cz = getWorldTranslation(task.combine.components[1].node)
+        local best, entry
+        for i, a in ipairs(field.points) do
+            local b = field.points[i % #field.points + 1]
+            local dx, dz = b.x-a.x, b.z-a.z
+            local length = dx*dx+dz*dz
+            local t = length > 0 and math.max(0, math.min(1, ((x-a.x)*dx+(z-a.z)*dz)/length)) or 0
+            local ex, ez = a.x+dx*t, a.z+dz*t
+            local distance = MathUtil.vector2Length(ex-x, ez-z)
+            -- Inset the goal until the conservative cab footprint fits. Native
+            -- obstacle/crop checks still decide whether this entrance is usable.
+            local ix, iz = cx-ex, cz-ez
+            local d = math.max(MathUtil.vector2Length(ix, iz), 0.01)
+            for inset = 6, 40, 2 do
+                local px, pz = ex+ix/d*inset, ez+iz/d*inset
+                if ADUnloaderClear.fieldFits(field, px, pz, zones.dirX, zones.dirZ, zones.halfWidth, zones.halfLength) then
+                    if best == nil or distance < best then
+                        best = distance
+                        entry = {x=x,z=z,ex=px,ez=pz}
+                    end
+                    break
+                end
+            end
+        end
+        if entry ~= nil then
+            local radius = AutoDrive.getDriverRadius ~= nil and AutoDrive.getDriverRadius(vehicle) or 12
+            -- od.81: entry.width = math.max(12, radius or 12)+(vehicle.size.length or 6)/2
+            -- A departure must fit the planner's 7m start offset, rounded grid
+            -- origin and a complete turn, including starts facing away. This
+            -- pad remains fixed at the original waiting position across retries.
+            entry.width = math.max(12,2*(radius or 12))
+                +(PathFinderModule.PATHFINDER_START_DISTANCE or 7)+(vehicle.size.length or 6)
+            entry.otherFields = {}
+            for _, f in pairs(g_fieldManager.fields or {}) do
+                local boundary = {points={}}
+                local nodes = f.getPolygonPoints ~= nil and f:getPolygonPoints() or f.polygonPoints
+                for _, node in ipairs(nodes or {}) do
+                    local px, _, pz = getWorldTranslation(node)
+                    table.insert(boundary.points, {x=px,z=pz})
+                end
+                if #boundary.points >= 3 then table.insert(entry.otherFields, boundary) end
+            end
+            task.fieldEntry = entry
+        end
+    end
+    if not task.enteredWorkingField then zones.entry = task.fieldEntry end
+end
+
+function ADUnloaderClear.entryContains(zones, x, z)
+    local e = zones.entry
+    if e == nil then return false end
+    local dx, dz = e.ex-e.x, e.ez-e.z
+    local length = dx*dx+dz*dz
+    local t = length > 0 and math.max(0, math.min(1, ((x-e.x)*dx+(z-e.z)*dz)/length)) or 0
+    if MathUtil.vector2Length(x-e.x-dx*t, z-e.z-dz*t) > e.width then return false end
+    -- A road/verge entrance is legitimate; crossing a different field is not.
+    for _, boundary in ipairs(e.otherFields) do
+        if ADUnloaderClear.pointInField(boundary, x, z)
+            and not ADUnloaderClear.pointInField(zones.field, x, z) then return false end
+    end
+    return true
+end
+
 -- od.79: stationary-chopper rendezvous uses the header/body clearance, rather
 -- than treating a safe loading lane as part of a moving harvester's front strip.
 function ADUnloaderClear.makeRendezvousZones(vehicle, combine)
@@ -231,10 +524,15 @@ function ADUnloaderClear.makeRendezvousZones(vehicle, combine)
 end
 
 function ADUnloaderClear.rendezvousBlocked(zones, x, z)
-    if zones ~= nil and zones.requireField and zones.field == nil then return true end
+    if zones ~= nil and zones.requireField and zones.field == nil then return true,"working field unavailable" end
     if zones ~= nil and zones.field ~= nil then
         local field = zones.field
-        if not ADUnloaderClear.fieldFits(field, x, z, zones.dirX, zones.dirZ, zones.halfWidth, zones.halfLength) then return true end
+        -- od.80 preserved: off-field starts were rejected before they could enter.
+        -- if not ADUnloaderClear.fieldFits(field, x, z, zones.dirX, zones.dirZ, zones.halfWidth, zones.halfLength) then return true end
+        if not ADUnloaderClear.fieldFits(field, x, z, zones.dirX, zones.dirZ, zones.halfWidth, zones.halfLength)
+            and not ADUnloaderClear.entryContains(zones, x, z) then
+            return true,string.format("outside working field/entry at %.1f %.1f",x,z)
+        end
     end
     for _, zone in ipairs(zones or {}) do
         local lx, _, lz = AutoDrive.worldToLocal(zone.frame, x, 0, z, zone.frame.ad.ADRootNode)
@@ -252,7 +550,7 @@ function ADUnloaderClear.rendezvousBlocked(zones, x, z)
             local outward = startClearance < 0 and clearance >= startClearance-0.05
                 and (zone.startX == 0 or lx*zone.startX >= 0)
                 and (zone.startZ <= zone.frontZ or lz >= zone.startZ-0.05)
-            if not outward then return true end
+            if not outward then return true,string.format("harvester clearance at %.1f %.1f",x,z) end
         end
     end
     return false
@@ -260,6 +558,8 @@ end
 
 function ADUnloaderClear.rendezvousPathSafe(zones, points, start, index, remaining)
     local x, z = start.x, start.z
+    local entered = zones ~= nil and zones.field ~= nil and ADUnloaderClear.fieldFits(zones.field,
+        x,z,zones.dirX,zones.dirZ,zones.halfWidth,zones.halfLength)
     local clearance = {}
     for i, zone in ipairs(zones or {}) do
         local lx, _, lz = AutoDrive.worldToLocal(zone.frame, x, 0, z, zone.frame.ad.ADRootNode)
@@ -276,13 +576,22 @@ function ADUnloaderClear.rendezvousPathSafe(zones, points, start, index, remaini
         local steps = math.max(1, math.ceil(distance))
         for j=1, steps do
             local px, pz = x+(p.x-x)*j/steps, z+(p.z-z)*j/steps
-            if ADUnloaderClear.rendezvousBlocked(zones, px, pz) then
-                return false
+            if zones ~= nil and zones.entry ~= nil then
+                local onField = ADUnloaderClear.fieldFits(zones.field, px,pz,
+                    zones.dirX,zones.dirZ,zones.halfWidth,zones.halfLength)
+                if entered and not onField then return false,string.format("leaves field after entry at %.1f %.1f",px,pz) end
+                entered = entered or onField
+            end
+            local blocked,reason = ADUnloaderClear.rendezvousBlocked(zones, px, pz)
+            if blocked then
+                return false,reason
             end
             for k, zone in ipairs(zones or {}) do
                 local lx, _, lz = AutoDrive.worldToLocal(zone.frame, px, 0, pz, zone.frame.ad.ADRootNode)
                 local nextClearance = math.max(math.abs(lx)-zone.halfW, zone.minZ-lz, lz-zone.maxZ)
-                if nextClearance < 0 and nextClearance < math.min(0, clearance[k])-0.05 then return false end
+                if nextClearance < 0 and nextClearance < math.min(0, clearance[k])-0.05 then
+                    return false,string.format("moves into harvester clearance at %.1f %.1f",px,pz)
+                end
                 clearance[k] = math.max(clearance[k], nextClearance)
             end
         end
@@ -341,14 +650,15 @@ function ADUnloaderClear.clearApproach(task, dt, checkRoute)
             local x, _, z = getWorldTranslation(vehicle.components[1].node)
             local zones = ADUnloaderClear.makeRendezvousZones(vehicle, task.combine)
             task.workingField = task.workingField or ADUnloaderClear.captureWorkingField(task.combine)
-            ADUnloaderClear.setRendezvousField(zones, vehicle, task.combine, task.workingField)
+            ADUnloaderClear.prepareRendezvous(task, zones)
             local drive = vehicle.ad.drivePathModule
             local speed = math.abs(vehicle.lastSpeedReal or 0)*1000
-            if not ADUnloaderClear.rendezvousPathSafe(zones, drive.wayPoints or {}, {x=x,z=z},
-                drive.currentWayPoint, math.max(15,speed*2+speed*speed/4)) then
+            local safe,reason=ADUnloaderClear.rendezvousPathSafe(zones, drive.wayPoints or {}, {x=x,z=z},
+                drive.currentWayPoint, math.max(15,speed*2+speed*speed/4))
+            if not safe then
                 vehicle.ad.specialDrivingModule:stopVehicle()
                 vehicle.ad.specialDrivingModule:update(dt)
-                task:requestChopperRecovery("normal route crosses field or harvester clearance")
+                task:requestChopperRecovery("normal route rejected: "..tostring(reason))
                 return true
             end
         end
@@ -391,7 +701,6 @@ function ADUnloaderClear.hasCrop(box, fruits)
 end
 
 -- the field edge closer than distance (checked in 8 directions)
---[=[ od.79: Unused field-edge helper; no callers in the current mod. Preserved for rollback.
 function ADUnloaderClear.isNearFieldEdge(x, z, distance)
     for i = 0, 7 do
         local angle = i * math.pi / 4
@@ -404,7 +713,7 @@ function ADUnloaderClear.isNearFieldEdge(x, z, distance)
     end
     return false
 end
---]=]
+
 
 -- why the vehicle (all its units) is in the way, or nil
 function ADUnloaderClear.getDanger(vehicle, harvesters, fruits)

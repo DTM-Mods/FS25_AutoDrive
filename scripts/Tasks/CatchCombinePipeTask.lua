@@ -86,7 +86,13 @@ function CatchCombinePipeTask:setUp()
     local angleToCombine = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:getAngleToCombine()
 
     -- od.80: preserve valid close approaches; only a requested recovery bypasses this handover.
-    if not self.chopperRecovery and not (AutoDrive.getIsCPTurning ~= nil and AutoDrive:getIsCPTurning(self.combine))
+    -- od.81: a nearby waiting marker is not a field-entry handover.
+    local onWorkingField = true
+    if self.combine.ad.isChopper then
+        self.workingField = self.workingField or ADUnloaderClear.captureWorkingField(self.combine)
+        onWorkingField = self.workingField ~= nil and ADUnloaderClear.trainOnField(self.vehicle, self.workingField)
+    end
+    if onWorkingField and not self.chopperRecovery and not (AutoDrive.getIsCPTurning ~= nil and AutoDrive:getIsCPTurning(self.combine))
         and angleToCombineHeading < 35 and angleToCombine < 90 and AutoDrive.getDistanceBetween(self.vehicle, self.combine) < 60
         and not self.combine.ad.isFixedPipeChopper then
         self:finished()
@@ -100,13 +106,15 @@ function CatchCombinePipeTask:update(dt)
         self:finished()
         return
     end
-    --[=[ od.79: unconditional rear manoeuvre, preserved for rollback.
+    if ADUnloaderClear ~= nil and ADUnloaderClear.holdForWaitingTruck(self, dt) then return end
+    if ADHarvesterTurn.update(self, dt) then return end
+    -- od.83: restore the stopped-chopper approach after waiting/turn holds.
     -- od.79: a stopped forage harvester needs this trailer before it can move.
     -- Retain the task/assignment and search different rear approaches, not clear/re-call.
     if self:isStationaryChopper() then
         self:updateStationaryApproach(dt)
         return
-    elseif self.rendezvous ~= nil then
+    elseif self.rendezvous ~= nil and not self.chopperRecovery then
         self.vehicle.ad.pathFinderModule:abort()
         self.rendezvous = nil
         self.rendezvousPreferredSide = nil
@@ -114,8 +122,6 @@ function CatchCombinePipeTask:update(dt)
         self.pauseTimer = 0
         self.waitForCheckTimer.elapsedTime = 4000
     end
-    --]=]
-    if ADHarvesterTurn.update(self, dt) then return end
     if self.chopperRecovery then
         self:updateStationaryApproach(dt)
         return
@@ -205,9 +211,10 @@ function CatchCombinePipeTask:update(dt)
             else
                 if self.combine.ad.isChopper then
                     local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
-                    if not ADUnloaderClear.rendezvousPathSafe(self.vehicle.ad.pathFinderModule.rendezvousZones,
-                        self.wayPoints, {x=x,z=z}) then
-                        self:requestChopperRecovery("normal approach crosses field or header")
+                    local safe,reason=ADUnloaderClear.rendezvousPathSafe(self.vehicle.ad.pathFinderModule.rendezvousZones,
+                        self.wayPoints, {x=x,z=z})
+                    if not safe then
+                        self:requestChopperRecovery("normal approach rejected: "..tostring(reason))
                         return
                     end
                 end
@@ -380,9 +387,10 @@ function CatchCombinePipeTask:startStationaryLeg(r)
     local dx, _, dz = AutoDrive.localDirectionToWorld(self.combine, 0, 0, 1, self.combine.ad.ADRootNode)
     pf:startPathPlanningTo(r.leg == 1 and r.rear or r.target, {x=dx, z=dz})
     r.zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
-    ADUnloaderClear.setRendezvousField(r.zones, self.vehicle, self.combine, self.workingField)
+    ADUnloaderClear.prepareRendezvous(self, r.zones)
     pf.rendezvousZones = r.zones
-    pf.restrictToField, pf.stayOnField = true, true
+    -- od.80: pf.restrictToField, pf.stayOnField = true, true
+    pf.restrictToField, pf.stayOnField = r.zones.entry == nil, true
     -- Keep the user's crop/field settings. No fruit fallback for a loading approach.
     pf.goingToPipe = true
     pf.chasingVehicle = false
@@ -404,7 +412,11 @@ function CatchCombinePipeTask:retryStationaryApproach(reason)
 end
 
 function CatchCombinePipeTask:diagStationary(reason)
-    Logging.info("[AD] %s, rendezvous with %s: %s", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reason)
+    -- od.80: duplicate display names hid which truck was failing.
+    -- Logging.info("[AD] %s, rendezvous with %s: %s", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reason)
+    local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
+    Logging.info("[AD] %s [node %s at %.1f %.1f], rendezvous with %s: %s",
+        ADDiag.name(self.vehicle), tostring(self.vehicle.components[1].node), x,z, ADDiag.name(self.combine), reason)
 end
 
 function CatchCombinePipeTask:updateStationaryApproach(dt)
@@ -525,8 +537,17 @@ function CatchCombinePipeTask:updateStationaryApproach(dt)
         if pf:hasFinished() then
             local points = pf:getPath()
             local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
-            if points == nil or #points == 0 or not ADUnloaderClear.rendezvousPathSafe(r.zones, points, {x=x,z=z}) then
-                self:retryStationaryApproach("no safe path")
+            -- od.81 conflated a failed search with rejection of a FOUND route:
+            -- if points == nil or #points == 0 or not ADUnloaderClear.rendezvousPathSafe(r.zones, points, {x=x,z=z}) then
+            --     self:retryStationaryApproach("no safe path")
+            if points == nil or #points == 0 then
+                self:retryStationaryApproach(string.format("planner returned no path (steps %d, traffic %s; last rejected segment: %s)",
+                    pf.steps or 0,tostring(pf.blockedByOtherVehicle),tostring(pf.rendezvousRejected)))
+                return
+            end
+            local safe,reason=ADUnloaderClear.rendezvousPathSafe(r.zones,points,{x=x,z=z})
+            if not safe then
+                self:retryStationaryApproach("found route rejected: "..tostring(reason))
                 return
             end
             drive:setWayPoints(points)
@@ -541,7 +562,8 @@ function CatchCombinePipeTask:updateStationaryApproach(dt)
     end
     local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
     -- Re-check the remaining smoothed route against current harvester geometry.
-    if not ADUnloaderClear.trainOnField(self.vehicle, self.workingField) then
+    -- od.80: if not ADUnloaderClear.trainOnField(self.vehicle, self.workingField) then
+    if self.enteredWorkingField and not ADUnloaderClear.trainOnField(self.vehicle, self.workingField) then
         sdm:stopVehicle(); sdm:update(dt)
         self:retryStationaryApproach("train reaches working-field boundary")
         return
@@ -550,12 +572,13 @@ function CatchCombinePipeTask:updateStationaryApproach(dt)
     if r.previewTime >= 100 then
         r.previewTime = 0
         local zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
-        ADUnloaderClear.setRendezvousField(zones, self.vehicle, self.combine, self.workingField)
+        ADUnloaderClear.prepareRendezvous(self, zones)
         local speed = math.abs(self.vehicle.lastSpeedReal or 0)*1000
-        if not ADUnloaderClear.rendezvousPathSafe(zones, drive.wayPoints or {}, {x=x,z=z},
-            drive.currentWayPoint, math.max(15, speed*2.1+speed*speed/4)) then
+        local safe,reason=ADUnloaderClear.rendezvousPathSafe(zones, drive.wayPoints or {}, {x=x,z=z},
+            drive.currentWayPoint, math.max(15, speed*2.1+speed*speed/4))
+        if not safe then
             sdm:stopVehicle(); sdm:update(dt)
-            self:retryStationaryApproach("route blocked")
+            self:retryStationaryApproach("route blocked: "..tostring(reason))
             return
         end
     end
@@ -611,7 +634,10 @@ function CatchCombinePipeTask:startNewPathFinding()
     -- PropaineX edit (3.2.1.4): with Active unloading on, a harvester that is almost full is still chased (it is about
     -- to stop; we want to be under the pipe then), not given up on
     local activeUnloadingOn = self.combine.ad.isHarvester and AutoDrive.getSetting("activeUnloading", self.combine:getRootVehicle()) == true
-    if (cFillRatio > 0.91 or cfillFreeCapacity < 0.1) and not activeUnloadingOn then
+    -- od.81: a full/zero-capacity chopper needs this trailer before it can move.
+    -- The combine-only fullness gate must not send its called truck back to wait.
+    -- if (cFillRatio > 0.91 or cfillFreeCapacity < 0.1) and not activeUnloadingOn then
+    if not self.combine.ad.isChopper and (cFillRatio > 0.91 or cfillFreeCapacity < 0.1) and not activeUnloadingOn then
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:startNewPathFinding() - Combine is almost full - dont chase for active unloading anymore")
         self:finished(ADTaskModule.DONT_PROPAGATE)
         self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:setToWaitForCall()
@@ -631,9 +657,10 @@ function CatchCombinePipeTask:startNewPathFinding()
             local pf = self.vehicle.ad.pathFinderModule
             self.workingField = self.workingField or ADUnloaderClear.captureWorkingField(self.combine)
             local zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
-            ADUnloaderClear.setRendezvousField(zones, self.vehicle, self.combine, self.workingField)
+            ADUnloaderClear.prepareRendezvous(self, zones)
             pf.rendezvousZones = zones
-            pf.restrictToField, pf.stayOnField = true, true
+            -- od.80: pf.restrictToField, pf.stayOnField = true, true
+            pf.restrictToField, pf.stayOnField = zones.entry == nil, true
         end
         -- use false to enable pathfinder fallback
         self.combinesStartLocation = {}

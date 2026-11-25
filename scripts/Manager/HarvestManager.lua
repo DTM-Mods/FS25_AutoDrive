@@ -430,7 +430,11 @@ function ADHarvestManager:getClosestIdleUnloader(harvester)
         local distance = AutoDrive.getDistanceBetween(unloader, harvester)
         --local distanceMatch = distance <= ADHarvestManager.MAX_SEARCH_RANGE and AutoDrive.getSetting("findDriver")
         local targetsMatch = unloader.ad.stateModule:getFirstMarker() == harvester.ad.stateModule:getFirstMarker()
-        if targetsMatch then --if distanceMatch or targetsMatch then
+        local task = unloader.ad.taskModule ~= nil and unloader.ad.taskModule:getActiveTask() or nil
+        -- od.81: keep a yielding truck registered, but finish separating before
+        -- accepting another job. Other idle trucks remain immediately callable.
+        -- if targetsMatch then --if distanceMatch or targetsMatch then
+        if targetsMatch and not (task ~= nil and task.queueYield ~= nil) then
             if closestUnloader == nil or distance < closestDistance then
                 closestUnloader = unloader
                 closestDistance = distance

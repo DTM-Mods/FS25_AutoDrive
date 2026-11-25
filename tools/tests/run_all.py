@@ -68,6 +68,8 @@ def main():
         run("test_harvester_covers.py"),
         run("test_stationary_chopper.py"),
         run("test_chopper_turn_field.py"),
+        run("test_waiting_field_entry.py"),
+        run("test_chopper_planner_edges.py"),
         run("test_catch_front_safety.py"),
         run("test_refuel_choice.py"),
         run("test_pipe_no_crop.py"),

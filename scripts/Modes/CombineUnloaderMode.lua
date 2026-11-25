@@ -127,6 +127,9 @@ function CombineUnloaderMode:monitorTasks(dt)
     -- assignment. Generic idle clearance/escape must not replace it mid-search.
     local approach = self.vehicle.ad.taskModule:getActiveTask()
     if approach == nil and self.state == self.STATE_DRIVE_TO_COMBINE then approach = self.activeTask end
+    -- od.81: a waiting truck yielding to its neighbour owns this short manoeuvre;
+    -- generic field-edge escape must not replace it or unregister the truck.
+    if approach ~= nil and approach.queueYield ~= nil then return end
     -- od.79 preserved: all stationary catches skipped monitors, even normal approaches.
     -- if approach ~= nil and approach.taskType == "CatchCombinePipeTask"
     --     and approach.isStationaryChopper ~= nil and approach:isStationaryChopper() then

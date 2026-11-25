@@ -105,6 +105,7 @@ end
 
 function PathFinderModule:reset()
     self.rendezvousZones = nil -- od.79: task-local stationary-harvester constraints
+    self.rendezvousRejected = nil
     PathFinderModule.debugMsg(self.vehicle, "PFM:reset start")
     self.mask = AutoDrive.collisionMaskTerrain
     self.steps = 0
@@ -369,6 +370,7 @@ end
 
 function PathFinderModule:startPathPlanningTo(targetPoint, targetVector)
     self.rendezvousZones = nil
+    self.rendezvousRejected = nil
     PathFinderModule.debugMsg(self.vehicle, "PathFinderModule:startPathPlanningTo self.minTurnRadius %.1f"
         , self.minTurnRadius
     )
@@ -915,7 +917,9 @@ function PathFinderModule:update(dt)
 
             local current
             local add_neighbor_fn = function(neighbor, cost)
-                if self:isDriveableAstar(neighbor) then
+                -- od.82: check the actual parent-to-neighbour edge, not just
+                -- its endpoint (from_node describes the steering predecessor).
+                if self:isDriveableAstar(neighbor, current) then
                     if not self.closedset[neighbor] then
                         if not cost then cost = self:get_cost(current, neighbor) end
                         local tentative_g_score = self.g_score[current] + cost
@@ -946,7 +950,9 @@ function PathFinderModule:update(dt)
                     return  -- no valid path
                 end
                 current = self:pop_best_node(self.openset, self.f_score)
-                if current == self.nodeGoal or self:reachedGoal(current, self.nodeGoal) then
+                -- od.81: if current == self.nodeGoal or self:reachedGoal(current, self.nodeGoal) then
+                if (current == self.nodeGoal or self:reachedGoal(current, self.nodeGoal))
+                    and self:rendezvousGoalSafe(current) then
                     self.came_from[self.nodeGoal] = current
                     self.path = self:unwind_path({}, self.came_from, self.nodeGoal)
                     table.insert(self.path, self.nodeGoal)
@@ -1055,7 +1061,8 @@ end
 
 function PathFinderModule:reachedTargetsNeighbor(cells)
     for _, outCell in pairs(cells) do
-        if outCell.x == self.targetCell.x and outCell.z == self.targetCell.z then
+        if outCell.x == self.targetCell.x and outCell.z == self.targetCell.z
+            and self:rendezvousGoalSafe(self.currentCell) then
             self.isFinished = true
             self.targetCell.incoming = self.currentCell --.incoming
 
@@ -1207,7 +1214,9 @@ end
 
 function PathFinderModule:checkGridCell(cell)
     local worldPos = self:gridLocationToWorldLocation(cell)
-    if self.rendezvousZones ~= nil and ADUnloaderClear.rendezvousBlocked(self.rendezvousZones, worldPos.x, worldPos.z) then
+    -- od.81: only cell centres were checked; diagonal links could cut through
+    -- forbidden space and the task would reject every otherwise found path.
+    if self.rendezvousZones ~= nil and not self:rendezvousEdgeSafe(worldPos,cell.incoming) then
         cell.isRestricted = true
         return
     end
@@ -1892,7 +1901,8 @@ function PathFinderModule:smoothResultingPPPath()
         filteredIndex = filteredIndex + 1
 
         if node.direction ~= nil and nodeAhead.direction ~= nil and nodeTwoAhead.direction ~= nil then
-            if node.direction == nodeTwoAhead.direction and node.direction ~= nodeAhead.direction then
+            if node.direction == nodeTwoAhead.direction and node.direction ~= nodeAhead.direction
+                and self:rendezvousSegmentSafe(node,nodeTwoAhead) then
                 index = index + 1 --skip next point because it is a zig zag line. Cut right through instead
             end
         end
@@ -2186,6 +2196,9 @@ function PathFinderModule:smoothResultingPPPath_Refined()
                     end
                 end
 
+                -- od.82: smoothing must obey the same geometry as search and
+                -- final validation, rather than reintroducing a rejected cut.
+                if not hasCollision and not self:rendezvousSegmentSafe(worldPos,nodeAhead) then hasCollision=true end
                 foundCollision = hasCollision
 
                 if foundCollision then
@@ -2538,10 +2551,46 @@ function PathFinderModule:drawDebugNewPF()
     end
 end
 
-function PathFinderModule:isDriveableAstar(cell)
+function PathFinderModule:rendezvousSegmentSafe(start, target)
+    if self.rendezvousZones == nil then return true end
+    local safe,reason = ADUnloaderClear.rendezvousPathSafe(self.rendezvousZones,{target},start)
+    if not safe then self.rendezvousRejected = reason end
+    return safe
+end
+
+function PathFinderModule:rendezvousEdgeSafe(target, parent)
+    if self.rendezvousZones == nil then return true end
+    local start
+    if parent ~= nil then
+        start = self:gridLocationToWorldLocation(parent)
+        if parent.isStart or parent == self.startCell then
+            local x,_,z=getWorldTranslation(self.vehicle.components[1].node)
+            local safe,reason=ADUnloaderClear.rendezvousPathSafe(self.rendezvousZones,
+                {start,target},{x=x,z=z})
+            if not safe then self.rendezvousRejected=reason end
+            return safe
+        end
+    else
+        local x,_,z = getWorldTranslation(self.vehicle.components[1].node)
+        start = {x=x,z=z}
+    end
+    return self:rendezvousSegmentSafe(start,target)
+end
+
+function PathFinderModule:rendezvousGoalSafe(current)
+    if self.rendezvousZones == nil then return true end
+    local start=self:gridLocationToWorldLocation(current)
+    local points={self:gridLocationToWorldLocation(self.targetCell)}
+    for _,p in ipairs(self.appendWayPoints or {}) do table.insert(points,p) end
+    local safe,reason=ADUnloaderClear.rendezvousPathSafe(self.rendezvousZones,points,start)
+    if not safe then self.rendezvousRejected=reason end
+    return safe
+end
+
+function PathFinderModule:isDriveableAstar(cell, parent)
     if self.rendezvousZones ~= nil then
         local approachPos = self:gridLocationToWorldLocation(cell)
-        if ADUnloaderClear.rendezvousBlocked(self.rendezvousZones, approachPos.x, approachPos.z) then
+        if not self:rendezvousEdgeSafe(approachPos,parent) then
             cell.isRestricted = true
             return false
         end
@@ -2920,7 +2969,15 @@ function PathFinderModule:appendWayPointsNew()
 end
 
 function PathFinderModule:isDriveableDubins(cell)
-    if self.rendezvousZones ~= nil and ADUnloaderClear.rendezvousBlocked(self.rendezvousZones, cell.worldPos.x, cell.worldPos.z) then
+    -- The native sampler calls its predecessor 'incomming'. Keep that contract
+    -- while checking the whole sampled link with the rendezvous validator.
+    local predecessor = cell.incoming or cell.incomming
+    local start = predecessor ~= nil and predecessor.worldPos or nil
+    if start == nil then
+        local x,_,z=getWorldTranslation(self.vehicle.components[1].node)
+        start={x=x,z=z}
+    end
+    if self.rendezvousZones ~= nil and not self:rendezvousSegmentSafe(start,cell.worldPos) then
         cell.isRestricted = true
         return false
     end
@@ -3055,6 +3112,11 @@ function PathFinderModule:getDubinsPath()
                         result = ADDubins.EDUBNOPATH
                         break
                     end
+                end
+                if result == ADDubins.EDUBOK and self.rendezvousZones ~= nil and fromCell ~= nil then
+                    local safe,reason=ADUnloaderClear.rendezvousPathSafe(self.rendezvousZones,
+                        self.appendWayPoints or {},fromCell.worldPos)
+                    if not safe then self.rendezvousRejected=reason;result=ADDubins.EDUBNOPATH end
                 end
             else
                 result = ADDubins.EDUBNOPATH

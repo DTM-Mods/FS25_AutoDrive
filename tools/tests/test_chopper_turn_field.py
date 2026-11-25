@@ -73,10 +73,10 @@ CombineUnloaderMode.monitorTasks(MODE,16);assert(MODE.crumbCalls==1)
 MODE.state=CombineUnloaderMode.STATE_DRIVE_TO_COMBINE
 MODE.activeTask={chopperRecovery=true};V.ad.taskModule.getActiveTask=function() return nil end
 CombineUnloaderMode.monitorTasks(MODE,16);assert(MODE.combine==C)
--- A normal valid catch is not replaced by an unconditional long rear manoeuvre.
+-- od.83: a normal stationary catch uses the restored rear/loading approach.
 reset();TASK.chopperRecovery=nil;TASK.rendezvous=nil
 TASK.shouldChaseDirectly=function() return true end;TASK.lastState=TASK.state
-TASK:update(16);assert(FINISHED and TASK.rendezvous==nil)
+TASK:update(16);assert(not FINISHED and TASK.rendezvous~=nil)
 reset();TASK.chopperRecovery=nil;TASK:waitForCrop()
 assert(TASK.chopperRecovery and MODE.combine==C) -- try another legal lane without a call-cycle reset
 -- Native async discharge detection uses the last raycast object, and only this train.
