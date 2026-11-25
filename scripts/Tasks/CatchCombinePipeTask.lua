@@ -85,9 +85,7 @@ function CatchCombinePipeTask:setUp()
     local angleToCombineHeading = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:getAngleToCombineHeading()
     local angleToCombine = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:getAngleToCombine()
 
-    -- od.80: preserve valid close approaches; only a requested recovery bypasses this handover.
-    if not self.chopperRecovery and not (AutoDrive.getIsCPTurning ~= nil and AutoDrive:getIsCPTurning(self.combine))
-        and angleToCombineHeading < 35 and angleToCombine < 90 and AutoDrive.getDistanceBetween(self.vehicle, self.combine) < 60
+    if angleToCombineHeading < 35 and angleToCombine < 90 and AutoDrive.getDistanceBetween(self.vehicle, self.combine) < 60
         and not self.combine.ad.isFixedPipeChopper then
         self:finished()
     end
@@ -98,26 +96,6 @@ end
 function CatchCombinePipeTask:update(dt)
     if self.combine ~= nil and g_currentMission.nodeToObject[self.combine.components[1].node] == nil then
         self:finished()
-        return
-    end
-    --[=[ od.79: unconditional rear manoeuvre, preserved for rollback.
-    -- od.79: a stopped forage harvester needs this trailer before it can move.
-    -- Retain the task/assignment and search different rear approaches, not clear/re-call.
-    if self:isStationaryChopper() then
-        self:updateStationaryApproach(dt)
-        return
-    elseif self.rendezvous ~= nil then
-        self.vehicle.ad.pathFinderModule:abort()
-        self.rendezvous = nil
-        self.rendezvousPreferredSide = nil
-        self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
-        self.pauseTimer = 0
-        self.waitForCheckTimer.elapsedTime = 4000
-    end
-    --]=]
-    if ADHarvesterTurn.update(self, dt) then return end
-    if self.chopperRecovery then
-        self:updateStationaryApproach(dt)
         return
     end
     if self.lastState ~= self.state then
@@ -175,10 +153,6 @@ function CatchCombinePipeTask:update(dt)
         if self.pathWait > CombineUnloaderMode.PATH_TIMEOUT then
             self.pathWait = 0
             self.vehicle.ad.pathFinderModule:abort()
-            if self.combine.ad.isChopper then
-                self:requestChopperRecovery("normal approach timed out")
-                return
-            end
             self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]:onPathTimeout()
             return
         end
@@ -203,14 +177,6 @@ function CatchCombinePipeTask:update(dt)
                 end
                 return
             else
-                if self.combine.ad.isChopper then
-                    local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
-                    if not ADUnloaderClear.rendezvousPathSafe(self.vehicle.ad.pathFinderModule.rendezvousZones,
-                        self.wayPoints, {x=x,z=z}) then
-                        self:requestChopperRecovery("normal approach crosses field or header")
-                        return
-                    end
-                end
                 self.vehicle.ad.noWayAroundCropLogged = nil
                 self.vehicle.ad.drivePathModule:setWayPoints(self.wayPoints)
                 self.state = CatchCombinePipeTask.STATE_DRIVING
@@ -310,10 +276,6 @@ end
 -- Overdrive: plan again (no path, combine moved on, not lined up); counted on the vehicle and logged, and after
 -- MAX_REPLANS in a row it pauses and tells the players why
 function CatchCombinePipeTask:replan(reason)
-    if self.combine.ad.isChopper then
-        self:requestChopperRecovery(reason)
-        return
-    end
     self.delayReason = reason
     self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
     local count = (self.vehicle.ad.catchReplans or 0) + 1
@@ -331,10 +293,6 @@ end
 -- Overdrive: no way around the crop (avoid fruit on): stand still for CROP_WAIT, then plan again. Not counted as a new
 -- path (it stands still, there is nothing to cap); logged once until a path is found.
 function CatchCombinePipeTask:waitForCrop()
-    if self.combine.ad.isChopper then
-        self:requestChopperRecovery("normal approach blocked by crop")
-        return
-    end
     self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
     self.delayReason = CatchCombinePipeTask.DELAY_NO_WAY_AROUND_CROP
     self.pauseTimer = self.CROP_WAIT
@@ -346,251 +304,12 @@ function CatchCombinePipeTask:waitForCrop()
 end
 
 function CatchCombinePipeTask:abort()
-    if self.state == CatchCombinePipeTask.STATE_PATHPLANNING or self.rendezvous ~= nil then
+    if self.state == CatchCombinePipeTask.STATE_PATHPLANNING then
         self.vehicle.ad.pathFinderModule:abort()
     end
 end
 
-function CatchCombinePipeTask:requestChopperRecovery(reason)
-    self.vehicle.ad.pathFinderModule:abort()
-    self.chopperRecovery = true
-    self.rendezvous = nil
-    self.recoveryDelay = 0
-    self:diagStationary("field-contained recovery: " .. reason)
-end
-
-function CatchCombinePipeTask:onHarvesterTurnStart()
-    self.vehicle.ad.pathFinderModule:abort()
-    self.rendezvous = nil
-    self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
-end
-
-function CatchCombinePipeTask:onHarvesterTurnResume()
-    self:requestChopperRecovery("turn ended; discard previous row route")
-end
-
-function CatchCombinePipeTask:isStationaryChopper()
-    return self.combine ~= nil and self.combine.ad ~= nil and self.combine.ad.isChopper == true
-        and (self.combine.lastSpeedReal or 0) <= 0.0004
-end
-
-function CatchCombinePipeTask:startStationaryLeg(r)
-    local pf = self.vehicle.ad.pathFinderModule
-    pf:reset()
-    local dx, _, dz = AutoDrive.localDirectionToWorld(self.combine, 0, 0, 1, self.combine.ad.ADRootNode)
-    pf:startPathPlanningTo(r.leg == 1 and r.rear or r.target, {x=dx, z=dz})
-    r.zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
-    ADUnloaderClear.setRendezvousField(r.zones, self.vehicle, self.combine, self.workingField)
-    pf.rendezvousZones = r.zones
-    pf.restrictToField, pf.stayOnField = true, true
-    -- Keep the user's crop/field settings. No fruit fallback for a loading approach.
-    pf.goingToPipe = true
-    pf.chasingVehicle = false
-    pf.isSecondChasingVehicle = false
-    r.planning = true
-    r.elapsed, r.still = 0, 0
-    pf.max_pathfinder_steps = math.max(pf.max_pathfinder_steps or 0, 400)*(r.searchScale or 1)
-    self.state = CatchCombinePipeTask.STATE_PATHPLANNING
-end
-
-function CatchCombinePipeTask:retryStationaryApproach(reason)
-    self.vehicle.ad.pathFinderModule:abort()
-    self.rendezvousAttempt = (self.rendezvousAttempt or 0)+1
-    self.rendezvous = nil
-    self.recoveryDelay = 1000
-    self.state = CatchCombinePipeTask.STATE_DELAY_PATHPLANNING
-    self.delayReason = CatchCombinePipeTask.DELAY_NO_PATH
-    self:diagStationary("trying another rear approach: " .. reason)
-end
-
-function CatchCombinePipeTask:diagStationary(reason)
-    Logging.info("[AD] %s, rendezvous with %s: %s", ADDiag.name(self.vehicle), ADDiag.name(self.combine), reason)
-end
-
-function CatchCombinePipeTask:updateStationaryApproach(dt)
-    local drive, pf = self.vehicle.ad.drivePathModule, self.vehicle.ad.pathFinderModule
-    local sdm = self.vehicle.ad.specialDrivingModule
-    local mode = self.vehicle.ad.modes[AutoDrive.MODE_UNLOAD]
-    local r = self.rendezvous
-    if self.workingField == nil then
-        self.fieldLookupDelay = (self.fieldLookupDelay or 0)-dt
-        if self.fieldLookupDelay <= 0 then
-            self.workingField = ADUnloaderClear.captureWorkingField(self.combine)
-            self.fieldLookupDelay = 1000
-        end
-    end
-    if self.workingField == nil then
-        sdm:stopVehicle(); sdm:update(dt)
-        if not self.fieldUnknownLogged then
-            self.fieldUnknownLogged = true
-            self:diagStationary("cannot identify working field boundary; no off-field fallback")
-        end
-        return
-    end
-    -- Finish early only when THIS train is actually receiving from the assigned harvester.
-    --[=[ od.79: synchronous dischargeObject only, preserved for rollback.
-    local node = self.combine.getCurrentDischargeNode ~= nil and self.combine:getCurrentDischargeNode() or nil
-    if node ~= nil and self.combine.getDischargeState ~= nil
-        and self.combine:getDischargeState() == Dischargeable.DISCHARGE_STATE_OBJECT then
-        for _, unit in pairs(self.trailers or {}) do
-            if node.dischargeObject == unit then
-                pf:abort()
-                self.rendezvous = nil
-                self:finished()
-                return
-            end
-        end
-    end
-    --]=]
-    if ADHarvesterTurn.receiving(self) then
-        pf:abort()
-        self.rendezvous = nil
-        self:finished()
-        return
-    end
-    if r == nil then
-        sdm:stopVehicle(); sdm:update(dt)
-        if (self.recoveryDelay or 0) > 0 then
-            self.recoveryDelay = self.recoveryDelay-dt
-            return
-        end
-        local attempt = self.rendezvousAttempt or 0
-        local target, side = mode:getPipeChasePosition(true)
-        local setting = AutoDrive.getSetting("chaseSide", self.combine)
-        local autoSide = self.combine.ad.isAutoAimingChopper and setting == AutoDrive.CHASEPOS_AUTO
-        if autoSide then
-            self.rendezvousPreferredSide = self.rendezvousPreferredSide
-                or (side == AutoDrive.CHASEPOS_RIGHT and side or AutoDrive.CHASEPOS_LEFT)
-            side = self.rendezvousPreferredSide
-            if attempt % 2 == 1 then side = side == AutoDrive.CHASEPOS_LEFT and AutoDrive.CHASEPOS_RIGHT or AutoDrive.CHASEPOS_LEFT end
-            local offset = math.abs(mode:getSideChaseOffsetX())
-            target = AutoDrive.createWayPointRelativeToVehicle(self.combine,
-                side*(offset+mode:getPipeSlopeCorrection()), mode:getSideChaseOffsetZ(AutoDrive.dynamicChaseDistance)-2)
-        end
-        local tx, _, tz = AutoDrive.worldToLocal(self.combine, target.x, target.y, target.z, self.combine.ad.ADRootNode)
-        local halfW, halfL = AutoDrive.getHarvesterHalfSize(self.combine)
-        if self.combine.ad.isAutoAimingChopper and side ~= AutoDrive.CHASEPOS_REAR then
-            local width = self.vehicle.size.width or 3
-            for _, unit in pairs(self.trailers or {}) do
-                width = math.max(width, unit.size ~= nil and unit.size.width or 0)
-            end
-            tx = (tx >= 0 and 1 or -1)*math.max(math.abs(tx), halfW+width/2+0.5,
-                AutoDrive.getFrontToolWidth(self.combine)/2+width/2+0.5)
-            target.x, target.y, target.z = AutoDrive.localToWorld(self.combine, tx, 0, tz, self.combine.ad.ADRootNode)
-        end
-        local train = AutoDrive.getTractorTrainLength(self.vehicle, true, false) or 20
-        --[=[ od.79: 35/50/65m rear goals were not checked against field boundaries.
-        local back = -halfL-math.max(train, 12)-12-({0,15,30})[math.floor(attempt/(autoSide and 2 or 1))%3+1]
-        local x, y, z = AutoDrive.localToWorld(self.combine, tx, 0, math.min(tz, back), self.combine.ad.ADRootNode)
-        r = {target=target, rear={x=x,y=y,z=z}, leg=1}
-        self.rendezvous = r
-        self:diagStationary(string.format("rear approach %d, side %s, run-up %.0f m", attempt+1, tostring(side), -back))
-        --]=]
-        local dx, _, dz = AutoDrive.localDirectionToWorld(self.combine, 0, 0, 1, self.combine.ad.ADRootNode)
-        local width = (self.vehicle.size.width or 3)/2+0.5
-        for _, unit in pairs(self.trailers or {}) do
-            width = math.max(width, (unit.size ~= nil and unit.size.width or 0)/2+0.5)
-        end
-        local candidates = {}
-        local backs = {halfL+math.min(train/2, 12)+3, halfL+(self.vehicle.size.length or 6)/2+2, halfL+3}
-        for _, back in ipairs(backs) do
-            local x, y, z = AutoDrive.localToWorld(self.combine, tx, 0, -back, self.combine.ad.ADRootNode)
-            -- Full straight train must fit at the end of the alignment leg.
-            local cx, cz = x-dx*(train-(self.vehicle.size.length or 6))/2, z-dz*(train-(self.vehicle.size.length or 6))/2
-            if ADUnloaderClear.fieldFits(self.workingField, cx, cz, dx, dz, width, train/2+0.5) then
-                table.insert(candidates, {x=x,y=y,z=z})
-            end
-        end
-        local tailOffset = (train-(self.vehicle.size.length or 6))/2
-        local finalFits = ADUnloaderClear.fieldFits(self.workingField,
-            target.x-dx*tailOffset, target.z-dz*tailOffset, dx, dz, width, train/2+0.5)
-        if not finalFits then
-            self:retryStationaryApproach("loading target outside working field")
-            return
-        end
-        -- At a tight headland there may be no room behind. Let the constrained
-        -- planner find a lane approach within the field, never extend across a road.
-        local choice = math.floor(attempt/(autoSide and 2 or 1))%(#candidates+1)+1
-        local rear = candidates[choice]
-        r = {target=target, rear=rear, leg=rear ~= nil and 1 or 2,
-            searchScale=1+math.floor(attempt/(2*(#candidates+1)))%3}
-        self.rendezvous = r
-        self:diagStationary(string.format("recovery %d, side %s, rear leg %s", attempt+1, tostring(side), tostring(rear ~= nil)))
-        self:startStationaryLeg(r)
-        return
-    end
-    r.elapsed = r.elapsed+dt
-    if r.planning then
-        sdm:stopVehicle(); sdm:update(dt)
-        if pf:hasFinished() then
-            local points = pf:getPath()
-            local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
-            if points == nil or #points == 0 or not ADUnloaderClear.rendezvousPathSafe(r.zones, points, {x=x,z=z}) then
-                self:retryStationaryApproach("no safe path")
-                return
-            end
-            drive:setWayPoints(points)
-            r.planning, r.elapsed = false, 0
-            self.state = CatchCombinePipeTask.STATE_DRIVING
-        elseif r.elapsed > 20000 then
-            self:retryStationaryApproach("planning time exceeded")
-        else
-            pf:update(dt)
-        end
-        return
-    end
-    local x, _, z = getWorldTranslation(self.vehicle.components[1].node)
-    -- Re-check the remaining smoothed route against current harvester geometry.
-    if not ADUnloaderClear.trainOnField(self.vehicle, self.workingField) then
-        sdm:stopVehicle(); sdm:update(dt)
-        self:retryStationaryApproach("train reaches working-field boundary")
-        return
-    end
-    r.previewTime = (r.previewTime or 100)+dt
-    if r.previewTime >= 100 then
-        r.previewTime = 0
-        local zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
-        ADUnloaderClear.setRendezvousField(zones, self.vehicle, self.combine, self.workingField)
-        local speed = math.abs(self.vehicle.lastSpeedReal or 0)*1000
-        if not ADUnloaderClear.rendezvousPathSafe(zones, drive.wayPoints or {}, {x=x,z=z},
-            drive.currentWayPoint, math.max(15, speed*2.1+speed*speed/4)) then
-            sdm:stopVehicle(); sdm:update(dt)
-            self:retryStationaryApproach("route blocked")
-            return
-        end
-    end
-    if drive:isTargetReached() then
-        local target = r.leg == 1 and r.rear or r.target
-        if MathUtil.vector2Length(x-target.x,z-target.z) > 5 then
-            self:retryStationaryApproach("stopped short of target")
-        elseif r.leg == 1 then
-            r.leg = 2
-            self:startStationaryLeg(r)
-        elseif mode:getAngleToCombineHeading() < 35 then
-            pf:abort()
-            self.rendezvous = nil
-            self.vehicle.ad.catchReplans = 0
-            self:diagStationary("in loading position")
-            self:finished()
-        else
-            self:retryStationaryApproach("not aligned at pipe")
-        end
-        return
-    end
-    r.still = (self.vehicle.lastSpeedReal or 0) < 0.0002 and r.still+dt or 0
-    if r.still > 8000 or r.elapsed > 120000 then
-        sdm:stopVehicle(); sdm:update(dt)
-        self:retryStationaryApproach("approach obstructed")
-        return
-    end
-    drive:update(dt)
-end
-
 function CatchCombinePipeTask:finished(propagate)
-    if self.rendezvous ~= nil then
-        self:abort()
-        self.rendezvous = nil
-    end
     CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:finished()")
     self.vehicle.ad.taskModule:setCurrentTaskFinished(propagate)
 end
@@ -627,14 +346,6 @@ function CatchCombinePipeTask:startNewPathFinding()
         CatchCombinePipeTask.debugMsg(self.vehicle, "CatchCombinePipeTask:startNewPathFinding() - chase pos looks good - calculate path to it...")
         self.vehicle.ad.pathFinderModule:reset()
         self.vehicle.ad.pathFinderModule:startPathPlanningToPipe(self.combine, false)
-        if self.combine.ad.isChopper then
-            local pf = self.vehicle.ad.pathFinderModule
-            self.workingField = self.workingField or ADUnloaderClear.captureWorkingField(self.combine)
-            local zones = ADUnloaderClear.makeRendezvousZones(self.vehicle, self.combine)
-            ADUnloaderClear.setRendezvousField(zones, self.vehicle, self.combine, self.workingField)
-            pf.rendezvousZones = zones
-            pf.restrictToField, pf.stayOnField = true, true
-        end
         -- use false to enable pathfinder fallback
         self.combinesStartLocation = {}
         self.combinesStartLocation.x, self.combinesStartLocation.y, self.combinesStartLocation.z = getWorldTranslation(self.combine.components[1].node)
@@ -688,7 +399,6 @@ end
 
 function CatchCombinePipeTask:getI18nInfo()
     local text = "$l10n_AD_task_catch_up_with_combine;"
-    if self.harvesterTurnHold then return text .. " - $l10n_AD_task_wait_for_combine_turn;" end
     if self.state == CatchCombinePipeTask.STATE_PATHPLANNING then
         local actualState, maxStates, steps, max_pathfinder_steps = self.vehicle.ad.pathFinderModule:getCurrentState()
         text = text .. " - " .. "$l10n_AD_task_pathfinding;" .. string.format(" %d / %d - %d / %d", actualState, maxStates, steps, max_pathfinder_steps)

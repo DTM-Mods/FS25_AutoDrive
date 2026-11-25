@@ -181,9 +181,7 @@ function ADDrivePathModule:update(dt)
             self.vehicle.ad.specialDrivingModule:handleReverseDriving(dt)
         else
             self:followWaypoints(dt)
-            -- od.80: a chopper approach may hand over here. Do not drive the old
-            -- waypoints again in the same frame after its recovery was requested.
-            if self:checkIfStuck(dt) then return end
+            self:checkIfStuck(dt)
 
             if self:isCloseToWaypoint() then
                 self:handleReachedWayPoint()
@@ -812,7 +810,7 @@ function ADDrivePathModule:checkIfStuck(dt)
             self.minDistanceTimer:timer(distanceToNextWayPoint >= self.minDistanceToNextWp, 8000, dt)
             self.minDistanceToNextWp = math.min(self.minDistanceToNextWp, distanceToNextWayPoint)
             if self.minDistanceTimer:done() then
-                return self:handleBeingStuck()
+                self:handleBeingStuck()
             end
         else
             self.minDistanceTimer:timer(false)
@@ -821,15 +819,6 @@ function ADDrivePathModule:checkIfStuck(dt)
 end
 
 function ADDrivePathModule:handleBeingStuck()
-    local module = self.vehicle.ad.taskModule
-    local task = module.getActiveTask ~= nil and module:getActiveTask() or nil
-    if self.vehicle.isServer and task ~= nil and task.requestChopperRecovery ~= nil
-        and task.combine ~= nil and task.combine.ad.isChopper then
-        self.vehicle.ad.specialDrivingModule:stopVehicle()
-        self.vehicle.ad.specialDrivingModule:update(0)
-        task:requestChopperRecovery("path made no progress; retain assignment")
-        return true
-    end
     if AutoDrive.getDebugChannelIsSet(AutoDrive.DC_PATHINFO) then
         AutoDrive.debugPrint(self.vehicle, AutoDrive.DC_VEHICLEINFO, "handleBeingStuck")
     end

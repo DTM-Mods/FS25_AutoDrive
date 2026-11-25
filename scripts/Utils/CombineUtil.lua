@@ -50,9 +50,8 @@ function AutoDrive.isSidewaysHarvester(combine)
         local vx, _, vz = localDirectionToWorld(carrier.components[1].node, 0, 0, 1)
         local cx, _, cz = localDirectionToWorld(combine.components[1].node, 0, 0, 1)
         combine.adSideways = math.abs(vx * cx + vz * cz) < 0.7071 -- cos 45 deg
-        -- od.79: empty former logging branch; preserved for rollback.
-        -- if combine.adSideways then
-        -- end
+        if combine.adSideways then
+        end
     end
     return combine.adSideways
 end

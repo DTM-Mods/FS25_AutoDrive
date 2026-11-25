@@ -3,47 +3,6 @@
 Changes made on top of AutoDrive Overdrive (by chrisdfennell, based on AutoDrive by the AutoDrive Team).
 Newest first. "Untested" means it has not been tried in the game yet.
 
-## 3.0.1.4-od.80 (2026-11-23, PropaineX): hold through chopper turns; keep recovery on the working field
-*Untested in the game. Offline checks passed.*
-
-- Stop following a forage harvester as soon as Courseplay/AI starts its turn or a working pickup is raised.
-  Hold consistently through the turn; the old chopper follow/reverse branches cannot override that hold.
-- Share the combine's hold/resume operations. After a chopper turn, discard the old row's steering state
-  and plan a fresh loading approach. A confirmed stationary pause needing unloading can receive a trailer
-  before the turn continues. Auto-aiming and fixed-pipe choppers use the same turn controller.
-- Preserve normal close approaches. Comment out od.79's unconditional long rear manoeuvre; recovery
-  starts after an actual approach failure or when lining up again after a turn.
-- Lock chopper approach planning to the working field polygon and field ground. Disable field-relaxing
-  fallbacks; validate smoothed routes and upcoming travel. Reject road crossings and neighbouring fields.
-- Choose shorter rear alignment positions that fit the train inside the field. Where no rear run-up fits,
-  try a constrained loading-lane approach rather than extending the route over the boundary.
-- Permit a truck already close alongside to leave the safety envelope outward, without cutting inward
-  or re-entering it. Apply whole-train keep-out steering and dynamic collision checks while following;
-  keep the assigned chopper in collision checks.
-- Route blocked following and the path module's eight-second no-progress handling into recovery while
-  retaining the assignment. Recognize asynchronous pipe discharge into this train as well as synchronous flow.
-- Preserve the previous logic in comments and an od.79 source snapshot for rollback. The proximity cover rule remains active.
-
-## 3.0.1.4-od.79 (2026-11-23, PropaineX): approach stopped forage harvesters; open nearby covers
-*Untested in the game. Offline checks passed.*
-
-- Keep the truck assigned to a stationary forage harvester. Plan to a position behind it, then
-  approach its loading position facing the same direction. Failed routes try the other permitted
-  side or a longer run-up instead of repeatedly moving clear and waiting for another call.
-- Allow the clear loading lane alongside the assigned stationary harvester while blocking routes
-  through its header/body and central front corridor. Check the planned route after smoothing;
-  recheck the upcoming route while driving. Crop settings, fixed-pipe sides and explicit side choices remain respected.
-- The rendezvous owns its obstruction retries so idle move-aside, escape and reverse monitors do not
-  interrupt it. A passing crop flow into this truck hands control back to normal following immediately.
-- Keep a compatible trailer's cover open whenever it is inside any harvester's pipe unloading trigger,
-  regardless of calls, assignments, AutoDrive mode or whether either vehicle is AI controlled.
-- Nearby harvesters take priority over AutoDrive's cover-closing requests and automatic-cover setting.
-  Retry opening when a cover animation temporarily prevents it. Outside range, normal cover rules apply.
-- Comment out unused turn drop-back and field-edge helpers, superseded active-unloading hold/creep
-  branches, obsolete trailer-straightening speed-cap handling and three empty logging branches.
-- Comment out loading and updating the already-disabled pallet-trigger enlargement feature.
-  Keep all original code and its module file for rollback. Live steering and safety controls remain active.
-
 ## 3.0.1.4-od.78 (2026-11-21, PropaineX): distinguish the physical pipe side from the approach target
 *Untested in the game. Offline checks passed.*
 

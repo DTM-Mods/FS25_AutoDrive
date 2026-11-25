@@ -706,7 +706,6 @@ function AutoDrive:handleScanDialog()
 end
 
 function AutoDrive:update(dt)
-	AutoDrive.updateHarvesterCovers()
 	if not AutoDrive:handleScanDialog() then
 		return
 	end
@@ -749,8 +748,7 @@ function AutoDrive:update(dt)
 		ADUnloaderEscape:update(dt)
 		ADGroundUnload:update(dt)
 		-- Overdrive: taller pallet areas at selling points (pallets stacked high on tall trucks)
-		-- od.79: pallet enlargement is disabled; registration and update preserved for rollback.
-		-- ADPalletAreas:update(dt)
+		ADPalletAreas:update(dt)
 	end
 
 	ADMessagesManager:update(dt)

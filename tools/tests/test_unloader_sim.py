@@ -288,7 +288,7 @@ end
 def build():
     lua = L.LuaRuntime(unpack_returned_tuples=True)
     lua.execute(HARNESS)
-    for p in (("scripts", "Manager", "HarvesterTurn.lua"), ("scripts", "Utils", "AutoDriveTON.lua"), ("scripts", "Tasks", "CatchCombinePipeTask.lua"),
+    for p in (("scripts", "Utils", "AutoDriveTON.lua"), ("scripts", "Tasks", "CatchCombinePipeTask.lua"),
               ("scripts", "Tasks", "FollowCombineTask.lua"), ("scripts", "Modules", "SpecialDrivingModule.lua"),
               ("scripts", "Manager", "UnloaderClear.lua")):
         lua.execute(read(*p))

@@ -65,12 +65,6 @@ s.execute("PF = newPF()")
 assert s.eval("exhaust(PF)") == "steps%d,fb1,fb2" % (total * 3), s.eval("exhaust(PF)")
 assert s.eval("PF.isFinished") and s.eval("#PF.wayPoints") == 0 and s.eval("PF.fallBackMode3") is False
 assert s.eval("PF:isNoWayAroundCrop()") is True
-# od.80 chopper approaches: exhaust the REAL fallback state machine. Field
-# restriction must survive failure in both native planner variants.
-for new_planner in (False, True):
-    s.execute("PF = newPF({stayOnField = true, isNewPF = %s})" % str(new_planner).lower())
-    assert s.eval("exhaust(PF)") == "steps%d" % (total * 3)
-    assert s.eval("PF.restrictToField and PF.stayOnField and not PF.fallBackMode1 and not PF.fallBackMode2 and not PF.fallBackMode3")
 # close to the combine it starts with only 100 steps: the bigger search applies there too; pathFinderTime x3 or the
 # new path finder (fallback 2 skipped there) as well
 s.execute("PF = newPF({max_pathfinder_steps = PathFinderModule.MAX_PATHFINDER_STEPS_COMBINE_TURN, pathFinderTime = 3})")
